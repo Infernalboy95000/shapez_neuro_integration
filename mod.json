@@ -1,0 +1,11 @@
+{
+    "entry": "main.js",
+    "id": "neuro_integration",
+    "version": "0.0.1",
+    "name": "Shapez Neuro Integration",
+    "author": "Infernal_Ekoro",
+    "description": "Let's Neuro and Evil play Shapez on their own",
+    "website": "",
+    "settings": { "timesLaunched": 0 },
+	"doesNotAffectSavegame": true
+}
