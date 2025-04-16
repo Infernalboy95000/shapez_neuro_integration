@@ -6,6 +6,8 @@
     "author": "Infernal_Ekoro",
     "description": "Let's Neuro and Evil play Shapez on their own",
     "website": "",
-    "settings": { "timesLaunched": 0 },
+    "settings": {
+		"timesOpen":0
+	},
 	"doesNotAffectSavegame": true
 }

@@ -1,159 +1,76 @@
-import { GameSystem	} from "shapez/game/game_system";
 import { Mod } from "shapez/mods/mod";
-
-import { NeuroClient } from	'neuro-game-sdk'
-
-const NEURO_SERVER_URL = 'ws://localhost:8000'
-const GAME_NAME	= 'Guess the Number'
-
-const neuroClient =	new	NeuroClient(NEURO_SERVER_URL, GAME_NAME, () => {
-	neuroClient.registerActions([
-		{
-		  name:	'guess_number',
-		  description: 'Guess the number between 1 and 10.',
-		  schema: {
-			type: 'object',
-			properties:	{
-			  number: {	type: 'integer', minimum: 1, maximum: 10 },
-			},
-			required: ['number'],
-		  },
-		},
-	  ])
-	
-	  let targetNumber = Math.floor(Math.random() *	10)	+ 1
-	
-	  neuroClient.onAction(actionData => {
-		if (actionData.name	===	'guess_number')	{
-		  const	guessedNumber =	actionData.params.number
-		  if (
-			typeof guessedNumber !== 'number' ||
-			guessedNumber <	1 ||
-			guessedNumber >	10
-		  ) {
-			neuroClient.sendActionResult(
-			  actionData.id,
-			  false,
-			  'Invalid number. Please guess	a number between 1 and 10.'
-			)
-			return
-		  }
-	
-		  if (guessedNumber	===	targetNumber) {
-			neuroClient.sendActionResult(
-			  actionData.id,
-			  true,
-			  `Correct!	The	number was ${targetNumber}.	Generating a new number.`
-			)
-			targetNumber = Math.floor(Math.random()	* 10) +	1
-			promptNeuroAction()
-		  } else {
-			neuroClient.sendActionResult(
-			  actionData.id,
-			  true,
-			  `Incorrect. The number is ${
-				guessedNumber <	targetNumber ? 'higher'	: 'lower'
-			  }. Try again.`
-			)
-			promptNeuroAction()
-		  }
-		} else {
-		  neuroClient.sendActionResult(actionData.id, false, 'Unknown action.')
-		}
-	  })
-	
-	  neuroClient.sendContext(
-		'Game started. I have picked a number between 1	and	10.',
-		false
-	  )
-	
-	  function promptNeuroAction() {
-		const availableActions = ['guess_number']
-		const query	= 'Please guess	a number between 1 and 10.'
-		const state	= 'Waiting for your	guess.'
-		neuroClient.forceActions(query,	availableActions, state)
-	  }
-	
-	  promptNeuroAction()
-})
-
-class TestClass	extends	GameSystem {
-	drawChunk(parameters, chunk) {
-		const contents = chunk.containedEntitiesByLayer.regular;
-		for	(let i = 0; i <	contents.length; ++i) {
-			const entity = contents[i];
-			const processorComp	= entity.components.ItemProcessor;
-			if (!processorComp)	{
-				continue;
-			}
-
-			const staticComp = entity.components.StaticMapEntity;
-
-			const context =	parameters.context;
-			const center = staticComp.getTileSpaceBounds().getCenter().toWorldSpace();
-
-			// Culling for better performance
-			if (parameters.visibleRect.containsCircle(center.x,	center.y, 40)) {
-				// Circle
-				context.fillStyle =	processorComp.ongoingCharges.length	===	0 ?	"#aaa" : "#53cf47";
-				context.strokeStyle	= "#000";
-				context.lineWidth =	1;
-
-				context.beginCircle(center.x + 5, center.y + 5, 4);
-				context.fill();
-				context.stroke();
-			}
-		}
-	}
-}
+import { SOUNDS } from "shapez/platform/sound";
 
 class ModImpl extends Mod {
-    init() {
-		this.modInterface.registerGameSystem({
-			id:	"something",
-			systemClass: TestClass,
-			before:	"belt",
-			drawHooks: ["staticAfter"],
-		});
-
-		this.settings.timesLaunched++;
-		this.saveSettings();
-
-		// Show	a dialog in the	main menu with the settings
-		/*
+	init() {
 		this.signals.stateEntered.add(state	=> {
-			if (state instanceof shapez.MainMenuState) {
-				this.dialogs.showInfo(
-					"Welcome back",
-					`You have launched this	mod	${this.settings.timesLaunched} times`
-				);
+			if (state.key === "SettingsState") {
+				this.settings.timesOpen++;
+				this.saveSettings();
+				const someMenu = this.ModSettingsMenu();
+
+				const parent = document.querySelector(".sidebar");
+				const otherBlock = document.querySelector(".other");
+				const container = document.querySelector(".categoryContainer");
+				container.appendChild(someMenu);
+
+				const settingsButton = document.createElement("button");
+				settingsButton.classList.add("styledButton", "categoryButton");
+				settingsButton.setAttribute("data-category-btn", "neuroSdk");
+				settingsButton.innerText = "Nuero SDK";
+				settingsButton.addEventListener("click", () => {
+					const previousCategory = document.querySelector(".category.active");
+					const previousCategoryButton = document.querySelector(".categoryButton.active");
+
+					previousCategory.classList.remove("active");
+					previousCategoryButton.classList.remove("active");
+
+					settingsButton.classList.add("active")
+					someMenu.classList.add("active");
+
+					this.app.sound.playUiSound(SOUNDS.uiClick);
+				});
+
+				settingsButton.addEventListener("mousedown", () => {
+					settingsButton.classList.add("selected");
+				});
+
+				settingsButton.addEventListener("mouseup", () => {
+					settingsButton.classList.remove("selected");
+				});
+				parent.insertBefore(settingsButton, otherBlock);
 			}
 		});
-		*/
+	}
 
-		this.signals.stateEntered.add(state => {
-            if (state.key === "SettingsState") {
-				const parent = document.getElementsByClassName("sidebar");
-				const otherBlock = document.getElementsByClassName("other ");
-                const button = document.createElement("button");
-                button.classList.add("styledButton");
-                button.innerText = "Hello world Hope git doesn't break this, please!";
-                button.addEventListener("click", () => {
-                    this.dialogs.showInfo("Mod Message", "Button clicked!");
-                });
-                parent[0].insertBefore(button, otherBlock[0]);
-            }
-        });
+	ModSettingsMenu() {
+		const menu = document.createElement("div");
+		menu.classList.add("category");
+		menu.setAttribute("data-category", "neuroSdk");
 
-        this.modInterface.registerCss(`
-                #demo_mod_hello_world_element {
-                    position: absolute;
-                    top: calc(10px * var(--ui-scale));
-                    left: calc(10px * var(--ui-scale));
-                    color: red;
-                    z-index: 0;
-                }
+		const setting = document.createElement("div")
+		setting.classList.add("setting", "cardbox", "enabled");
+		menu.appendChild(setting);
 
-            `);
+		const row = document.createElement("div")
+		row.className = "row"
+		setting.appendChild(row);
+
+		const label = document.createElement("label");
+		label.textContent = "This is a setting";
+		row.appendChild(label);
+
+		const value = document.createElement("div");
+		value.classList.add("value", "int");
+		value.setAttribute("data-setting", "test");
+		value.textContent = `Times launched: ${this.settings.timesOpen}`
+		row.appendChild(value);
+
+		const description = document.createElement("div")
+		description.classList.add("desc");
+		description.textContent = "This is a non functional setting. (for now)";
+		setting.appendChild(description);
+
+		return menu;
 	}
 }
