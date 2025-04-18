@@ -1,0 +1,12 @@
+#state_SettingsState input {
+	background: #eee;
+	color: #333438;
+	width: calc(150px*var(--ui-scale));
+	padding: calc(5px*var(--ui-scale));
+	margin: 0px 0px 0px 10px;
+	font-size: calc(11px*var(--ui-scale));
+}
+
+#state_SettingsState input.errored {
+	background: #facece;
+}

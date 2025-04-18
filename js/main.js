@@ -133,7 +133,7 @@ class ModImpl extends Mod {
 		setting2.appendChild(row2);
 
 		const label2 = document.createElement("label");
-		label2.textContent = "Websocket URL";
+		label2.textContent = "SDK URL";
 		row2.appendChild(label2);
 
 		const inputElement = document.createElement("div");
@@ -142,6 +142,7 @@ class ModImpl extends Mod {
 		row2.appendChild(inputElement);
 
 		const inputText = document.createElement("input");
+		inputText.type = "text";
 		inputText.value = this.settings.socketURL;
 		inputText.maxLength = 128;
 		inputText.autocomplete = "off";
@@ -170,9 +171,6 @@ class ModImpl extends Mod {
 		});
 
 		inputElement.appendChild(inputText);
-
-		
-		
 		setting2.appendChild(description2);
 
 		return menu;
