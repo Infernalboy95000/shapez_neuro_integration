@@ -1,11 +1,19 @@
 import { Mod } from "shapez/mods/mod";
 import { SOUNDS	} from "shapez/platform/sound";
 import { NeuroListener } from "./neuroListener";
+const DEFAULT_URL = "ws://localhost:8000";
 
-let neuroListener;
 
 class ModImpl extends Mod {
-    init() {
+	init() {
+		if (this.settings.socketURL == undefined)
+		{
+			this.settings.socketURL = DEFAULT_URL;
+			this.saveSettings();
+		}
+
+		this.neuroListener = new NeuroListener(this.settings.socketURL);
+
 		this.signals.stateEntered.add(state	=> {
 			if (state.key === "SettingsState") {
 				this.settings.timesOpen++;
@@ -60,39 +68,49 @@ class ModImpl extends Mod {
 		setting.appendChild(row);
 
 		const label	= document.createElement("label");
-		label.textContent =	"Enable	SDK	integration";
+		label.textContent =	"SDK integration";
 		row.appendChild(label);
 
-		const value	= document.createElement("div");
-		value.classList.add("value", "checkbox");
-		value.setAttribute("data-setting", "sdkStatus");
+		const toggle = document.createElement("div");
+		toggle.classList.add("value", "checkbox");
+		toggle.setAttribute("data-setting", "sdkStatus");
 
-		value.addEventListener("click",	() => {
-			if (value.classList.contains("checked")) {
-				neuroListener.disconnect();
-				value.classList.remove("checked");
+		if (NeuroListener.isConnected()) {
+			toggle.classList.add("checked");
+		}
+
+		toggle.addEventListener("click", () => {
+			if (toggle.classList.contains("checked")) {
+				NeuroListener.disconnect();
+				toggle.classList.remove("checked");
 			}
 			else {
-				neuroListener = new NeuroListener('ws://localhost:8000');
-				value.classList.add("checked");
+				NeuroListener.connected = () => { this.onConnected(label, toggle) };
+				NeuroListener.disconnected = () => { this.onDisconnected(label, toggle) };
+				NeuroListener.reattempting = () => { this.onReattempting(label, toggle) };
+				NeuroListener.closed = () => { this.onClosed(label, toggle) };
+				NeuroListener.failed = () => { this.onFailed(label, toggle) };
+
+				label.textContent =	"Connecting...";
+				NeuroListener.tryConnect();
 			}
 
 			this.app.sound.playUiSound(SOUNDS.uiClick);
 		});
 
-		value.addEventListener("mousedown",	() => {
-			value.classList.add("selected");
+		toggle.addEventListener("mousedown", () => {
+			toggle.classList.add("selected");
 		});
 
-		value.addEventListener("mouseup", () => {
-			value.classList.remove("selected");
+		toggle.addEventListener("mouseup", () => {
+			toggle.classList.remove("selected");
 		});
 
-		row.appendChild(value);
+		row.appendChild(toggle);
 
 		const knob = document.createElement("span");
 		knob.classList.add("knob");
-		value.appendChild(knob);
+		toggle.appendChild(knob);
 
 		const description =	document.createElement("div")
 		description.classList.add("desc");
@@ -100,5 +118,35 @@ class ModImpl extends Mod {
 		setting.appendChild(description);
 
 		return menu;
+	}
+
+	onConnected(label, toggle) {
+		label.textContent = "SDK integration";
+		if (!toggle.classList.contains("checked"))
+			toggle.classList.add("checked");
+	}
+
+	onDisconnected(label, toggle) {
+		label.textContent = "SDK integration";
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+	}
+
+	onReattempting(label, toggle,) {
+		label.textContent = `Connecting... (${NeuroListener.getRetriesFormatted()})`;
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+	}
+
+	onClosed(label, toggle) {
+		label.textContent = "SDK integration";
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+	}
+
+	onFailed(label, toggle) {
+		label.textContent = "SDK integration";
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
 	}
 }

@@ -1,84 +1,91 @@
 // @ts-ignore
 import { NeuroClient } from 'neuro-game-sdk';
+// Private constants
 const GAME_NAME = 'Shapez';
+const MAX_RETRIES = 3;
 
-let neuroClient;
+// Private variables
+let connected;
+let socketURL;
+let retries;
 
 export class NeuroListener {
 	constructor(URL) {
-		neuroClient = new NeuroClient(URL, GAME_NAME, () => {
-		  neuroClient.registerActions([
-			{
-			  name: 'guess_number',
-			  description: 'Guess the number between 1 and 10.',
-			  schema: {
-				type: 'object',
-				properties: {
-				  number: { type: 'integer', minimum: 1, maximum: 10 },
-				},
-				required: ['number'],
-			  },
-			},
-		  ])
-		
-		  let targetNumber = Math.floor(Math.random() * 10) + 1
-		
-		  neuroClient.onAction(actionData => {
-			if (actionData.name === 'guess_number') {
-			  const guessedNumber = actionData.params.number
-			  if (
-				typeof guessedNumber !== 'number' ||
-				guessedNumber < 1 ||
-				guessedNumber > 10
-			  ) {
-				neuroClient.sendActionResult(
-				  actionData.id,
-				  false,
-				  'Invalid number. Please guess a number between 1 and 10.'
-				)
-				return
-			  }
-		
-			  if (guessedNumber === targetNumber) {
-				neuroClient.sendActionResult(
-				  actionData.id,
-				  true,
-				  `Correct! The number was ${targetNumber}. Generating a new number.`
-				)
-				targetNumber = Math.floor(Math.random() * 10) + 1
-				promptNeuroAction()
-			  } else {
-				neuroClient.sendActionResult(
-				  actionData.id,
-				  true,
-				  `Incorrect. The number is ${
-					guessedNumber < targetNumber ? 'higher' : 'lower'
-				  }. Try again.`
-				)
-				promptNeuroAction()
-			  }
-			} else {
-			  neuroClient.sendActionResult(actionData.id, false, 'Unknown action.')
-			}
-		  })
-		
-		  neuroClient.sendContext(
-			'Game started. I have picked a number between 1 and 10.',
-			false
-		  )
-		
-		  function promptNeuroAction() {
-			const availableActions = ['guess_number']
-			const query = 'Please guess a number between 1 and 10.'
-			const state = 'Waiting for your guess.'
-			neuroClient.forceActions(query, availableActions, state)
-		  }
-		
-		  promptNeuroAction()
-		})
+		socketURL = URL;
 	}
 
-	disconnect() {
-		neuroClient.disconnect();
+	static tryConnect() {
+		connected = false;
+		retries = 0;
+		this.neuroClient = new NeuroClient(socketURL, GAME_NAME, () => { NeuroListener.onConnected(); });
+		this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
+		this.neuroClient.onError = () => { NeuroListener.onErrored(); };
+	}
+
+	static retryConnection() {
+		if (this.neuroClient) {
+			this.neuroClient.connect(() => { NeuroListener.onConnected(); });
+			if (NeuroListener.reattempting) {
+				NeuroListener.reattempting();
+			}
+		}
+		else {
+			NeuroListener.tryConnect();
+		}
+	}
+
+	static disconnect() {
+		if (this.neuroClient) {
+			this.neuroClient.disconnect();
+			this.neuroClient = null;
+			connected = false;
+			if (NeuroListener.disconnect) {
+				NeuroListener.disconnect();
+			}
+		}
+	}
+
+	static isConnected() {
+		return connected;
+	}
+
+	static getRetriesFormatted() {
+		return `${retries}/${MAX_RETRIES}`;
+	}
+
+	static onConnected() {
+		connected = true;
+		if (NeuroListener.connected) {
+			NeuroListener.connected();
+		}
+	}
+
+	static onClosed() {
+		if (connected) {
+			connected = false;
+			if (NeuroListener.closed) {
+				NeuroListener.closed();
+			}
+		}
+	}
+
+	static onErrored() {
+		if (retries < MAX_RETRIES) {
+			retries++;
+			NeuroListener.retryConnection();
+		}
+		else {
+			this.neuroClient = null;
+
+			if (NeuroListener.failed) {
+				NeuroListener.failed()
+			}
+		}
 	}
 }
+// Public events
+NeuroListener.connected = undefined;
+NeuroListener.disconnected = undefined;
+NeuroListener.reattempting = undefined;
+NeuroListener.closed = undefined;
+NeuroListener.failed = undefined;
