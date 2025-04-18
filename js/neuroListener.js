@@ -5,16 +5,20 @@ const GAME_NAME = 'Shapez';
 const MAX_RETRIES = 3;
 
 // Private variables
-let connected;
-let socketURL;
-let retries;
+let connected = false;
+let socketURL = "";
+let retries = 0;
 
 export class NeuroListener {
-	constructor(URL) {
-		socketURL = URL;
-	}
+	static tryConnect(URL) {
+		if (this.neuroClient) {
+			this.neuroClient.disconnect();
+			this.neuroClient.onConnected = () => { };
+			this.neuroClient.onClose = () => { };
+			this.neuroClient.onError = () => { };
+		}
 
-	static tryConnect() {
+		socketURL = URL;
 		connected = false;
 		retries = 0;
 		this.neuroClient = new NeuroClient(socketURL, GAME_NAME, () => { NeuroListener.onConnected(); });
@@ -39,8 +43,9 @@ export class NeuroListener {
 			this.neuroClient.disconnect();
 			this.neuroClient = null;
 			connected = false;
-			if (NeuroListener.disconnect) {
-				NeuroListener.disconnect();
+			socketURL = "";
+			if (NeuroListener.disconnected) {
+				NeuroListener.disconnected();
 			}
 		}
 	}
@@ -53,6 +58,10 @@ export class NeuroListener {
 		return `${retries}/${MAX_RETRIES}`;
 	}
 
+	static getCurrentURL() {
+		return socketURL;
+	}
+
 	static onConnected() {
 		connected = true;
 		if (NeuroListener.connected) {
@@ -63,6 +72,7 @@ export class NeuroListener {
 	static onClosed() {
 		if (connected) {
 			connected = false;
+			socketURL = "";
 			if (NeuroListener.closed) {
 				NeuroListener.closed();
 			}
@@ -76,6 +86,8 @@ export class NeuroListener {
 		}
 		else {
 			this.neuroClient = null;
+			connected = false;
+			socketURL = "";
 
 			if (NeuroListener.failed) {
 				NeuroListener.failed()
