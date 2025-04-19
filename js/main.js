@@ -1,6 +1,9 @@
 import { Mod } from "shapez/mods/mod";
 import { SOUNDS	} from "shapez/platform/sound";
 import { NeuroListener } from "./neuroListener";
+import { Vector } from "shapez/core/vector";
+import { MetaMinerBuilding } from "shapez/game/buildings/miner";
+import { HUDBuildingPlacerLogic } from "shapez/game/hud/parts/building_placer_logic";
 const DEFAULT_URL = "ws://localhost:8000";
 
 
@@ -10,6 +13,11 @@ class ModImpl extends Mod {
 			this.settings.socketURL = DEFAULT_URL;
 			this.saveSettings();
 		}
+
+		this.modInterface.runAfterMethod(HUDBuildingPlacerLogic, "startSelection", function(){
+			console.log("We select a building");
+			this.tryPlaceCurrentBuildingAt(new Vector(50, 0));
+		});
 
 		this.signals.stateEntered.add(state	=> {
 			if (state.key === "SettingsState") {
