@@ -1,159 +1,218 @@
-import { GameSystem	} from "shapez/game/game_system";
 import { Mod } from "shapez/mods/mod";
+import { SOUNDS	} from "shapez/platform/sound";
+import { NeuroListener } from "./neuroListener";
+const DEFAULT_URL = "ws://localhost:8000";
 
-import { NeuroClient } from	'neuro-game-sdk'
-
-const NEURO_SERVER_URL = 'ws://localhost:8000'
-const GAME_NAME	= 'Guess the Number'
-
-const neuroClient =	new	NeuroClient(NEURO_SERVER_URL, GAME_NAME, () => {
-	neuroClient.registerActions([
-		{
-		  name:	'guess_number',
-		  description: 'Guess the number between 1 and 10.',
-		  schema: {
-			type: 'object',
-			properties:	{
-			  number: {	type: 'integer', minimum: 1, maximum: 10 },
-			},
-			required: ['number'],
-		  },
-		},
-	  ])
-	
-	  let targetNumber = Math.floor(Math.random() *	10)	+ 1
-	
-	  neuroClient.onAction(actionData => {
-		if (actionData.name	===	'guess_number')	{
-		  const	guessedNumber =	actionData.params.number
-		  if (
-			typeof guessedNumber !== 'number' ||
-			guessedNumber <	1 ||
-			guessedNumber >	10
-		  ) {
-			neuroClient.sendActionResult(
-			  actionData.id,
-			  false,
-			  'Invalid number. Please guess	a number between 1 and 10.'
-			)
-			return
-		  }
-	
-		  if (guessedNumber	===	targetNumber) {
-			neuroClient.sendActionResult(
-			  actionData.id,
-			  true,
-			  `Correct!	The	number was ${targetNumber}.	Generating a new number.`
-			)
-			targetNumber = Math.floor(Math.random()	* 10) +	1
-			promptNeuroAction()
-		  } else {
-			neuroClient.sendActionResult(
-			  actionData.id,
-			  true,
-			  `Incorrect. The number is ${
-				guessedNumber <	targetNumber ? 'higher'	: 'lower'
-			  }. Try again.`
-			)
-			promptNeuroAction()
-		  }
-		} else {
-		  neuroClient.sendActionResult(actionData.id, false, 'Unknown action.')
-		}
-	  })
-	
-	  neuroClient.sendContext(
-		'Game started. I have picked a number between 1	and	10.',
-		false
-	  )
-	
-	  function promptNeuroAction() {
-		const availableActions = ['guess_number']
-		const query	= 'Please guess	a number between 1 and 10.'
-		const state	= 'Waiting for your	guess.'
-		neuroClient.forceActions(query,	availableActions, state)
-	  }
-	
-	  promptNeuroAction()
-})
-
-class TestClass	extends	GameSystem {
-	drawChunk(parameters, chunk) {
-		const contents = chunk.containedEntitiesByLayer.regular;
-		for	(let i = 0; i <	contents.length; ++i) {
-			const entity = contents[i];
-			const processorComp	= entity.components.ItemProcessor;
-			if (!processorComp)	{
-				continue;
-			}
-
-			const staticComp = entity.components.StaticMapEntity;
-
-			const context =	parameters.context;
-			const center = staticComp.getTileSpaceBounds().getCenter().toWorldSpace();
-
-			// Culling for better performance
-			if (parameters.visibleRect.containsCircle(center.x,	center.y, 40)) {
-				// Circle
-				context.fillStyle =	processorComp.ongoingCharges.length	===	0 ?	"#aaa" : "#53cf47";
-				context.strokeStyle	= "#000";
-				context.lineWidth =	1;
-
-				context.beginCircle(center.x + 5, center.y + 5, 4);
-				context.fill();
-				context.stroke();
-			}
-		}
-	}
-}
 
 class ModImpl extends Mod {
-    init() {
-		this.modInterface.registerGameSystem({
-			id:	"something",
-			systemClass: TestClass,
-			before:	"belt",
-			drawHooks: ["staticAfter"],
-		});
+	init() {
+		if (this.settings.socketURL == undefined) {
+			this.settings.socketURL = DEFAULT_URL;
+			this.saveSettings();
+		}
 
-		this.settings.timesLaunched++;
-		this.saveSettings();
-
-		// Show	a dialog in the	main menu with the settings
-		/*
 		this.signals.stateEntered.add(state	=> {
-			if (state instanceof shapez.MainMenuState) {
-				this.dialogs.showInfo(
-					"Welcome back",
-					`You have launched this	mod	${this.settings.timesLaunched} times`
-				);
+			if (state.key === "SettingsState") {
+				this.settings.timesOpen++;
+				this.saveSettings();
+				const someMenu = this.ModSettingsMenu();
+
+				const parent = document.querySelector(".sidebar");
+				const otherBlock = document.querySelector(".other");
+				const container	= document.querySelector(".categoryContainer");
+				container.appendChild(someMenu);
+
+				const settingsButton = document.createElement("button");
+				settingsButton.classList.add("styledButton", "categoryButton");
+				settingsButton.setAttribute("data-category-btn", "neuroSdk");
+				settingsButton.innerText = "Nuero SDK";
+				settingsButton.addEventListener("click", () => {
+					const previousCategory = document.querySelector(".category.active");
+					const previousCategoryButton = document.querySelector(".categoryButton.active");
+
+					previousCategory.classList.remove("active");
+					previousCategoryButton.classList.remove("active");
+
+					settingsButton.classList.add("active")
+					someMenu.classList.add("active");
+
+					this.app.sound.playUiSound(SOUNDS.uiClick);
+				});
+
+				settingsButton.addEventListener("mousedown", () => {
+					settingsButton.classList.add("selected");
+				});
+
+				settingsButton.addEventListener("mouseup", () => {
+					settingsButton.classList.remove("selected");
+				});
+				parent.insertBefore(settingsButton,	otherBlock);
 			}
 		});
-		*/
+	}
+	
+	ModSettingsMenu() {
+		const menu = document.createElement("div");
+		menu.classList.add("category");
+		menu.setAttribute("data-category", "neuroSdk");
 
-		this.signals.stateEntered.add(state => {
-            if (state.key === "SettingsState") {
-				const parent = document.getElementsByClassName("sidebar");
-				const otherBlock = document.getElementsByClassName("other ");
-                const button = document.createElement("button");
-                button.classList.add("styledButton");
-                button.innerText = "Hello world Hope git doesn't break this, please!";
-                button.addEventListener("click", () => {
-                    this.dialogs.showInfo("Mod Message", "Button clicked!");
-                });
-                parent[0].insertBefore(button, otherBlock[0]);
-            }
-        });
+		const setting =	document.createElement("div")
+		setting.classList.add("setting", "cardbox", "enabled");
+		menu.appendChild(setting);
 
-        this.modInterface.registerCss(`
-                #demo_mod_hello_world_element {
-                    position: absolute;
-                    top: calc(10px * var(--ui-scale));
-                    left: calc(10px * var(--ui-scale));
-                    color: red;
-                    z-index: 0;
-                }
+		const row =	document.createElement("div")
+		row.className = "row"
+		setting.appendChild(row);
 
-            `);
+		const label	= document.createElement("label");
+		label.textContent = "SDK integration";
+		row.appendChild(label);
+
+		const toggle = document.createElement("div");
+		toggle.classList.add("value", "checkbox");
+		toggle.setAttribute("data-setting", "sdkStatus");
+
+		if (NeuroListener.isConnected()) {
+			toggle.classList.add("checked");
+		}
+
+		const description2 = document.createElement("div");
+		description2.classList.add("desc");
+		description2.textContent = "The URL the SDK will use next time is connected.";
+		if (NeuroListener.isConnected()) {
+			description2.textContent += ` Connected to: ${NeuroListener.getCurrentURL()}`;
+		}
+
+		toggle.addEventListener("click", () => {
+			if (toggle.classList.contains("checked")) {
+				NeuroListener.disconnect();
+				toggle.classList.remove("checked");
+			}
+			else {
+				NeuroListener.connected = () => { this.onConnected(label, toggle, description2) };
+				NeuroListener.disconnected = () => { this.onDisconnected(label, toggle, description2) };
+				NeuroListener.reattempting = () => { this.onReattempting(label, toggle, description2) };
+				NeuroListener.closed = () => { this.onClosed(label, toggle, description2) };
+				NeuroListener.failed = () => { this.onFailed(label, toggle, description2) };
+
+				label.textContent = "Connecting...";
+				description2.textContent = `The URL the SDK will use next time is connected. Attempting connection at: ${this.settings.socketURL} ...`;
+
+				NeuroListener.tryConnect(this.settings.socketURL);
+			}
+
+			this.app.sound.playUiSound(SOUNDS.uiClick);
+		});
+
+		toggle.addEventListener("mousedown", () => {
+			toggle.classList.add("selected");
+		});
+
+		toggle.addEventListener("mouseup", () => {
+			toggle.classList.remove("selected");
+		});
+
+		row.appendChild(toggle);
+
+		const knob = document.createElement("span");
+		knob.classList.add("knob");
+		toggle.appendChild(knob);
+
+		const description = document.createElement("div")
+		description.classList.add("desc");
+		description.textContent = "Connect the SDK integration to your player";
+		setting.appendChild(description);
+
+
+		const setting2 = document.createElement("div")
+		setting2.classList.add("setting", "cardbox", "enabled");
+		menu.appendChild(setting2);
+
+		const row2 = document.createElement("div")
+		row2.className = "row"
+		setting2.appendChild(row2);
+
+		const label2 = document.createElement("label");
+		label2.textContent = "SDK URL";
+		row2.appendChild(label2);
+
+		const inputElement = document.createElement("div");
+		inputElement.classList.add("formElement", "input");
+		inputElement.setAttribute("data-setting", "sdkURL");
+		row2.appendChild(inputElement);
+
+		const inputText = document.createElement("input");
+		inputText.type = "text";
+		inputText.value = this.settings.socketURL;
+		inputText.maxLength = 128;
+		inputText.autocomplete = "off";
+		inputText.autocapitalize = "off";
+		inputText.spellcheck = false;
+		inputText.classList.add("input-text");
+
+		if (inputText.value == "") {
+			inputText.classList.add("errored");
+		}
+
+		inputText.addEventListener("focusout", () => {
+			this.settings.socketURL = inputText.value;
+			this.saveSettings();
+		});
+
+		inputText.addEventListener("input", () => {
+			if (inputText.value != "") {
+				if (inputText.classList.contains("errored")) {
+					inputText.classList.remove("errored");
+				}
+			}
+			else if (!inputText.classList.contains("errored")){
+				inputText.classList.add("errored");
+			}
+		});
+
+		inputElement.appendChild(inputText);
+		setting2.appendChild(description2);
+
+		return menu;
+	}
+
+	onConnected(label, toggle, desc2) {
+		label.textContent = "SDK integration";
+		if (!toggle.classList.contains("checked"))
+			toggle.classList.add("checked");
+
+		desc2.textContent = `The URL the SDK will use next time is connected. Connected to: ${NeuroListener.getCurrentURL()}`;
+	}
+
+	onDisconnected(label, toggle, desc2) {
+		label.textContent = "SDK integration";
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+		
+		desc2.textContent = "The URL the SDK will use next time is connected.";
+	}
+
+	onReattempting(label, toggle, desc2) {
+		label.textContent = `Connecting... (${NeuroListener.getRetriesFormatted()})`;
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+		
+		desc2.textContent = `The URL the SDK will use next time is connected. Attempting connection at: ${NeuroListener.getCurrentURL()} ...`;
+	}
+
+	onClosed(label, toggle, desc2) {
+		label.textContent = "SDK integration";
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+		
+		desc2.textContent = "The URL the SDK will use next time is connected.";
+	}
+
+	onFailed(label, toggle, desc2) {
+		label.textContent = "SDK integration";
+		if (toggle.classList.contains("checked"))
+			toggle.classList.remove("checked");
+		
+		desc2.textContent = "The URL the SDK will use next time is connected.";
 	}
 }

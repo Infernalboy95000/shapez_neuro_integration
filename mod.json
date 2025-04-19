@@ -6,6 +6,7 @@
     "author": "Infernal_Ekoro",
     "description": "Let's Neuro and Evil play Shapez on their own",
     "website": "",
-    "settings": { "timesLaunched": 0 },
-	"doesNotAffectSavegame": true
+    "settings": {
+		"socketURL": "ws://localhost:8000"
+	}
 }
