@@ -2,10 +2,11 @@ import { Mod } from "shapez/mods/mod";
 import { SOUNDS	} from "shapez/platform/sound";
 import { NeuroListener } from "./neuroListener";
 import { Vector } from "shapez/core/vector";
-import { MetaMinerBuilding } from "shapez/game/buildings/miner";
-import { HUDBuildingPlacerLogic } from "shapez/game/hud/parts/building_placer_logic";
+import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 const DEFAULT_URL = "ws://localhost:8000";
 
+/** @type {import("shapez/game/root").GameRoot} */
+let rootGame;
 
 class ModImpl extends Mod {
 	init() {
@@ -14,10 +15,9 @@ class ModImpl extends Mod {
 			this.saveSettings();
 		}
 
-		this.modInterface.runAfterMethod(HUDBuildingPlacerLogic, "startSelection", function(){
-			console.log("We select a building");
-			this.tryPlaceCurrentBuildingAt(new Vector(50, 0));
-		});
+		this.signals.gameInitialized.add(root => {
+			rootGame = root;
+		})
 
 		this.signals.stateEntered.add(state	=> {
 			if (state.key === "SettingsState") {
@@ -56,7 +56,31 @@ class ModImpl extends Mod {
 				});
 				parent.insertBefore(settingsButton,	otherBlock);
 			}
+			else if (state.key == "InGameState") {
+				//this.modInterface.extendClass(HUDBuildingPlacerLogic, AutoBuilder);
+				const actionButton = document.createElement("div");
+				actionButton.id = "neuro_action_test";
+				document.body.appendChild(actionButton);
+
+				const button = document.createElement("button");
+				button.classList.add("styledButton");
+				button.innerText = "Test action!";
+				button.addEventListener("click", () => {
+					console.log("click");
+					this.ActionTest();
+				});
+				actionButton.appendChild(button);
+			}
 		});
+	}
+
+	ActionTest() {
+		const metaBuild = gMetaBuildingRegistry.findByClass(rootGame.hud.parts.buildingsToolbar.allBuildings[0])
+
+		console.log("Building! " + metaBuild);
+		rootGame.hud.parts.buildingsToolbar.selectBuildingForPlacement(metaBuild)
+
+		rootGame.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(new Vector(50, 0));
 	}
 	
 	ModSettingsMenu() {

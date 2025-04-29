@@ -10,3 +10,11 @@
 #state_SettingsState input.errored {
 	background: #facece;
 }
+
+#neuro_action_test {
+	position: absolute;
+	top: calc(100px*var(--ui-scale));
+	left: calc(10px*var(--ui-scale));
+	color: red;
+	z-index: 300;
+}
