@@ -6,18 +6,12 @@ const MAX_RETRIES = 3;
 
 // Private variables
 let connected = false;
+let attempting = false;
 let socketURL = "";
 let retries = 0;
 
 export class NeuroListener {
 	static tryConnect(URL) {
-		if (this.neuroClient) {
-			this.neuroClient.disconnect();
-			this.neuroClient.onConnected = () => { };
-			this.neuroClient.onClose = () => { };
-			this.neuroClient.onError = () => { };
-		}
-
 		if (!URL) {
 			NeuroListener.onInitCrashed();
 			return false;
@@ -39,6 +33,7 @@ export class NeuroListener {
 			this.neuroClient = new NeuroClient(
 				socketURL, GAME_NAME, () => { NeuroListener.onConnected(); }
 			);
+			attempting = true;
 			this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
 			this.neuroClient.onError = () => { NeuroListener.onErrored(); };
 		}
@@ -61,11 +56,16 @@ export class NeuroListener {
 		}
 	}
 
+	static requestCancell() {
+		retries = MAX_RETRIES;
+	}
+
 	static disconnect() {
 		if (this.neuroClient) {
 			this.neuroClient.disconnect();
 			this.neuroClient = null;
 			connected = false;
+			attempting = false;
 			socketURL = "";
 			if (NeuroListener.disconnected) {
 				NeuroListener.disconnected();
@@ -75,6 +75,10 @@ export class NeuroListener {
 
 	static isConnected() {
 		return connected;
+	}
+
+	static isAttempting() {
+		return attempting;
 	}
 
 	static getRetriesFormatted() {
@@ -87,6 +91,7 @@ export class NeuroListener {
 
 	static onConnected() {
 		connected = true;
+		attempting = false;
 		if (NeuroListener.connected) {
 			NeuroListener.connected();
 		}
@@ -95,6 +100,7 @@ export class NeuroListener {
 	static onClosed() {
 		if (connected) {
 			connected = false;
+			attempting = false;
 			socketURL = "";
 			if (NeuroListener.closed) {
 				NeuroListener.closed();
@@ -110,6 +116,7 @@ export class NeuroListener {
 		else {
 			this.neuroClient = null;
 			connected = false;
+			attempting = false;
 			socketURL = "";
 
 			if (NeuroListener.failed) {
@@ -120,6 +127,7 @@ export class NeuroListener {
 
 	static onInitCrashed() {
 		connected = false;
+		attempting = false;
 		socketURL = "";
 		if (NeuroListener.initCrash) {
 			NeuroListener.initCrash()

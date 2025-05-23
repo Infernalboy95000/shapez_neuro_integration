@@ -66,6 +66,11 @@ export class SdkSettings {
 			this.#sdkToogle.set(false);
 			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
+		else if (NeuroListener.isAttempting()) {
+			this.#sdkToogle.changeDescription("Requested cancellation ...");
+			NeuroListener.requestCancell();
+			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
+		}
 		else if (NeuroListener.tryConnect(this.#mod.settings.socketURL)) {
 			this.#sdkToogle.changeTitle("Connecting...");
 			this.#sdkToogle.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
