@@ -2,7 +2,7 @@ import { Mod } from "shapez/mods/mod";
 import { Vector } from "shapez/core/vector";
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { SettingsMenu } from "./settings/settingsMenu";
-const DEFAULT_URL = "ws://localhost:8000";
+const DEFAULT_URL = "localhost:8000";
 
 /** @type {import("shapez/game/root").GameRoot} */
 let rootGame;

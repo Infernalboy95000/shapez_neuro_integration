@@ -66,15 +66,10 @@ export class SdkSettings {
 			this.#sdkToogle.set(false);
 			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
-		else if (this.#mod.settings.socketURL) {
+		else if (NeuroListener.tryConnect(this.#mod.settings.socketURL)) {
 			this.#sdkToogle.changeTitle("Connecting...");
-			this.#sdkToogle.changeDescription(`Attempting connection at: ${this.#mod.settings.socketURL} ...`);
-
-			NeuroListener.tryConnect(this.#mod.settings.socketURL);
+			this.#sdkToogle.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
 			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
-		}
-		else {
-			this.#mod.app.sound.playUiSound(SOUNDS.uiError);
 		}
 	}
 

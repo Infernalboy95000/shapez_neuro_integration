@@ -18,7 +18,20 @@ export class NeuroListener {
 			this.neuroClient.onError = () => { };
 		}
 
-		socketURL = URL;
+		if (!URL) {
+			NeuroListener.onInitCrashed();
+			return false;
+		}
+		else if (/^ws{1,2}:{1}\/{2}/.test(URL)) {
+			socketURL = URL;
+		}
+		else if (/^.+:{1}\/+/.test(URL)) {
+			NeuroListener.onInitCrashed();
+			return false;
+		}
+		else {
+			socketURL = "ws://" + URL;
+		}
 		connected = false;
 		retries = 0;
 
@@ -28,9 +41,12 @@ export class NeuroListener {
 			);
 			this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
 			this.neuroClient.onError = () => { NeuroListener.onErrored(); };
-		} catch {
-			NeuroListener.onInitCrashed();
 		}
+		catch {
+			NeuroListener.onInitCrashed();
+			return false;
+		}
+		return true;
 	}
 
 	static retryConnection() {
