@@ -21,9 +21,16 @@ export class NeuroListener {
 		socketURL = URL;
 		connected = false;
 		retries = 0;
-		this.neuroClient = new NeuroClient(socketURL, GAME_NAME, () => { NeuroListener.onConnected(); });
-		this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
-		this.neuroClient.onError = () => { NeuroListener.onErrored(); };
+
+		try {
+			this.neuroClient = new NeuroClient(
+				socketURL, GAME_NAME, () => { NeuroListener.onConnected(); }
+			);
+			this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
+			this.neuroClient.onError = () => { NeuroListener.onErrored(); };
+		} catch {
+			NeuroListener.onInitCrashed();
+		}
 	}
 
 	static retryConnection() {
@@ -94,6 +101,14 @@ export class NeuroListener {
 			}
 		}
 	}
+
+	static onInitCrashed() {
+		connected = false;
+		socketURL = "";
+		if (NeuroListener.initCrash) {
+			NeuroListener.initCrash()
+		}
+	}
 }
 // Public events
 NeuroListener.connected = undefined;
@@ -101,3 +116,4 @@ NeuroListener.disconnected = undefined;
 NeuroListener.reattempting = undefined;
 NeuroListener.closed = undefined;
 NeuroListener.failed = undefined;
+NeuroListener.initCrash = undefined;
