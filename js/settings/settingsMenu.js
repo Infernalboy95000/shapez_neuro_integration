@@ -10,7 +10,7 @@ export class SettingsMenu {
 	/** @type {HTMLButtonElement} */ #button;
 
 	/**
-	 //* @param {import("shapez/mods/mod").Mod} mod
+	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {import("shapez/game/root").GameRoot} root
 	 */
 	constructor(mod, root) {
@@ -96,6 +96,13 @@ export class SettingsMenu {
 			"text",
 			this.#mod.settings.socketURL,
 			256
+		));
+
+		settings.addCorodsGridToogle(new ToggleSetting (
+			this.#menu,
+			"Coordinates grid",
+			"Shows every tile's x/y position. Maybe usefull when using external vision.",
+			"sdkCoordsGrid"
 		));
 	}
 }

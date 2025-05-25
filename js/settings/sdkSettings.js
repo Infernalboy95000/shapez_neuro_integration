@@ -12,6 +12,7 @@ export class SdkSettings {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/**@type {ToggleSetting} */ #sdkToogle;
 	/**@type {InputSetting} */#sdkURL;
+	/**@type {ToggleSetting} */ #coordsGridToogle;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
@@ -22,7 +23,7 @@ export class SdkSettings {
 		this.#root = root;
 	}
 
-	/**@type {ToggleSetting} */ toogleSetting;
+	/** @param {ToggleSetting} toogleSetting */
 	addSdkToogle(toogleSetting) {
 		this.#sdkToogle = toogleSetting;
 		this.#setSdkToogleEvents();
@@ -33,10 +34,17 @@ export class SdkSettings {
 		}
 	}
 
-	/**@type {InputSetting} */ inputSetting;
+	/** @param {InputSetting} inputSetting */
 	addSdkURL(inputSetting) {
 		this.#sdkURL = inputSetting;
 		this.#setSdkURLEvents()
+	}
+
+	/** @param {ToggleSetting} toogleSetting */
+	addCorodsGridToogle(toogleSetting) {
+		this.#coordsGridToogle = toogleSetting;
+		this.#setCoordsGridEvents();
+		this.#coordsGridToogle.set(this.#mod.settings.coordsGrid);
 	}
 
 	#setSdkToogleEvents() {
@@ -45,6 +53,10 @@ export class SdkSettings {
 
 	#setSdkURLEvents() {
 		this.#sdkURL.onFocusOut = (e) => { this.#onSdkUrlFocusOut(e) };
+	}
+
+	#setCoordsGridEvents() {
+		this.#coordsGridToogle.onClicked = () => { this.#onCoordsGridToogleClicked() };
 	}
 
 	#setNeuroListenerEvents() {
@@ -87,6 +99,11 @@ export class SdkSettings {
 		this.#mod.saveSettings();
 	}
 
+	#saveCoordsGridSetting(value) {
+		this.#mod.settings.coordsGrid = value;
+		this.#mod.saveSettings();
+	}
+
 	#onConnected() {
 		this.#sdkToogle.set(true);
 		this.#sdkToogle.resetTitle();
@@ -117,5 +134,11 @@ export class SdkSettings {
 		this.#onFailed();
 		this.#sdkURL.markAsError();
 		this.#mod.app.sound.playUiSound(SOUNDS.uiError);
+	}
+
+	#onCoordsGridToogleClicked() {
+		const value = !this.#mod.settings.coordsGrid;
+		this.#coordsGridToogle.set(value);
+		this.#saveCoordsGridSetting(value);
 	}
 }
