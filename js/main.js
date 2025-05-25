@@ -2,6 +2,9 @@ import { Mod } from "shapez/mods/mod";
 import { Vector } from "shapez/core/vector";
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { SettingsMenu } from "./settings/settingsMenu";
+import { MapView } from "shapez/game/map_view";
+import { MapChunkAggregate } from "shapez/game/map_chunk_aggregate";
+import { MapChunkView } from "shapez/game/map_chunk_view";
 const DEFAULT_URL = "localhost:8000";
 
 /** @type {import("shapez/game/root").GameRoot} */
@@ -37,6 +40,33 @@ class NeuroIntegration extends Mod {
 					this.ActionTest();
 				});
 				actionButton.appendChild(button);
+			}
+		});
+
+		// Those are the zoomed out chunk coordinates
+		/*
+		this.modInterface.runAfterMethod(MapChunkAggregate, "drawOverlay", function(parameters) {
+			console.log(`Coords -> X: ${this.x}, Y: ${this.y}`);
+		});
+		*/
+
+		this.modInterface.runAfterMethod(MapChunkView, "drawForegroundStaticLayer", function(parameters) {
+			const chunkWidth = this.worldSpaceRectangle.w / this.tileSpaceRectangle.w;
+			const chunkHeight = this.worldSpaceRectangle.h / this.tileSpaceRectangle.h;
+			
+			const context = parameters.context;
+			context.fillStyle = "rgb(113, 213, 202)";
+			context.shadowColor = "rgb(129, 163, 159)";
+			context.shadowOffsetX = 1.5;
+			context.shadowOffsetY = 1.5;
+			context.shadowBlur = 1;
+			context.font = "6px GameFont";
+
+			for (let i = 0; i < this.tileSpaceRectangle.w; i++) {
+				for (let j = 0; j < this.tileSpaceRectangle.h; j++) {
+					context.fillText(`x: ${this.tileX + i}`, this.worldSpaceRectangle.x + (i * chunkWidth), this.worldSpaceRectangle.y + (j * chunkHeight) - 8, chunkWidth);
+					context.fillText(`y: ${this.tileY + j}`, this.worldSpaceRectangle.x + (i * chunkWidth), this.worldSpaceRectangle.y + (j * chunkHeight) - 2, chunkWidth);
+				}
 			}
 		});
 	}
