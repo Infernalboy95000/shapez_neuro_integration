@@ -3,9 +3,7 @@ import { MapChunkView } from "shapez/game/map_chunk_view";
 export class CoordsGrid {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 
-	/**
-	 * @param {import("shapez/mods/mod").Mod} mod
-	 */
+	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#asignDrawFunction();
@@ -18,23 +16,64 @@ export class CoordsGrid {
 			MapChunkView,
 			"drawForegroundStaticLayer",
 			function(parameters) {
-				const map = this;
-				if (coords.#mod.settings.coordsGrid) {
-					coords.#drawGrid(map, parameters);
+				if (coords.#canDrawChunk(this, parameters)) {
+					coords.#drawGrid(this, parameters);
 				}
 			}
 		);
 	}
 
 	/**
+	 * @param {MapChunkView} chunk
+	 * @param {import("shapez/core/draw_utils").DrawParameters} parameters 
+	 * @returns {boolean}
+	 * */
+	#canDrawChunk(chunk, parameters) {
+		if (!this.#mod.settings.coordsGrid) {
+			return false;
+		}
+
+		if (!parameters.visibleRect.containsRect(chunk.worldSpaceRectangle)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * 
-	 * @param {MapChunkView} map 
+	 * @param {MapChunkView} chunk 
 	 * @param {import("shapez/core/draw_utils").DrawParameters} parameters 
 	 */
-	#drawGrid(map, parameters) {
-		const chunkWidth = map.worldSpaceRectangle.w / map.tileSpaceRectangle.w;
-		const chunkHeight = map.worldSpaceRectangle.h / map.tileSpaceRectangle.h;
-		
+	#drawGrid(chunk, parameters) {
+		const chunkWidth = chunk.worldSpaceRectangle.w / chunk.tileSpaceRectangle.w;
+		const chunkHeight = chunk.worldSpaceRectangle.h / chunk.tileSpaceRectangle.h;
+		const context = this.#contextGridFont(parameters);
+
+		for (let i = 0; i < chunk.tileSpaceRectangle.w; i++) {
+			for (let j = 0; j < chunk.tileSpaceRectangle.h; j++) {
+				context.fillText(
+					`x: ${chunk.tileX + i}`,
+					chunk.worldSpaceRectangle.x + (i * chunkWidth),
+					chunk.worldSpaceRectangle.y + (j * chunkHeight) - 8,
+					chunkWidth
+				);
+
+				context.fillText(
+					`y: ${chunk.tileY + j}`,
+					chunk.worldSpaceRectangle.x + (i * chunkWidth),
+					chunk.worldSpaceRectangle.y + (j * chunkHeight) - 2,
+					chunkWidth
+				);
+			}
+		}
+	}
+
+	/**
+	 * @param {import("shapez/core/draw_utils").DrawParameters} parameters
+	 * @returns {CanvasRenderingContext2D}
+	 * */
+	#contextGridFont(parameters) {
 		const context = parameters.context;
 		context.fillStyle = "rgb(113, 213, 202)";
 		context.shadowColor = "rgb(129, 163, 159)";
@@ -43,12 +82,7 @@ export class CoordsGrid {
 		context.shadowBlur = 1;
 		context.font = "6px GameFont";
 
-		for (let i = 0; i < map.tileSpaceRectangle.w; i++) {
-			for (let j = 0; j < map.tileSpaceRectangle.h; j++) {
-				context.fillText(`x: ${map.tileX + i}`, map.worldSpaceRectangle.x + (i * chunkWidth), map.worldSpaceRectangle.y + (j * chunkHeight) - 8, chunkWidth);
-				context.fillText(`y: ${map.tileY + j}`, map.worldSpaceRectangle.x + (i * chunkWidth), map.worldSpaceRectangle.y + (j * chunkHeight) - 2, chunkWidth);
-			}
-		}
+		return context;
 	}
 
 	/* Those are the zoomed out chunk coordinates
