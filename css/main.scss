@@ -1,5 +1,5 @@
 #state_SettingsState input.input-text {
-	background: #eee;
+	background-color: #eee;
 	color: #333438;
 	width: calc(150px*var(--ui-scale));
 	padding-top: calc(2px*var(--ui-scale));
@@ -11,7 +11,7 @@
 }
 
 #state_SettingsState input.errored {
-	background: #facece;
+	background-color: #facece;
 }
 
 #neuro_action_test {
@@ -27,12 +27,12 @@
 }
 
 #state_SettingsState .container .content .categoryContainer .category .title {
-	background:rgb(223, 225, 236);
+	background-color:rgb(223, 225, 236);
 }
 
 html[data-theme=dark]
 #state_SettingsState .container .content .categoryContainer .category .title {
-	background:rgb(46, 49, 56);
+	background-color:rgb(46, 49, 56);
 }
 
 #state_SettingsState .title>.row>label {
@@ -42,4 +42,16 @@ html[data-theme=dark]
 html[data-theme=dark]
 #state_SettingsState .title>.row>label {
 	color:rgb(135, 249, 255);
+}
+
+#state_SettingsState button.settings.button.styledButton.good {
+	background-color: rgb(102, 187, 106);
+}
+
+#state_SettingsState button.settings.button.styledButton.maybe {
+	background-color: rgb(215, 210, 111);
+}
+
+#state_SettingsState button.settings.button.styledButton.bad {
+	background-color: rgb(239, 80, 114);
 }

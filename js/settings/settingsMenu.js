@@ -1,10 +1,11 @@
 import { SOUNDS	} from "shapez/platform/sound";
 import { SettingCategory } from "./settingsCategory";
-import { ToggleSetting } from "./toggleSetting";
-import { InputSetting } from "./inputSetting";
+import { ToggleSetting } from "./inputs/toggleSetting";
+import { TextSetting } from "./inputs/textSetting";
 import { ConnectionSettings } from "./connectionSettings";
 import { ContextSettings } from "./contextSettings";
 import { StartupSettings } from "./startupSettings";
+import { ButtonSetting } from "./inputs/buttonSetting";
 
 export class SettingsMenu {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -91,14 +92,16 @@ export class SettingsMenu {
 		new SettingCategory(this.#menu, "Player connection", true);
 		const connSettings = new ConnectionSettings(this.#mod, this.#root);
 
-		connSettings.addSdkToogle(new ToggleSetting (
+		connSettings.addSdkButton(new ButtonSetting(
 			this.#menu,
 			"SDK integration",
 			"Connect the SDK integration to your player",
+			"Connect",
+			ButtonSetting.Style.DEFAULT,
 			"sdkStatus"
 		));
 
-		connSettings.addSdkURL(new InputSetting (
+		connSettings.addSdkURL(new TextSetting (
 			this.#menu,
 			"SDK URL",
 			"The URL the SDK will use next time is connected",

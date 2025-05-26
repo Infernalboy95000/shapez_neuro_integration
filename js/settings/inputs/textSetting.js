@@ -1,11 +1,11 @@
 import { SettingBase } from "./settingBase";
 
 /**
- * Creates a user input setting
- * @class InputSetting
+ * Creates a user text input setting
+ * @class TextSetting
  * @extends {SettingBase}
  */
-export class InputSetting extends SettingBase {
+export class TextSetting extends SettingBase {
 	/**@type {CallableFunction} */ onFocusOut;
 	
 	/**@type {HTMLDivElement} */ #inputParent;

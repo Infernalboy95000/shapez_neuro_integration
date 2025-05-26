@@ -1,7 +1,8 @@
 import { SOUNDS	} from "shapez/platform/sound";
 import { NeuroListener } from "../neuroListener";
-import { InputSetting } from "./inputSetting";
-import { ToggleSetting } from "./toggleSetting";
+import { TextSetting } from "./inputs/textSetting";
+import { ToggleSetting } from "./inputs/toggleSetting";
+import { ButtonSetting } from "./inputs/buttonSetting";
 
 /**
  * Manages settings related to connextion
@@ -10,8 +11,8 @@ import { ToggleSetting } from "./toggleSetting";
 export class ConnectionSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
-	/**@type {ToggleSetting} */ #sdkToogle;
-	/**@type {InputSetting} */#sdkURL;
+	/**@type {ButtonSetting} */ #sdkButton;
+	/**@type {TextSetting} */#sdkURL;
 	/**@type {ToggleSetting} */ #coordsGridToogle;
 
 	/**
@@ -23,20 +24,20 @@ export class ConnectionSettings {
 		this.#root = root;
 	}
 
-	/** @param {ToggleSetting} toogleSetting */
-	addSdkToogle(toogleSetting) {
-		this.#sdkToogle = toogleSetting;
-		this.#setSdkToogleEvents();
+	/** @param {ButtonSetting} buttonSetting */
+	addSdkButton(buttonSetting) {
+		this.#sdkButton = buttonSetting;
+		this.#setSdkButtonEvents();
 		this.#setNeuroListenerEvents();
 
 		if (NeuroListener.isConnected()) {
-			this.#sdkToogle.set(true);
+			this.#showDisconnect();
 		}
 	}
 
-	/** @param {InputSetting} inputSetting */
-	addSdkURL(inputSetting) {
-		this.#sdkURL = inputSetting;
+	/** @param {TextSetting} textSetting */
+	addSdkURL(textSetting) {
+		this.#sdkURL = textSetting;
 		this.#setSdkURLEvents()
 	}
 
@@ -47,8 +48,8 @@ export class ConnectionSettings {
 		this.#coordsGridToogle.set(this.#mod.settings.coordsGrid);
 	}
 
-	#setSdkToogleEvents() {
-		this.#sdkToogle.onClicked = () => { this.#onSdkToogleClicked() };
+	#setSdkButtonEvents() {
+		this.#sdkButton.onClicked = () => { this.#onSdkButtonClicked() };
 	}
 
 	#setSdkURLEvents() {
@@ -68,26 +69,43 @@ export class ConnectionSettings {
 		NeuroListener.initCrash = () => { this.#onInitCrash() };
 	}
 
-	#onSdkToogleClicked() {
-		this.#sdkToogleAction();
+	#onSdkButtonClicked() {
+		this.#sdkButtonAction();
 	}
 
-	#sdkToogleAction() {
+	#sdkButtonAction() {
 		if (NeuroListener.isConnected()) {
 			NeuroListener.disconnect();
-			this.#sdkToogle.set(false);
+			this.#showConnect();
 			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
 		else if (NeuroListener.isAttempting()) {
-			this.#sdkToogle.changeDescription("Requested cancellation ...");
+			this.#sdkButton.changeDescription("Requested cancellation ...");
+			this.#showCancel();
 			NeuroListener.requestCancell();
 			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
 		else if (NeuroListener.tryConnect(this.#mod.settings.socketURL)) {
-			this.#sdkToogle.changeTitle("Connecting...");
-			this.#sdkToogle.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
+			this.#sdkButton.changeTitle("Connecting...");
+			this.#sdkButton.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
+			this.#showCancel();
 			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
+	}
+
+	#showConnect() {
+		this.#sdkButton.resetText();
+		this.#sdkButton.resetStyle();
+	}
+
+	#showCancel() {
+		this.#sdkButton.changeText("Cancel");
+		this.#sdkButton.changeStyle(ButtonSetting.Style.MAYBE);
+	}
+
+	#showDisconnect() {
+		this.#sdkButton.changeText("Disconnect");
+		this.#sdkButton.changeStyle(ButtonSetting.Style.BAD);
 	}
 
 	#onSdkUrlFocusOut(value) {
@@ -105,9 +123,9 @@ export class ConnectionSettings {
 	}
 
 	#onConnected() {
-		this.#sdkToogle.set(true);
-		this.#sdkToogle.resetTitle();
-		this.#sdkToogle.changeDescription(`Connected to: ${NeuroListener.getCurrentURL()}`);
+		this.#showDisconnect();
+		this.#sdkButton.resetTitle();
+		this.#sdkButton.changeDescription(`Connected to: ${NeuroListener.getCurrentURL()}`);
 	}
 
 	#onDisconnected() {
@@ -115,9 +133,9 @@ export class ConnectionSettings {
 	}
 
 	#onReattempting() {
-		this.#sdkToogle.set(false);
-		this.#sdkToogle.changeTitle(`Connecting... (${NeuroListener.getRetriesFormatted()})`);
-		this.#sdkToogle.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
+		this.#showCancel();
+		this.#sdkButton.changeTitle(`Connecting... (${NeuroListener.getRetriesFormatted()})`);
+		this.#sdkButton.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
 	}
 
 	#onClosed() {
@@ -125,9 +143,9 @@ export class ConnectionSettings {
 	}
 
 	#onFailed() {
-		this.#sdkToogle.set(false);
-		this.#sdkToogle.resetTitle();
-		this.#sdkToogle.resetDescription();
+		this.#showConnect();
+		this.#sdkButton.resetTitle();
+		this.#sdkButton.resetDescription();
 	}
 
 	#onInitCrash() {

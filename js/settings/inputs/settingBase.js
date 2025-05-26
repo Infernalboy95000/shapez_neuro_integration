@@ -40,12 +40,12 @@ export class SettingBase {
 		this.#divDescription.textContent = this.#defaultDescription;
 	}
 
-	/** @param {HTMLDivElement} element */
+	/** @param {HTMLElement} element */
 	addToRow(element) {
 		this.#baseRow.appendChild(element);
 	}
 
-	/** @param {HTMLDivElement} parent */
+	/** @param {HTMLElement} parent */
 	#createBaseSetting(parent) {
 		this.#baseSetting = document.createElement("div")
 		this.#baseSetting.classList.add("setting", "cardbox", "enabled");

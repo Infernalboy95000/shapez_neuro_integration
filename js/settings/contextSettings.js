@@ -1,5 +1,5 @@
 import { SOUNDS	} from "shapez/platform/sound";
-import { ToggleSetting } from "./toggleSetting";
+import { ToggleSetting } from "./inputs/toggleSetting";
 
 /**
  * Manages settings related to the SDK context
