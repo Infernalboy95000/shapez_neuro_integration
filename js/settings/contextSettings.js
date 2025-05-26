@@ -1,23 +1,19 @@
 import { SOUNDS	} from "shapez/platform/sound";
-import { InputSetting } from "./inputSetting";
 import { ToggleSetting } from "./toggleSetting";
 
 /**
- * Manages settings related to context
- * @class ConnextionSettings
+ * Manages settings related to the SDK context
+ * @class ContextSettings
  */
 export class ContextSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
-	/** @type {import("shapez/game/root").GameRoot} */ #root;
-	/**@type {ToggleSetting} */ #coordsGridToogle;
+	/** @type {ToggleSetting} */ #coordsGridToogle;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
-	 * @param {import("shapez/game/root").GameRoot} root
 	 */
-	constructor(mod, root) {
+	constructor(mod) {
 		this.#mod = mod;
-		this.#root = root;
 	}
 
 	/** @param {ToggleSetting} toogleSetting */
@@ -28,7 +24,9 @@ export class ContextSettings {
 	}
 
 	#setCoordsGridEvents() {
-		this.#coordsGridToogle.onClicked = () => { this.#onCoordsGridToogleClicked() };
+		this.#coordsGridToogle.onClicked = () => {
+			this.#onCoordsGridToogleClicked()
+		};
 	}
 
 	#saveCoordsGridSetting(value) {

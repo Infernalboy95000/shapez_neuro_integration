@@ -4,6 +4,7 @@ import { ToggleSetting } from "./toggleSetting";
 import { InputSetting } from "./inputSetting";
 import { ConnectionSettings } from "./connectionSettings";
 import { ContextSettings } from "./contextSettings";
+import { StartupSettings } from "./startupSettings";
 
 export class SettingsMenu {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -83,6 +84,7 @@ export class SettingsMenu {
 	#createSettings() {
 		this.#connextionSettings();
 		this.#contextSettings();
+		this.#startupSettings();
 	}
 
 	#connextionSettings() {
@@ -109,13 +111,40 @@ export class SettingsMenu {
 
 	#contextSettings() {
 		new SettingCategory(this.#menu, "SDK Context");
-		const contextSettings = new ContextSettings(this.#mod, this.#root);
+		const contextSettings = new ContextSettings(this.#mod);
 
 		contextSettings.addCorodsGridToogle(new ToggleSetting (
 			this.#menu,
 			"Coordinates grid",
 			"Shows every tile's x/y position. Maybe usefull when using external vision.",
 			"sdkCoordsGrid"
+		));
+	}
+
+	#startupSettings() {
+		new SettingCategory(this.#menu, "Startup");
+
+		const startupSettngs = new StartupSettings(this.#mod, this.#root);
+
+		startupSettngs.addAutoConnectToogle(new ToggleSetting (
+			this.#menu,
+			"Auto connect to player",
+			"Attempts to connect to the player when launching the game",
+			"sdkPlayerAutoConnect"
+		));
+
+		startupSettngs.addPlayerChooseMapToggle(new ToggleSetting (
+			this.#menu,
+			"Player can choose map",
+			"Allows the player to start a map. This can be limited to certain maps.",
+			"sdkPlayerChooseMap"
+		));
+
+		startupSettngs.addForceOpenMapToggle(new ToggleSetting (
+			this.#menu,
+			"Force open map",
+			"Opens a map when entering the main menu. This can be limited to certain maps.",
+			"sdkForceOpenMap"
 		));
 	}
 }

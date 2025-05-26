@@ -8,6 +8,9 @@
     "website": "",
     "settings": {
 		"socketURL": "localhost:8000",
-		"coordsGrid": false
+		"coordsGrid": false,
+		"autoConnect": false,
+		"playerChooseMap": false,
+		"forceOpenMap": false
 	}
 }
