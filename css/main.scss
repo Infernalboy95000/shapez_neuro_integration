@@ -18,3 +18,26 @@
 	color: red;
 	z-index: 300;
 }
+
+#state_SettingsState .container .content .categoryContainer .category .title:not(.first) {
+	margin-top: calc(10px*var(--ui-scale));
+}
+
+#state_SettingsState .container .content .categoryContainer .category .title {
+	background:rgb(223, 225, 236);
+}
+
+html[data-theme=dark]
+#state_SettingsState .container .content .categoryContainer .category .title {
+	background:rgb(46, 49, 56);
+}
+
+#state_SettingsState .title>.row>label {
+	color:rgb(11, 135, 144);
+	font-weight: bold;
+}
+
+html[data-theme=dark]
+#state_SettingsState .title>.row>label {
+	color:rgb(135, 249, 255);
+}

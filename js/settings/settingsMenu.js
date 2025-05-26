@@ -1,7 +1,9 @@
 import { SOUNDS	} from "shapez/platform/sound";
-import { SdkSettings } from "./sdkSettings";
+import { SettingCategory } from "./settingsCategory";
 import { ToggleSetting } from "./toggleSetting";
 import { InputSetting } from "./inputSetting";
+import { ConnextionSettings } from "./connextionSettings";
+import { ContextSettings } from "./contextSettings";
 
 export class SettingsMenu {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -79,16 +81,22 @@ export class SettingsMenu {
 	}
 
 	#createSettings() {
-		const settings = new SdkSettings(this.#mod, this.#root);
+		this.#connextionSettings();
+		this.#contextSettings();
+	}
 
-		settings.addSdkToogle(new ToggleSetting (
+	#connextionSettings() {
+		new SettingCategory(this.#menu, "Player connextion", true);
+		const connSettings = new ConnextionSettings(this.#mod, this.#root);
+
+		connSettings.addSdkToogle(new ToggleSetting (
 			this.#menu,
 			"SDK integration",
 			"Connect the SDK integration to your player",
 			"sdkStatus"
 		));
 
-		settings.addSdkURL(new InputSetting (
+		connSettings.addSdkURL(new InputSetting (
 			this.#menu,
 			"SDK URL",
 			"The URL the SDK will use next time is connected",
@@ -97,8 +105,13 @@ export class SettingsMenu {
 			this.#mod.settings.socketURL,
 			256
 		));
+	}
 
-		settings.addCorodsGridToogle(new ToggleSetting (
+	#contextSettings() {
+		new SettingCategory(this.#menu, "SDK Context");
+		const contextSettings = new ContextSettings(this.#mod, this.#root);
+
+		contextSettings.addCorodsGridToogle(new ToggleSetting (
 			this.#menu,
 			"Coordinates grid",
 			"Shows every tile's x/y position. Maybe usefull when using external vision.",

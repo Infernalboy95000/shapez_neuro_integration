@@ -4,10 +4,10 @@ import { InputSetting } from "./inputSetting";
 import { ToggleSetting } from "./toggleSetting";
 
 /**
- * Manages every setting
- * @class SdkSettings
+ * Manages settings related to connextion
+ * @class ConnextionSettings
  */
-export class SdkSettings {
+export class ConnextionSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/**@type {ToggleSetting} */ #sdkToogle;
