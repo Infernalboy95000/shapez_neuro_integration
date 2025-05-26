@@ -2,7 +2,7 @@ import { SOUNDS	} from "shapez/platform/sound";
 import { SettingCategory } from "./settingsCategory";
 import { ToggleSetting } from "./toggleSetting";
 import { InputSetting } from "./inputSetting";
-import { ConnextionSettings } from "./connextionSettings";
+import { ConnectionSettings } from "./connectionSettings";
 import { ContextSettings } from "./contextSettings";
 
 export class SettingsMenu {
@@ -86,8 +86,8 @@ export class SettingsMenu {
 	}
 
 	#connextionSettings() {
-		new SettingCategory(this.#menu, "Player connextion", true);
-		const connSettings = new ConnextionSettings(this.#mod, this.#root);
+		new SettingCategory(this.#menu, "Player connection", true);
+		const connSettings = new ConnectionSettings(this.#mod, this.#root);
 
 		connSettings.addSdkToogle(new ToggleSetting (
 			this.#menu,

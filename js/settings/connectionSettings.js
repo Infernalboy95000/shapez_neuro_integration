@@ -5,9 +5,9 @@ import { ToggleSetting } from "./toggleSetting";
 
 /**
  * Manages settings related to connextion
- * @class ConnextionSettings
+ * @class ConnectionSettings
  */
-export class ConnextionSettings {
+export class ConnectionSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/**@type {ToggleSetting} */ #sdkToogle;
