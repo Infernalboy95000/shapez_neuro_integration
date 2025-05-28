@@ -13,8 +13,9 @@ export class OptionListSetting extends SettingBase {
 	/** @type {HTMLDivElement} */ #menuAccess;
 	/** @type {HTMLDivElement} */ #menu;
 	/** @type {HTMLButtonElement} */ #closeMenuBt;
-	/** @type {string[]} */ #options;
-	/** @type {number} */ #currentOption;
+	/** @type {Map} */ #options;
+	/** @type {string} */ #currentOption;
+	/** @type {string} */ #defaultOption;
 	/** @type {string} */ #title;
 
 	/**
@@ -22,26 +23,27 @@ export class OptionListSetting extends SettingBase {
 	 * @param {HTMLDivElement} parent
 	 * @param {string} title
 	 * @param {string} description
-	 * @param {string[]} options
-	 * @param {number} currentOption
+	 * @param {Map} options
+	 * @param {string} currentOption
+	 * @param {string} defaultOption
 	 * @param {string} attribute
 	 */
 	constructor(
 		mod, parent, title, description, options,
-		currentOption = 0, attribute = ""
+		currentOption = "", defaultOption = "", attribute = ""
 	) {
 		super(mod, parent, title, description);
+		this.#defaultOption = defaultOption;
 		this.#options = options;
 		this.#title = title;
 
-		this.#ensureValidOption();
 		this.#createMenuAccess(currentOption, attribute);
 	}
 
 	/**
 	 * 
-	 * @param {number} optionID
-	 * @param {string} attribute 
+	 * @param {string} optionID
+	 * @param {string} attribute
 	 */
 	#createMenuAccess(optionID, attribute) {
 		this.#menuAccess = document.createElement("div");
@@ -52,20 +54,38 @@ export class OptionListSetting extends SettingBase {
 
 		this.addToRow(this.#menuAccess);
 		this.#setButtonEvents(
-			this.#menuAccess, 0, "pressed", this.#onAccessClicked,
+			this.#menuAccess, "menu_access", "pressed", this.#onAccessClicked,
 			this.#onMouseDown, this.#onMouseUp, this.#onMouseLeave
 		);
 	}
 
-	/** @param {number} optionID */
+	/** @param {string} optionID */
 	#setOption(optionID) {
+		if (!this.#options.has(optionID)) {
+			if (this.#options.has(this.#defaultOption)) {
+				optionID = this.#defaultOption;
+			}
+			else {
+				for(const [key, _] of this.#options) {
+					this.#defaultOption = key;
+					optionID = key;
+					break;
+				}
+			}
+		}
+
 		this.#currentOption = optionID;
-		this.#menuAccess.textContent = this.#options[optionID];
+		let visualText = this.#options.get(optionID);
+		if (visualText.length >= 15) {
+			visualText = visualText.slice(0, 11) + " ...";
+		}
+
+		this.#menuAccess.textContent = visualText;
 	}
 
 	/**
 	 * @param {HTMLElement} bt
-	 * @param {number} ID,
+	 * @param {string} ID,
 	 * @param {string} classCall,
 	 * @param {CallableFunction} click
 	 * @param {CallableFunction} mouseDown
@@ -108,7 +128,7 @@ export class OptionListSetting extends SettingBase {
 		this.#closeMenuBt = document.createElement("button");
 		this.#closeMenuBt.classList.add("closeButton");
 		this.#setButtonEvents(
-			this.#closeMenuBt, 0, "pressedSmallElement", this.#onCloseClicked,
+			this.#closeMenuBt, "close_menu", "pressedSmallElement", this.#onCloseClicked,
 			this.#onMouseDown, this.#onMouseUp, this.#onMouseLeave
 		)
 		title.appendChild(this.#closeMenuBt);
@@ -125,10 +145,10 @@ export class OptionListSetting extends SettingBase {
 		optionsParent.classList.add("optionParent");
 		optionsContainer.appendChild(optionsParent);
 
-		for (let i = 0; i < this.#options.length; i++) {
-			const option = this.#createOption(this.#options[i]);
+		for(const [key, value] of this.#options) {
+			const option = this.#createOption(key, value);
 			this.#setButtonEvents(
-				option, i, "pressedOption", this.#onOptionClicked,
+				option, key, "pressedOption", this.#onOptionClicked,
 				this.#onMouseDown, this.#onMouseUp, this.#onMouseLeave
 			)
 			optionsParent.appendChild(option);
@@ -138,17 +158,19 @@ export class OptionListSetting extends SettingBase {
 	}
 
 	/**
+	 * @param {string} optionKey
 	 * @param {string} optionName
 	 * @returns {HTMLDivElement}
 	 * */
-	#createOption(optionName) {
+	#createOption(optionKey, optionName) {
 		const option = document.createElement("div");
+		const currOptionValue = this.#options.get(this.#currentOption);
 		option.classList.add("option");
-		if (optionName == this.#options[this.#currentOption]) {
+		if (optionName == currOptionValue) {
 			option.classList.add("active");
 		}
 
-		option.setAttribute("data-optionvalue", optionName.toLowerCase());
+		option.setAttribute("data-optionvalue", optionKey);
 
 		const spanName = document.createElement("span");
 		spanName.classList.add("title");
@@ -158,31 +180,26 @@ export class OptionListSetting extends SettingBase {
 		return option;
 	}
 
-	#ensureValidOption() {
-		if (this.#currentOption < 0) {
-			this.#currentOption = 0;
-		}
-		else if (this.#currentOption > this.#options.length) {
-			this.#currentOption = this.#options.length - 1;
-		}
-	}
-
-	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {number} ID */
+	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {string} ID */
 	#onAccessClicked(e, button, ID) {
 		e.#showOptions();
 	}
 
-	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {number} ID */
+	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {string} ID */
 	#onCloseClicked(e, button, ID) {
 		document.body.classList.remove("modalDialogActive");
 		e.#menu.remove();
 	}
 
-	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {number} ID */
+	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {string} ID */
 	#onOptionClicked(e, button, ID) {
 		if (!button.classList.contains("active")) {
 			e.#setOption(ID);
 			e.#menu.remove();
+			if (e.onOptionChoosed) {
+				e.onOptionChoosed(e.#currentOption);
+			}
+
 			e.playSound(SOUNDS.uiClick);
 		}
 	}

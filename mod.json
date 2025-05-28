@@ -11,6 +11,7 @@
 		"coordsGrid": false,
 		"autoConnect": false,
 		"playerChooseMap": false,
-		"forceOpenMap": false
+		"forceOpenMap": false,
+		"mapAvailable" : "any_map"
 	}
 }

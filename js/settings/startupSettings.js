@@ -1,3 +1,4 @@
+import { OptionListSetting } from "./inputs/optionListSetting";
 import { ToggleSetting } from "./inputs/toggleSetting";
 
 /**
@@ -10,6 +11,7 @@ export class StartupSettings {
 	/** @type {ToggleSetting} */ #autoConnectToggle;
 	/** @type {ToggleSetting} */ #playerChooseMapToggle;
 	/** @type {ToggleSetting} */ #forceOpenMapToggle;
+	/** @type {OptionListSetting} */ #mapAwailableOptions;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
@@ -41,6 +43,12 @@ export class StartupSettings {
 		this.#forceOpenMapToggle.set(this.#mod.settings.forceOpenMap);
 	}
 
+	/** @param {OptionListSetting} optionListSetting */
+	addMapAvailableOptions(optionListSetting, options) {
+		this.#mapAwailableOptions = optionListSetting;
+		this.#setMapAvailableEvents();
+	}
+
 	#setAutoConnectEvents() {
 		this.#autoConnectToggle.onClicked = () => {
 			this.#onAutoConnectToogleClicked()
@@ -59,6 +67,12 @@ export class StartupSettings {
 		};
 	}
 
+	#setMapAvailableEvents() {
+		this.#mapAwailableOptions.onOptionChoosed = (optionID) => {
+			this.#onMapAvailableOptionChosed(optionID)
+		}
+	}
+
 	#saveAutoConnectSetting(value) {
 		this.#mod.settings.autoConnect = value;
 		this.#mod.saveSettings();
@@ -71,6 +85,13 @@ export class StartupSettings {
 
 	#saveForceOpenMapSetting(value) {
 		this.#mod.settings.forceOpenMap = value;
+		this.#mod.saveSettings();
+	}
+
+	#saveMapAvailableSetting(value) {
+		console.log("Original value: " + this.#mod.settings.mapAvailable);
+		console.log("New value: " + value);
+		this.#mod.settings.mapAvailable = value;
 		this.#mod.saveSettings();
 	}
 
@@ -90,5 +111,9 @@ export class StartupSettings {
 		const value = !this.#mod.settings.forceOpenMap;
 		this.#forceOpenMapToggle.set(value);
 		this.#saveForceOpenMapSetting(value);
+	}
+
+	#onMapAvailableOptionChosed(optionID) {
+		this.#saveMapAvailableSetting(optionID);
 	}
 }

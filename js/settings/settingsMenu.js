@@ -150,12 +150,38 @@ export class SettingsMenu {
 			"sdkForceOpenMap"
 		));
 
-		new OptionListSetting(
+		const mapOptions = this.#getMapOptions();
+		
+		startupSettngs.addMapAvailableOptions(new OptionListSetting(
 			this.#mod, this.#menu,
 			"Map to open",
-			"Which map will be allowed to be open by the player or forced to open",
-			["Option 1", "Option 2"], 0,
-			"sdkMapOpenAvailable",
-		)
+			"Which map will be allowed to be open by the player or forced to open. " +
+			"After selecting and creating a new map, this will set to continue it after",
+			mapOptions, this.#mod.settings.mapAvailable, "any_map",
+			"sdkMapAvailable",
+		));
+	}
+
+	/** @return {Map} */
+	#getMapOptions() {
+		const mapOptions = new Map();
+		mapOptions.set("any_map", "Any map");
+		mapOptions.set("any_option", "Any option");
+		mapOptions.set("new_map", "New Map");
+		mapOptions.set("last_map", "Continue");
+		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
+		let unnamedMaps = 0;
+
+		for (let i = 0; i < saves.length; i++) {
+			let mapName = saves[i].name;
+
+			if (!mapName) {
+				unnamedMaps++;
+				mapName = `Unnamed map ${unnamedMaps}`;
+			}
+			mapOptions.set(saves[i].internalId, mapName);
+		}
+
+		return mapOptions;
 	}
 }
