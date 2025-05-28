@@ -71,12 +71,11 @@ export class SettingsMenu {
 
 		this.#button.classList.add("active")
 		this.#menu.classList.add("active");
-
-		this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 	}
 
 	#onButtonMouseDown() {
 		this.#button.classList.add("selected");
+		this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 	}
 
 	#onButtonMouseUp() {
@@ -94,7 +93,7 @@ export class SettingsMenu {
 		const connSettings = new ConnectionSettings(this.#mod, this.#root);
 
 		connSettings.addSdkButton(new ButtonSetting(
-			this.#menu,
+			this.#mod, this.#menu,
 			"SDK integration",
 			"Connect the SDK integration to your player",
 			"Connect",
@@ -103,7 +102,7 @@ export class SettingsMenu {
 		));
 
 		connSettings.addSdkURL(new TextSetting (
-			this.#menu,
+			this.#mod, this.#menu,
 			"SDK URL",
 			"The URL the SDK will use next time is connected",
 			"sdkURL",
@@ -118,7 +117,7 @@ export class SettingsMenu {
 		const contextSettings = new ContextSettings(this.#mod);
 
 		contextSettings.addCorodsGridToogle(new ToggleSetting (
-			this.#menu,
+			this.#mod, this.#menu,
 			"Coordinates grid",
 			"Shows every tile's x/y position. Maybe usefull when using external vision.",
 			"sdkCoordsGrid"
@@ -131,28 +130,28 @@ export class SettingsMenu {
 		const startupSettngs = new StartupSettings(this.#mod, this.#root);
 
 		startupSettngs.addAutoConnectToogle(new ToggleSetting (
-			this.#menu,
+			this.#mod, this.#menu,
 			"Auto connect to player",
 			"Attempts to connect to the player when launching the game",
 			"sdkPlayerAutoConnect"
 		));
 
 		startupSettngs.addPlayerChooseMapToggle(new ToggleSetting (
-			this.#menu,
+			this.#mod, this.#menu,
 			"Player can choose map",
 			"Allows the player to start a map. This can be limited to certain maps.",
 			"sdkPlayerChooseMap"
 		));
 
 		startupSettngs.addForceOpenMapToggle(new ToggleSetting (
-			this.#menu,
+			this.#mod, this.#menu,
 			"Force open map",
 			"Opens a map when entering the main menu. This can be limited to certain maps.",
 			"sdkForceOpenMap"
 		));
 
 		new OptionListSetting(
-			this.#menu,
+			this.#mod, this.#menu,
 			"Map to open",
 			"Which map will be allowed to be open by the player or forced to open",
 			["Option 1", "Option 2"], 0,

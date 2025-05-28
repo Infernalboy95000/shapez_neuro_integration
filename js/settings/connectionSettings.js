@@ -77,19 +77,16 @@ export class ConnectionSettings {
 		if (NeuroListener.isConnected()) {
 			NeuroListener.disconnect();
 			this.#showConnect();
-			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
 		else if (NeuroListener.isAttempting()) {
 			this.#sdkButton.changeDescription("Requested cancellation ...");
 			this.#showCancel();
 			NeuroListener.requestCancell();
-			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
 		else if (NeuroListener.tryConnect(this.#mod.settings.socketURL)) {
 			this.#sdkButton.changeTitle("Connecting...");
 			this.#sdkButton.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
 			this.#showCancel();
-			this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 		}
 	}
 

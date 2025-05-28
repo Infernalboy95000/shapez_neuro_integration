@@ -1,4 +1,3 @@
-import { SOUNDS	} from "shapez/platform/sound";
 import { ToggleSetting } from "./inputs/toggleSetting";
 
 /**
@@ -79,20 +78,17 @@ export class StartupSettings {
 		const value = !this.#mod.settings.autoConnect;
 		this.#autoConnectToggle.set(value);
 		this.#saveAutoConnectSetting(value);
-		this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 	}
 
 	#onPlayerChooseMapToogleClicked() {
 		const value = !this.#mod.settings.playerChooseMap;
 		this.#playerChooseMapToggle.set(value);
 		this.#savePlayerChooseMapSetting(value);
-		this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 	}
 
 	#onForceOpenMapToogleClicked() {
 		const value = !this.#mod.settings.forceOpenMap;
 		this.#forceOpenMapToggle.set(value);
 		this.#saveForceOpenMapSetting(value);
-		this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 	}
 }

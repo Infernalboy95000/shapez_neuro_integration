@@ -1,3 +1,4 @@
+import { SOUNDS } from "shapez/platform/sound";
 import { SettingBase } from "./settingBase";
 
 /**
@@ -11,13 +12,14 @@ export class ToggleSetting extends SettingBase {
 	/** @type {HTMLDivElement} */ #toggle;
 
 	/**
+	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {HTMLDivElement} parent
 	 * @param {string} title
 	 * @param {string} description
 	 * @param {string} attribute
 	 */
-	constructor(parent, title, description, attribute = "") {
-		super(parent, title, description);
+	constructor(mod, parent, title, description, attribute = "") {
+		super(mod, parent, title, description);
 		this.#createToogle(attribute);
 	}
 
@@ -53,6 +55,7 @@ export class ToggleSetting extends SettingBase {
 		this.#toggle.addEventListener("click", () => this.#onClicked());
 		this.#toggle.addEventListener("mousedown", () => this.#onMouseDown());
 		this.#toggle.addEventListener("mouseup", () => this.#onMouseUp());
+		this.#toggle.addEventListener("mouseleave", () => this.#onMouseLeave());
 	}
 
 	#onClicked() {
@@ -61,10 +64,15 @@ export class ToggleSetting extends SettingBase {
 	}
 
 	#onMouseDown() {
-		this.#toggle.classList.add("selected");
+		this.#toggle.classList.add("pressed");
+		this.playSound(SOUNDS.uiClick);
 	}
 
 	#onMouseUp() {
-		this.#toggle.classList.remove("selected");
+		this.#toggle.classList.remove("pressed");
+	}
+
+	#onMouseLeave() {
+		this.#toggle.classList.remove("pressed");
 	}
 }

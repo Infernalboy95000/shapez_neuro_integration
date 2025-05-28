@@ -3,6 +3,7 @@
  * @class SettingBase
  */
 export class SettingBase {
+	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {string} */ #defaultTitle;
 	/** @type {string} */ #defaultDescription;
 	/** @type {HTMLDivElement} */ #baseSetting;
@@ -10,11 +11,12 @@ export class SettingBase {
 	/** @type {HTMLLabelElement} */ #label;
 	/** @type {HTMLDivElement} */ #divDescription;
 
-	constructor(parent, title, description) {
+	constructor(mod, parent, title, description) {
 		if (this.constructor === SettingBase) {
 			throw new Error("Can't instantiate abstract class!");
 		}
 
+		this.#mod = mod;
 		this.#defaultTitle = title;
 		this.#defaultDescription = description;
 		this.#createBaseSetting(parent);
@@ -43,6 +45,11 @@ export class SettingBase {
 	/** @param {HTMLElement} element */
 	addToRow(element) {
 		this.#baseRow.appendChild(element);
+	}
+
+	/** @param {string} soundKey */
+	playSound(soundKey) {
+		this.#mod.app.sound.playUiSound(soundKey);
 	}
 
 	/** @param {HTMLElement} parent */

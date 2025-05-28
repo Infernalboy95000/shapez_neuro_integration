@@ -1,3 +1,4 @@
+import { SOUNDS } from "shapez/platform/sound";
 import { SettingBase } from "./settingBase";
 
 /**
@@ -20,6 +21,7 @@ export class ButtonSetting extends SettingBase {
 	/** @type {string} */ #defaultStyle;
 
 	/**
+	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {HTMLDivElement} parent
 	 * @param {string} title
 	 * @param {string} description
@@ -27,10 +29,10 @@ export class ButtonSetting extends SettingBase {
 	 * @param {string} attribute
 	 */
 	constructor(
-		parent, title, description, btText,
+		mod, parent, title, description, btText,
 		style = ButtonSetting.Style.DEFAULT, attribute = ""
 	) {
-		super(parent, title, description);
+		super(mod, parent, title, description);
 		this.#defaultBtText = btText;
 		this.#defaultStyle = style;
 		this.#createButton(btText, style, attribute);
@@ -77,6 +79,7 @@ export class ButtonSetting extends SettingBase {
 		this.#button.addEventListener("click", () => this.#onClicked());
 		this.#button.addEventListener("mousedown", () => this.#onMouseDown());
 		this.#button.addEventListener("mouseup", () => this.#onMouseUp());
+		this.#button.addEventListener("mouseleave", () => this.#onMouseLeave());
 	}
 
 	#onClicked() {
@@ -86,9 +89,14 @@ export class ButtonSetting extends SettingBase {
 
 	#onMouseDown() {
 		this.#button.classList.add("pressed");
+		this.playSound(SOUNDS.uiClick);
 	}
 
 	#onMouseUp() {
+		this.#button.classList.remove("pressed");
+	}
+
+	#onMouseLeave() {
 		this.#button.classList.remove("pressed");
 	}
 }

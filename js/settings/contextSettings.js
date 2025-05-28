@@ -1,4 +1,3 @@
-import { SOUNDS	} from "shapez/platform/sound";
 import { ToggleSetting } from "./inputs/toggleSetting";
 
 /**
@@ -38,6 +37,5 @@ export class ContextSettings {
 		const value = !this.#mod.settings.coordsGrid;
 		this.#coordsGridToogle.set(value);
 		this.#saveCoordsGridSetting(value);
-		this.#mod.app.sound.playUiSound(SOUNDS.uiClick);
 	}
 }

@@ -1,3 +1,5 @@
+import { SOUNDS } from "shapez/platform/sound";
+
 const { SettingBase } = require("./settingBase");
 
 /**
@@ -16,6 +18,7 @@ export class OptionListSetting extends SettingBase {
 	/** @type {string} */ #title;
 
 	/**
+	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {HTMLDivElement} parent
 	 * @param {string} title
 	 * @param {string} description
@@ -24,10 +27,10 @@ export class OptionListSetting extends SettingBase {
 	 * @param {string} attribute
 	 */
 	constructor(
-		parent, title, description, options,
+		mod, parent, title, description, options,
 		currentOption = 0, attribute = ""
 	) {
-		super(parent, title, description);
+		super(mod, parent, title, description);
 		this.#options = options;
 		this.#title = title;
 
@@ -177,13 +180,20 @@ export class OptionListSetting extends SettingBase {
 
 	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {number} ID */
 	#onOptionClicked(e, button, ID) {
-		e.#setOption(ID);
-		e.#menu.remove();
+		if (!button.classList.contains("active")) {
+			e.#setOption(ID);
+			e.#menu.remove();
+			e.playSound(SOUNDS.uiClick);
+		}
 	}
 
 	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {string} classCall */
 	#onMouseDown(e, button, classCall) {
 		button.classList.add(classCall);
+
+		if (!button.classList.contains("option")) {
+			e.playSound(SOUNDS.uiClick);
+		}
 	}
 
 	/** @param {OptionListSetting} e @param {HTMLElement} button  @param {string} classCall */

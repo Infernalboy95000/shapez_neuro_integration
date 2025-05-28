@@ -12,6 +12,7 @@ export class TextSetting extends SettingBase {
 	/**@type {HTMLInputElement} */ #inputElement;
 
 	/**
+	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {HTMLDivElement} parent
 	 * @param {string} title
 	 * @param {string} description
@@ -20,9 +21,9 @@ export class TextSetting extends SettingBase {
 	 * @param {string} text
 	 * @param {number} maxLength
 	 */
-	constructor(parent, title, description, attribute = "",
+	constructor(mod, parent, title, description, attribute = "",
 		type = "text", text = "", maxLength = 128) {
-		super(parent, title, description);
+		super(mod, parent, title, description);
 		this.#createInputParent(attribute);
 		this.#createInputElement(type, text, maxLength);
 	}
