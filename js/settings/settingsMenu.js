@@ -6,6 +6,7 @@ import { ConnectionSettings } from "./connectionSettings";
 import { ContextSettings } from "./contextSettings";
 import { StartupSettings } from "./startupSettings";
 import { ButtonSetting } from "./inputs/buttonSetting";
+import { OptionListSetting } from "./inputs/optionListSetting";
 
 export class SettingsMenu {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -149,5 +150,13 @@ export class SettingsMenu {
 			"Opens a map when entering the main menu. This can be limited to certain maps.",
 			"sdkForceOpenMap"
 		));
+
+		new OptionListSetting(
+			this.#menu,
+			"Map to open",
+			"Which map will be allowed to be open by the player or forced to open",
+			["Option 1", "Option 2"], 0,
+			"sdkMapOpenAvailable",
+		)
 	}
 }
