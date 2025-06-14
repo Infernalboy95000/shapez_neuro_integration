@@ -4,6 +4,7 @@ import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { SettingsMenu } from "./settings/settingsMenu";
 import { CoordsGrid } from "./descriptors/coordsGrid";
 import { NeuroListener } from "./neuroListener";
+import { OpenGameAction } from "./actions/menu/openGameAction";
 const DEFAULT_URL = "localhost:8000";
 
 /** @type {import("shapez/game/root").GameRoot} */
@@ -22,12 +23,7 @@ class NeuroIntegration extends Mod {
 
 		this.signals.stateEntered.add(state	=> {
 			if (state.key == "MainMenuState") {
-				if (NeuroListener.isConnected()) {
-					/** @type {import("shapez/states/main_menu").MainMenuState} */
-					const mainMenu = state;
-					const mapID = this.settings.mapAvailable;
-					mainMenu.resumeGame(this.app.savegameMgr.getGameMetaDataByInternalId(mapID));
-				}
+				new OpenGameAction(this, rootGame, state);
 			}
 			else if (state.key == "SettingsState") {
 				this.settingsMenu = new SettingsMenu(this, rootGame);

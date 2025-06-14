@@ -9,6 +9,11 @@ import { ButtonSetting } from "./inputs/buttonSetting";
 import { OptionListSetting } from "./inputs/optionListSetting";
 
 export class SettingsMenu {
+	static ANY_MAP = "any_map";
+	static ANY_OPTION = "any_option";
+	static NEW_MAP = "new_map";
+	static LAST_MAP = "last_map";
+
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {HTMLDivElement} */ #menu;
@@ -165,10 +170,10 @@ export class SettingsMenu {
 	/** @return {Map} */
 	#getMapOptions() {
 		const mapOptions = new Map();
-		mapOptions.set("any_map", "Any map");
-		mapOptions.set("any_option", "Any option");
-		mapOptions.set("new_map", "New Map");
-		mapOptions.set("last_map", "Continue");
+		mapOptions.set(SettingsMenu.ANY_MAP, "Any map");
+		mapOptions.set(SettingsMenu.ANY_OPTION, "Any option");
+		mapOptions.set(SettingsMenu.NEW_MAP, "New Map");
+		mapOptions.set(SettingsMenu.LAST_MAP, "Continue");
 		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
 		let unnamedMaps = 0;
 
