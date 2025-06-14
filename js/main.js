@@ -10,6 +10,7 @@ const DEFAULT_URL = "localhost:8000";
 
 /** @type {import("shapez/game/root").GameRoot} */
 let rootGame;
+let initialized = false;
 
 class NeuroIntegration extends Mod {
 	init() {
@@ -19,7 +20,10 @@ class NeuroIntegration extends Mod {
 
 		this.signals.gameInitialized.add(root => {
 			rootGame = root;
-			this.coordsGrid = new CoordsGrid(this);
+			if (!initialized) {
+				this.coordsGrid = new CoordsGrid(this);
+				initialized = true;
+			}
 		})
 
 		this.signals.stateEntered.add(state	=> {
