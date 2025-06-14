@@ -7,6 +7,8 @@ import { ContextSettings } from "./contextSettings";
 import { StartupSettings } from "./startupSettings";
 import { ButtonSetting } from "./inputs/buttonSetting";
 import { OptionListSetting } from "./inputs/optionListSetting";
+import { NeuroListener } from "../neuroListener";
+import { SdkActionList } from "../actions/sdkActionList";
 
 export class SettingsMenu {
 	static ANY_MAP = "any_map";
@@ -28,6 +30,15 @@ export class SettingsMenu {
 		this.#root = root;
 
 		this.#buildMenu();
+		this.#notifyPlayer();
+	}
+
+	#notifyPlayer() {
+		const actions = [SdkActionList.PLAY_GAME];
+		NeuroListener.removeActions(actions);
+		NeuroListener.sendMessage(
+			"A human player is on the settings menu. Please, wait patiently till they finish.",
+		);
 	}
 
 	#buildMenu() {

@@ -1,5 +1,7 @@
 import { NeuroListener } from "../../neuroListener";
 import { SettingsMenu } from "../../settings/settingsMenu";
+import { SimpleSdkAction } from "../register/simpleSdkAction";
+import { SdkActionList } from "../sdkActionList";
 
 export class OpenGameAction {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -25,7 +27,7 @@ export class OpenGameAction {
 				this.#forceChosenMap();
 			}
 			else if (this.#mod.settings.playerChooseMap) {
-
+				this.#promptMapToPlayer();
 			}
 		}
 	}
@@ -69,6 +71,21 @@ export class OpenGameAction {
 		return options;
 	}
 
+	#promptMapToPlayer() {
+		NeuroListener.action = ((e) => this.#OnAction(e));
+
+		const actions = [];
+		const options = this.#getAvailableOptions();
+		if (options.length <= 1) {
+			actions.push(new SimpleSdkAction(
+				SdkActionList.PLAY_GAME,
+				"Play the game"
+			));
+		}
+		NeuroListener.registerActions(actions);
+		NeuroListener.sendMessage("You can play the game now, if you want.");
+	}
+
 	#forceChosenMap() {
 		const options = this.#getAvailableOptions();
 		const random = Math.floor(Math.random() * options.length);
@@ -83,6 +100,12 @@ export class OpenGameAction {
 			const metaData = this.#mod.app.savegameMgr.
 				getGameMetaDataByInternalId(options[random]);
 			this.#state.resumeGame(metaData);
+		}
+	}
+
+	#OnAction(msg) {
+		if (msg.name == SdkActionList.PLAY_GAME) {
+			this.#forceChosenMap();
 		}
 	}
 }

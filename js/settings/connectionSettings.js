@@ -123,6 +123,9 @@ export class ConnectionSettings {
 		this.#showDisconnect();
 		this.#sdkButton.resetTitle();
 		this.#sdkButton.changeDescription(`Connected to: ${NeuroListener.getCurrentURL()}`);
+		NeuroListener.sendMessage(
+			"A human player is on the settings menu. Please, wait patiently till they finish."
+		)
 	}
 
 	#onDisconnected() {

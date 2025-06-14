@@ -3,8 +3,9 @@ import { Vector } from "shapez/core/vector";
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { SettingsMenu } from "./settings/settingsMenu";
 import { CoordsGrid } from "./descriptors/coordsGrid";
-import { NeuroListener } from "./neuroListener";
 import { OpenGameAction } from "./actions/menu/openGameAction";
+import { SdkActionList } from "./actions/sdkActionList";
+import { NeuroListener } from "./neuroListener";
 const DEFAULT_URL = "localhost:8000";
 
 /** @type {import("shapez/game/root").GameRoot} */
@@ -23,7 +24,7 @@ class NeuroIntegration extends Mod {
 
 		this.signals.stateEntered.add(state	=> {
 			if (state.key == "MainMenuState") {
-				new OpenGameAction(this, rootGame, state);
+				this.openGameAction = new OpenGameAction(this, rootGame, state);
 			}
 			else if (state.key == "SettingsState") {
 				this.settingsMenu = new SettingsMenu(this, rootGame);
@@ -42,6 +43,13 @@ class NeuroIntegration extends Mod {
 					this.ActionTest();
 				});
 				actionButton.appendChild(button);
+
+				const actions = [SdkActionList.PLAY_GAME];
+				NeuroListener.removeActions(actions);
+				NeuroListener.sendMessage(
+					"The game has loaded. Have fun.",
+					true,
+				);
 			}
 		});
 	}

@@ -1,5 +1,6 @@
 // @ts-ignore
 import { NeuroClient } from 'neuro-game-sdk';
+import { SdkAction } from './actions/register/sdkAction';
 // Private constants
 const GAME_NAME = 'Shapez';
 const MAX_RETRIES = 3;
@@ -36,6 +37,7 @@ export class NeuroListener {
 			attempting = true;
 			this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
 			this.neuroClient.onError = () => { NeuroListener.onErrored(); };
+			this.neuroClient.onAction((e) => NeuroListener.onAction(e));
 		}
 		catch {
 			NeuroListener.onInitCrashed();
@@ -70,6 +72,30 @@ export class NeuroListener {
 			if (NeuroListener.disconnected) {
 				NeuroListener.disconnected();
 			}
+		}
+	}
+
+	static sendMessage(msg, silent = false) {
+		if (connected) {
+			this.neuroClient.sendContext(msg, silent);
+		}
+	}
+
+	/** @param {Array<SdkAction>} actions */
+	static registerActions(actions) {
+		if (connected) {
+			const actionsSchemas = new Array();
+			for (let i = 0; i < actions.length; i++) {
+				actionsSchemas.push(actions[i].build());
+			}
+			this.neuroClient.registerActions(actionsSchemas);
+		}
+	}
+
+	/** @param {Array<string>} actionIds */
+	static removeActions(actionIds) {
+		if (connected) {
+			this.neuroClient.unregisterActions(actionIds);
 		}
 	}
 
@@ -133,6 +159,12 @@ export class NeuroListener {
 			NeuroListener.initCrash()
 		}
 	}
+
+	static onAction(msg) {
+		if (NeuroListener.action) {
+			NeuroListener.action(msg);
+		}
+	}
 }
 // Public events
 NeuroListener.connected = undefined;
@@ -141,3 +173,4 @@ NeuroListener.reattempting = undefined;
 NeuroListener.closed = undefined;
 NeuroListener.failed = undefined;
 NeuroListener.initCrash = undefined;
+NeuroListener.action = undefined;
