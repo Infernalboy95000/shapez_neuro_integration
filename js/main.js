@@ -1,63 +1,41 @@
 import { Mod } from "shapez/mods/mod";
-import { Vector } from "shapez/core/vector";
-import { gMetaBuildingRegistry } from "shapez/core/global_registries";
-import { SettingsMenu } from "./settings/settingsMenu";
+//import { Vector } from "shapez/core/vector";
+//import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { CoordsGrid } from "./descriptors/coordsGrid";
-import { OpenGameAction } from "./actions/menu/openGameAction";
-import { SdkActionList } from "./actions/sdkActionList";
-import { NeuroListener } from "./neuroListener";
+import { ActionsController } from "./actions/controllers/actionsController";
 const DEFAULT_URL = "localhost:8000";
 
 /** @type {import("shapez/game/root").GameRoot} */
 let rootGame;
-let initialized = false;
 
 class NeuroIntegration extends Mod {
+	/** @type {boolean} */ #booted = false;
+	/** @type {CoordsGrid} */ #coordsGrid;
+	/** @type {ActionsController} */ #actionsController;
+
 	init() {
 		if (this.settings.socketURL == undefined) {
-			this.SaveDefaultSettings();
+			this.#SaveDefaultSettings();
 		}
+
+		this.signals.appBooted.add(() => {
+			this.#coordsGrid = new CoordsGrid(this);
+			this.#actionsController = new ActionsController(this);
+			this.#booted = true
+		});
 
 		this.signals.gameInitialized.add(root => {
 			rootGame = root;
-			if (!initialized) {
-				this.coordsGrid = new CoordsGrid(this);
-				initialized = true;
-			}
-		})
+		});
 
 		this.signals.stateEntered.add(state	=> {
-			if (state.key == "MainMenuState") {
-				this.openGameAction = new OpenGameAction(this, rootGame, state);
-			}
-			else if (state.key == "SettingsState") {
-				this.settingsMenu = new SettingsMenu(this, rootGame);
-			}
-			else if (state.key == "InGameState") {
-				//this.modInterface.extendClass(HUDBuildingPlacerLogic, AutoBuilder);
-				const actionButton = document.createElement("div");
-				actionButton.id = "neuro_action_test";
-				document.body.appendChild(actionButton);
-
-				const button = document.createElement("button");
-				button.classList.add("styledButton");
-				button.innerText = "Test action!";
-				button.addEventListener("click", () => {
-					console.log("click");
-					this.ActionTest();
-				});
-				actionButton.appendChild(button);
-
-				const actions = [SdkActionList.PLAY_GAME];
-				NeuroListener.removeActions(actions);
-				NeuroListener.sendMessage(
-					"The game has loaded. Have fun.",
-					true,
-				);
+			if (this.#booted) {
+				this.#actionsController.notifyStateChange(state);
 			}
 		});
 	}
 
+	/*
 	ActionTest() {
 		const metaBuild = gMetaBuildingRegistry.findByClass(rootGame.hud.parts.buildingsToolbar.allBuildings[0])
 
@@ -67,7 +45,29 @@ class NeuroIntegration extends Mod {
 		rootGame.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(new Vector(50, 0));
 	}
 
-	SaveDefaultSettings() {
+	//this.modInterface.extendClass(HUDBuildingPlacerLogic, AutoBuilder);
+	const actionButton = document.createElement("div");
+	actionButton.id = "neuro_action_test";
+	document.body.appendChild(actionButton);
+
+	const button = document.createElement("button");
+	button.classList.add("styledButton");
+	button.innerText = "Test action!";
+	button.addEventListener("click", () => {
+		console.log("click");
+		this.ActionTest();
+	});
+	actionButton.appendChild(button);
+
+	const actions = [SdkActionList.PLAY_GAME];
+	SdkClient.removeActions(actions);
+	SdkClient.sendMessage(
+		"The game has loaded. Have fun.",
+		true,
+	);
+	*/
+
+	#SaveDefaultSettings() {
 		this.settings.socketURL = DEFAULT_URL;
 		this.saveSettings();
 	}

@@ -7,7 +7,6 @@ import { ToggleSetting } from "./inputs/toggleSetting";
  */
 export class StartupSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
-	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ToggleSetting} */ #autoConnectToggle;
 	/** @type {ToggleSetting} */ #playerChooseMapToggle;
 	/** @type {ToggleSetting} */ #forceOpenMapToggle;
@@ -15,11 +14,9 @@ export class StartupSettings {
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
-	 * @param {import("shapez/game/root").GameRoot} root
 	 */
-	constructor(mod, root) {
+	constructor(mod) {
 		this.#mod = mod;
-		this.#root = root;
 	}
 
 	/** @param {ToggleSetting} toogleSetting */

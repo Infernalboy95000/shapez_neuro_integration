@@ -1,6 +1,6 @@
-// @ts-ignore
 import { NeuroClient } from 'neuro-game-sdk';
-import { SdkAction } from './actions/register/sdkAction';
+import { SdkAction } from './actions/definitions/sdkAction';
+import { ActionEvent } from './custom/actionEvent';
 // Private constants
 const GAME_NAME = 'Shapez';
 const MAX_RETRIES = 3;
@@ -11,17 +11,17 @@ let attempting = false;
 let socketURL = "";
 let retries = 0;
 
-export class NeuroListener {
+export class SdkClient {
 	static tryConnect(URL) {
 		if (!URL) {
-			NeuroListener.onInitCrashed();
+			SdkClient.#onInitCrashed();
 			return false;
 		}
 		else if (/^ws{1,2}:{1}\/{2}/.test(URL)) {
 			socketURL = URL;
 		}
 		else if (/^.+:{1}\/+/.test(URL)) {
-			NeuroListener.onInitCrashed();
+			SdkClient.#onInitCrashed();
 			return false;
 		}
 		else {
@@ -32,15 +32,15 @@ export class NeuroListener {
 
 		try {
 			this.neuroClient = new NeuroClient(
-				socketURL, GAME_NAME, () => { NeuroListener.onConnected(); }
+				socketURL, GAME_NAME, () => { SdkClient.#onConnected(); }
 			);
 			attempting = true;
-			this.neuroClient.onClose = () => { NeuroListener.onClosed(); };
-			this.neuroClient.onError = () => { NeuroListener.onErrored(); };
-			this.neuroClient.onAction((e) => NeuroListener.onAction(e));
+			this.neuroClient.onClose = () => { SdkClient.#onClosed(); };
+			this.neuroClient.onError = () => { SdkClient.#onErrored(); };
+			this.neuroClient.onAction(e => { SdkClient.#onAction(e); });
 		}
 		catch {
-			NeuroListener.onInitCrashed();
+			SdkClient.#onInitCrashed();
 			return false;
 		}
 		return true;
@@ -48,13 +48,10 @@ export class NeuroListener {
 
 	static retryConnection() {
 		if (this.neuroClient) {
-			this.neuroClient.connect(() => { NeuroListener.onConnected(); });
-			if (NeuroListener.reattempting) {
-				NeuroListener.reattempting();
-			}
+			SdkClient.reattempting.invoke();
 		}
 		else {
-			NeuroListener.tryConnect();
+			SdkClient.tryConnect();
 		}
 	}
 
@@ -69,9 +66,7 @@ export class NeuroListener {
 			connected = false;
 			attempting = false;
 			socketURL = "";
-			if (NeuroListener.disconnected) {
-				NeuroListener.disconnected();
-			}
+			SdkClient.disconnected.invoke();
 		}
 	}
 
@@ -99,6 +94,17 @@ export class NeuroListener {
 		}
 	}
 
+	/**
+	 * @param {string} id
+     * @param {boolean} success
+     * @param {string} message
+     */
+	static tellActionResult(id, success, message = "") {
+		if (connected) {
+			this.neuroClient.sendActionResult(id, success, message);
+		}
+	}
+
 	static isConnected() {
 		return connected;
 	}
@@ -115,29 +121,25 @@ export class NeuroListener {
 		return socketURL;
 	}
 
-	static onConnected() {
+	static #onConnected() {
 		connected = true;
 		attempting = false;
-		if (NeuroListener.connected) {
-			NeuroListener.connected();
-		}
+		SdkClient.connected.invoke();
 	}
 
-	static onClosed() {
+	static #onClosed() {
 		if (connected) {
 			connected = false;
 			attempting = false;
 			socketURL = "";
-			if (NeuroListener.closed) {
-				NeuroListener.closed();
-			}
+			SdkClient.closed.invoke();
 		}
 	}
 
-	static onErrored() {
+	static #onErrored() {
 		if (retries < MAX_RETRIES) {
 			retries++;
-			NeuroListener.retryConnection();
+			SdkClient.retryConnection();
 		}
 		else {
 			this.neuroClient = null;
@@ -145,32 +147,26 @@ export class NeuroListener {
 			attempting = false;
 			socketURL = "";
 
-			if (NeuroListener.failed) {
-				NeuroListener.failed()
-			}
+			SdkClient.failed.invoke();
 		}
 	}
 
-	static onInitCrashed() {
+	static #onInitCrashed() {
 		connected = false;
 		attempting = false;
 		socketURL = "";
-		if (NeuroListener.initCrash) {
-			NeuroListener.initCrash()
-		}
+		SdkClient.initCrash.invoke();
 	}
 
-	static onAction(msg) {
-		if (NeuroListener.action) {
-			NeuroListener.action(msg);
-		}
+	static #onAction(msg) {
+		SdkClient.action.invoke(msg);
 	}
 }
 // Public events
-NeuroListener.connected = undefined;
-NeuroListener.disconnected = undefined;
-NeuroListener.reattempting = undefined;
-NeuroListener.closed = undefined;
-NeuroListener.failed = undefined;
-NeuroListener.initCrash = undefined;
-NeuroListener.action = undefined;
+SdkClient.connected = new ActionEvent()
+SdkClient.disconnected = new ActionEvent();
+SdkClient.reattempting = new ActionEvent();
+SdkClient.closed = new ActionEvent();
+SdkClient.failed = new ActionEvent();
+SdkClient.initCrash = new ActionEvent();
+SdkClient.action = new ActionEvent();

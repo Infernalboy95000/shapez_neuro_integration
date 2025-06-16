@@ -1,42 +1,106 @@
-import { NeuroListener } from "../../neuroListener";
+import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
-import { SimpleSdkAction } from "../register/simpleSdkAction";
+import { SimpleSdkAction } from "../definitions/simpleSdkAction";
 import { SdkActionList } from "../sdkActionList";
 
 export class OpenGameAction {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
-	/** @type {import("shapez/game/root").GameRoot} */ #root;
-	/** @type {import("shapez/states/main_menu").MainMenuState} */ #state;
 
-	/**
-	 * @param {import("shapez/mods/mod").Mod} mod
-	 * @param {import("shapez/game/root").GameRoot} root
-	 * @param {import("shapez/states/main_menu").MainMenuState} state
-	 */
-	constructor(mod, root, state) {
+	/** @param {import("shapez/mods/mod").Mod} mod */
+	constructor(mod) {
 		this.#mod = mod;
-		this.#root = root;
-		this.#state = state;
-
-		this.#tryOpenGame();
 	}
 
-	#tryOpenGame() {
-		if (NeuroListener.isConnected()) {
-			if (this.#mod.settings.forceOpenMap) {
-				this.#forceChosenMap();
-			}
-			else if (this.#mod.settings.playerChooseMap) {
-				this.#promptMapToPlayer();
-			}
+	promptMapToPlayer() {
+		const actions = [];
+		const options = this.#getAvailableOptions();
+		if (options.length == 1) {
+			actions.push(new SimpleSdkAction(
+				SdkActionList.PLAY_GAME,
+				"Play the game"
+			));
+			SdkClient.registerActions(actions);
 		}
+		SdkClient.sendMessage("You can play the game now, if you want.");
+	}
+
+	/** @param {import("shapez/states/main_menu").MainMenuState} state */
+	forceChosenMap(state) {
+		const options = this.#getAvailableOptions();
+		const random = Math.floor(Math.random() * options.length);
+
+		if (options[random] == SettingsMenu.LAST_MAP) {
+			state.onContinueButtonClicked();
+		}
+		else if (options[random] == SettingsMenu.NEW_MAP) {
+			state.onPlayButtonClicked();
+		}
+		else {
+			const metaData = this.#mod.app.savegameMgr.
+				getGameMetaDataByInternalId(options[random]);
+			state.resumeGame(metaData);
+		}
+	}
+
+	/**
+	 * @param {import("shapez/states/main_menu").MainMenuState} state
+	 * @returns {boolean}
+	 */
+	tryContinueLastMap(state) {
+		let mapOpenned = true;
+		state.onContinueButtonClicked();
+		return mapOpenned;
+	}
+
+	/**
+	 * @param {import("shapez/states/main_menu").MainMenuState} state
+	 * @returns {boolean}
+	 */
+	tryCreateNewMap(state) {
+		let mapCreated = true;
+		state.onPlayButtonClicked();
+		return mapCreated;
+	}
+
+	/** 
+	 * @param {string} mapName
+	 * @param {import("shapez/states/main_menu").MainMenuState} state
+	 * @returns {boolean}
+	 */
+	tryOpenMap(mapName, state) {
+		let mapOpenned = true;
+		const metaData = this.#getMapFromName(mapName);
+		if (metaData != null) {
+			state.resumeGame(metaData);
+		}
+		else {
+			mapOpenned = false;
+		}
+		return mapOpenned;
+	}
+
+	/** 
+	 * @param {string} mapID
+	 * @param {import("shapez/states/main_menu").MainMenuState} state
+	 * @returns {boolean}
+	 */
+	tryOpenMapID(mapID, state) {
+		let mapOpenned = true;
+		const metaData = this.#mod.app.savegameMgr.getGameMetaDataByInternalId(mapID);
+		if (metaData != null) {
+			state.resumeGame(metaData);
+		}
+		else {
+			mapOpenned = false;
+		}
+		return mapOpenned;
 	}
 
 	/** @returns {Array<string>} */
 	#getAvailableOptions() {
 		const options = [];
 		const allowedMap = this.#mod.settings.mapAvailable;
-		const saves = this.#state.savedGames;
+		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
 
 		if (allowedMap == SettingsMenu.LAST_MAP) {
 			if (saves.length > 0) {
@@ -71,41 +135,25 @@ export class OpenGameAction {
 		return options;
 	}
 
-	#promptMapToPlayer() {
-		NeuroListener.action = ((e) => this.#OnAction(e));
+	/**
+	 * @param {string} mapName
+	 * @returns {import("shapez/savegame/savegame_typedefs").SavegameMetadata}
+	 */
+	#getMapFromName(mapName) {
+		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
+		let mapID = "";
 
-		const actions = [];
-		const options = this.#getAvailableOptions();
-		if (options.length <= 1) {
-			actions.push(new SimpleSdkAction(
-				SdkActionList.PLAY_GAME,
-				"Play the game"
-			));
+		for (let i = 0; i < saves.length; i++) {
+			if (saves[i].name == mapName) {
+				mapID = saves[i].internalId;
+			}
 		}
-		NeuroListener.registerActions(actions);
-		NeuroListener.sendMessage("You can play the game now, if you want.");
-	}
 
-	#forceChosenMap() {
-		const options = this.#getAvailableOptions();
-		const random = Math.floor(Math.random() * options.length);
-
-		if (options[random] == SettingsMenu.LAST_MAP) {
-			this.#state.onContinueButtonClicked();
-		}
-		else if (options[random] == SettingsMenu.NEW_MAP) {
-			this.#state.onPlayButtonClicked();
+		if (mapID == "") {
+			return null;
 		}
 		else {
-			const metaData = this.#mod.app.savegameMgr.
-				getGameMetaDataByInternalId(options[random]);
-			this.#state.resumeGame(metaData);
-		}
-	}
-
-	#OnAction(msg) {
-		if (msg.name == SdkActionList.PLAY_GAME) {
-			this.#forceChosenMap();
+			return this.#mod.app.savegameMgr.getGameMetaDataByInternalId(mapID);
 		}
 	}
 }

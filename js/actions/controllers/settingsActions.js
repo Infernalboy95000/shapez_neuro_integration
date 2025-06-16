@@ -1,0 +1,47 @@
+import { SdkClient } from "../../sdkClient";
+import { SettingsMenu } from "../../settings/settingsMenu";
+import { SdkActionList } from "../sdkActionList";
+
+export class SettingsActions {
+	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+	/** @type {SettingsMenu} */ #settingsMenu;
+
+	/**
+	 * @param {import("shapez/mods/mod").Mod} mod
+	 */
+	constructor(mod) {
+		this.#mod = mod;
+		this.#settingsMenu = new SettingsMenu(mod);
+	}
+
+	menuOpenned() {
+		this.#settingsMenu.showMenu();
+
+		if (SdkClient.isConnected()) {
+			this.#removeGameplayActions();
+		}
+	}
+
+	playerSentAction(action) {
+		SdkClient.tellActionResult(
+			action.id, false,
+			`You have no permissions to move or change settings. ` +
+			`Please, wait till a human exists from the settings menu.`
+		)
+	}
+
+	playerConntected() {
+		SdkClient.sendMessage(
+			`Welcome to shapez. ` +
+			`Please, wait till a human finishes setting up your SDK permissions to play.`
+		)
+	}
+
+	#removeGameplayActions() {
+		const actions = [SdkActionList.PLAY_GAME];
+		SdkClient.removeActions(actions);
+		SdkClient.sendMessage(
+			"A human player entered the settings. Please, wait patiently till they finish.",
+		);
+	}
+}

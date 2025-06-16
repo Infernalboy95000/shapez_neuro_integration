@@ -1,5 +1,5 @@
 import { SOUNDS	} from "shapez/platform/sound";
-import { NeuroListener } from "../neuroListener";
+import { SdkClient } from "../sdkClient";
 import { TextSetting } from "./inputs/textSetting";
 import { ToggleSetting } from "./inputs/toggleSetting";
 import { ButtonSetting } from "./inputs/buttonSetting";
@@ -10,27 +10,24 @@ import { ButtonSetting } from "./inputs/buttonSetting";
  */
 export class ConnectionSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
-	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/**@type {ButtonSetting} */ #sdkButton;
 	/**@type {TextSetting} */#sdkURL;
 	/**@type {ToggleSetting} */ #coordsGridToogle;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
-	 * @param {import("shapez/game/root").GameRoot} root
 	 */
-	constructor(mod, root) {
+	constructor(mod) {
 		this.#mod = mod;
-		this.#root = root;
 	}
 
 	/** @param {ButtonSetting} buttonSetting */
 	addSdkButton(buttonSetting) {
 		this.#sdkButton = buttonSetting;
 		this.#setSdkButtonEvents();
-		this.#setNeuroListenerEvents();
+		this.#setSdkClientEvents();
 
-		if (NeuroListener.isConnected()) {
+		if (SdkClient.isConnected()) {
 			this.#showDisconnect();
 		}
 	}
@@ -60,13 +57,13 @@ export class ConnectionSettings {
 		this.#coordsGridToogle.onClicked = () => { this.#onCoordsGridToogleClicked() };
 	}
 
-	#setNeuroListenerEvents() {
-		NeuroListener.connected = () => { this.#onConnected() };
-		NeuroListener.disconnected = () => { this.#onDisconnected() };
-		NeuroListener.reattempting = () => { this.#onReattempting() };
-		NeuroListener.closed = () => { this.#onClosed() };
-		NeuroListener.failed = () => { this.#onFailed() };
-		NeuroListener.initCrash = () => { this.#onInitCrash() };
+	#setSdkClientEvents() {
+		SdkClient.connected.add(() => { this.#onConnected() });
+		SdkClient.disconnected.add(() => { this.#onDisconnected() });
+		SdkClient.reattempting.add(() => { this.#onReattempting() });
+		SdkClient.closed.add(() => { this.#onClosed() });
+		SdkClient.failed.add(() => { this.#onFailed() });
+		SdkClient.initCrash.add(() => { this.#onInitCrash() });
 	}
 
 	#onSdkButtonClicked() {
@@ -74,18 +71,18 @@ export class ConnectionSettings {
 	}
 
 	#sdkButtonAction() {
-		if (NeuroListener.isConnected()) {
-			NeuroListener.disconnect();
+		if (SdkClient.isConnected()) {
+			SdkClient.disconnect();
 			this.#showConnect();
 		}
-		else if (NeuroListener.isAttempting()) {
+		else if (SdkClient.isAttempting()) {
 			this.#sdkButton.changeDescription("Requested cancellation ...");
 			this.#showCancel();
-			NeuroListener.requestCancell();
+			SdkClient.requestCancell();
 		}
-		else if (NeuroListener.tryConnect(this.#mod.settings.socketURL)) {
+		else if (SdkClient.tryConnect(this.#mod.settings.socketURL)) {
 			this.#sdkButton.changeTitle("Connecting...");
-			this.#sdkButton.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
+			this.#sdkButton.changeDescription(`Attempting connection at: ${SdkClient.getCurrentURL()} ...`);
 			this.#showCancel();
 		}
 	}
@@ -122,10 +119,7 @@ export class ConnectionSettings {
 	#onConnected() {
 		this.#showDisconnect();
 		this.#sdkButton.resetTitle();
-		this.#sdkButton.changeDescription(`Connected to: ${NeuroListener.getCurrentURL()}`);
-		NeuroListener.sendMessage(
-			"A human player is on the settings menu. Please, wait patiently till they finish."
-		)
+		this.#sdkButton.changeDescription(`Connected to: ${SdkClient.getCurrentURL()}`);
 	}
 
 	#onDisconnected() {
@@ -134,8 +128,8 @@ export class ConnectionSettings {
 
 	#onReattempting() {
 		this.#showCancel();
-		this.#sdkButton.changeTitle(`Connecting... (${NeuroListener.getRetriesFormatted()})`);
-		this.#sdkButton.changeDescription(`Attempting connection at: ${NeuroListener.getCurrentURL()} ...`);
+		this.#sdkButton.changeTitle(`Connecting... (${SdkClient.getRetriesFormatted()})`);
+		this.#sdkButton.changeDescription(`Attempting connection at: ${SdkClient.getCurrentURL()} ...`);
 	}
 
 	#onClosed() {
