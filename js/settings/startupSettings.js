@@ -35,9 +35,20 @@ export class StartupSettings {
 
 	/** @param {ToggleSetting} toogleSetting */
 	addForceOpenMapToggle(toogleSetting) {
+		const forceMap = this.#mod.settings.forceOpenMap;
+		const playerChoose = this.#mod.settings.playerChooseMap;
+
 		this.#forceOpenMapToggle = toogleSetting;
 		this.#setForceOpenMapEvents();
-		this.#forceOpenMapToggle.set(this.#mod.settings.forceOpenMap);
+
+		// Player can choose and Force open are mutually exlusive
+		if (forceMap && playerChoose) {
+			this.#forceOpenMapToggle.set(false);
+			this.#saveForceOpenMapSetting(false);
+		}
+		else {
+			this.#forceOpenMapToggle.set(forceMap);
+		}
 	}
 
 	/** @param {OptionListSetting} optionListSetting */
@@ -102,12 +113,24 @@ export class StartupSettings {
 		const value = !this.#mod.settings.playerChooseMap;
 		this.#playerChooseMapToggle.set(value);
 		this.#savePlayerChooseMapSetting(value);
+
+		// Player can choose and Force open are mutually exlusive
+		if (this.#mod.settings.forceOpenMap) {
+			this.#forceOpenMapToggle.set(false);
+			this.#saveForceOpenMapSetting(false);
+		}
 	}
 
 	#onForceOpenMapToogleClicked() {
 		const value = !this.#mod.settings.forceOpenMap;
 		this.#forceOpenMapToggle.set(value);
 		this.#saveForceOpenMapSetting(value);
+
+		// Player can choose and Force open are mutually exlusive
+		if (this.#mod.settings.playerChooseMap) {
+			this.#playerChooseMapToggle.set(false);
+			this.#savePlayerChooseMapSetting(false);
+		}
 	}
 
 	#onMapAvailableOptionChosed(optionID) {
