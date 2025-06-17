@@ -1,7 +1,4 @@
-import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
-import { SimpleSdkAction } from "../definitions/simpleSdkAction";
-import { SdkActionList } from "../sdkActionList";
 
 export class OpenGameAction {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -11,22 +8,9 @@ export class OpenGameAction {
 		this.#mod = mod;
 	}
 
-	promptMapToPlayer() {
-		const actions = [];
-		const options = this.#getAvailableOptions();
-		if (options.length == 1) {
-			actions.push(new SimpleSdkAction(
-				SdkActionList.PLAY_GAME,
-				"Play the game"
-			));
-			SdkClient.registerActions(actions);
-		}
-		SdkClient.sendMessage("You can play the game now, if you want.");
-	}
-
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	forceChosenMap(state) {
-		const options = this.#getAvailableOptions();
+		const options = this.getAvailableOptions();
 		const random = Math.floor(Math.random() * options.length);
 
 		if (options[random] == SettingsMenu.LAST_MAP) {
@@ -63,28 +47,11 @@ export class OpenGameAction {
 	}
 
 	/** 
-	 * @param {string} mapName
-	 * @param {import("shapez/states/main_menu").MainMenuState} state
-	 * @returns {boolean}
-	 */
-	tryOpenMap(mapName, state) {
-		let mapOpenned = true;
-		const metaData = this.#getMapFromName(mapName);
-		if (metaData != null) {
-			state.resumeGame(metaData);
-		}
-		else {
-			mapOpenned = false;
-		}
-		return mapOpenned;
-	}
-
-	/** 
 	 * @param {string} mapID
 	 * @param {import("shapez/states/main_menu").MainMenuState} state
 	 * @returns {boolean}
 	 */
-	tryOpenMapID(mapID, state) {
+	tryOpenMapByID(mapID, state) {
 		let mapOpenned = true;
 		const metaData = this.#mod.app.savegameMgr.getGameMetaDataByInternalId(mapID);
 		if (metaData != null) {
@@ -97,7 +64,7 @@ export class OpenGameAction {
 	}
 
 	/** @returns {Array<string>} */
-	#getAvailableOptions() {
+	getAvailableOptions() {
 		const options = [];
 		const allowedMap = this.#mod.settings.mapAvailable;
 		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
@@ -133,27 +100,5 @@ export class OpenGameAction {
 		}
 
 		return options;
-	}
-
-	/**
-	 * @param {string} mapName
-	 * @returns {import("shapez/savegame/savegame_typedefs").SavegameMetadata}
-	 */
-	#getMapFromName(mapName) {
-		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
-		let mapID = "";
-
-		for (let i = 0; i < saves.length; i++) {
-			if (saves[i].name == mapName) {
-				mapID = saves[i].internalId;
-			}
-		}
-
-		if (mapID == "") {
-			return null;
-		}
-		else {
-			return this.#mod.app.savegameMgr.getGameMetaDataByInternalId(mapID);
-		}
 	}
 }

@@ -24,6 +24,7 @@ export class ActionsController {
 	}
 
 	notifyStateChange(state) {
+		this.#notifyCloseOfMenus();
 		this.#stateKey = state.key;
 		switch (state.key) {
 			case "MainMenuState":
@@ -33,11 +34,14 @@ export class ActionsController {
 				this.#settingsActions.menuOpenned();
 				break;
 			case "InGameState":
-				// Way too temporal, but should ""work"" for now
-				if (SdkClient.isConnected) {
-					const actions = [SdkActionList.PLAY_GAME];
-					SdkClient.removeActions(actions);
-				}
+				break;
+		}
+	}
+
+	#notifyCloseOfMenus() {
+		switch (this.#stateKey) {
+			case "MainMenuState":
+				this.#mainMenuActions.menuClosed();
 				break;
 		}
 	}

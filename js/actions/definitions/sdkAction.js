@@ -22,4 +22,14 @@ export class SdkAction {
 
 		return action;
 	}
+
+	/** @returns {string} */
+	getName() {
+		return this.#actName;
+	}
+
+	/** @param {string} actDesc */
+	setDescription(actDesc) {
+		this.#actDesc = actDesc;
+	}
 }

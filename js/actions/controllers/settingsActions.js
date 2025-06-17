@@ -38,10 +38,9 @@ export class SettingsActions {
 	}
 
 	#removeGameplayActions() {
-		const actions = [SdkActionList.PLAY_GAME];
-		SdkClient.removeActions(actions);
 		SdkClient.sendMessage(
-			"A human player entered the settings. Please, wait patiently till they finish.",
+			`A human entered the settings menu. ` +
+			`Please, wait patiently till they finish.`,
 		);
 	}
 }
