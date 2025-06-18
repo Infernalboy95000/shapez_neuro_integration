@@ -3,7 +3,6 @@ import { SettingsMenu } from "../../settings/settingsMenu";
 import { ActionList } from "../lists/actionList";
 import { MainMenuActionList } from "../lists/mainMenuActionList";
 import { OpenGameAction } from "../menu/openGameAction";
-import { SdkActionList } from "../sdkActionList";
 
 export class MainMenuActions {
 	/** @type {import("shapez/states/main_menu").MainMenuState} */ #state;
@@ -84,8 +83,8 @@ export class MainMenuActions {
 		else if (action.name ==  MainMenuActionList.NEW_GAME.getName()) {
 			return this.#openGameAction.tryCreateNewMap(this.#state);
 		}
-		else if (this.#mapsAvailable.has(action.params.options)) {
-			const mapID = this.#mapsAvailable.get(action.params.options);
+		else if (this.#mapsAvailable.has(action.params.map)) {
+			const mapID = this.#mapsAvailable.get(action.params.map);
 			return this.#openGameAction.tryOpenMapByID(mapID, this.#state);
 		}
 		else {

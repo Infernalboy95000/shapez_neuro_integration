@@ -16,7 +16,7 @@ export class MainMenuActionList {
 	);
 
 	static LOAD_GAME = new EnumSdkAction(
-		"load_game", "Select the map you want to load"
+		"load_game", "Select the map you want to load", "map"
 	);
 
 	/*
