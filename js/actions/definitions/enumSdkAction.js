@@ -31,18 +31,14 @@ export class EnumSdkAction extends SdkAction {
 
 	/** @returns {Object} */
 	#getSchema() {
-		let schemaString = '{' +
-			'"type":"object",' +
-			'"properties":{"' +
-				this.#optionsName + '":{' +
-					'"enum":[]' +
-				'}' +
-			'},' +
-			'"required":["' + this.#optionsName + '"]}';
-		let schema = JSON.parse(schemaString);
-
-		for (let i = 0; i < this.#options.length; i++) {
-			schema.properties[this.#optionsName].enum.push(this.#options[i]);
+		let schema = {
+			type: 'object',
+			properties: {
+				[this.#optionsName]: {
+					enum: this.#options
+				}
+			},
+			required: [this.#optionsName],
 		}
 
 		return schema;
