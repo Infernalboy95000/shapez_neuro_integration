@@ -1,5 +1,6 @@
 import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
+import { EnumSchema } from "../definitions/schema/enumSchema";
 import { ActionList } from "../lists/actionList";
 import { MainMenuActionList } from "../lists/mainMenuActionList";
 import { OpenGameAction } from "../menu/openGameAction";
@@ -11,9 +12,7 @@ export class MainMenuActions {
 	/** @type {OpenGameAction} */ #openGameAction;
 	/** @type {ActionList} */ #actions;
 
-	/**
-	 * @param {import("shapez/mods/mod").Mod} mod
-	 */
+	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#openGameAction = new OpenGameAction(mod);
@@ -132,7 +131,8 @@ export class MainMenuActions {
 
 			if (this.#mapsAvailable.size > 0) {
 				const maps = Array.from(this.#mapsAvailable.keys());
-				MainMenuActionList.LOAD_GAME.setOptions(maps)
+				const mapsSchema = new EnumSchema("map", maps);
+				MainMenuActionList.LOAD_GAME.setOptions([mapsSchema])
 				this.#actions.addAction(MainMenuActionList.LOAD_GAME);
 			}
 		}
