@@ -1,12 +1,7 @@
 import { Mod } from "shapez/mods/mod";
-//import { Vector } from "shapez/core/vector";
-//import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { CoordsGrid } from "./descriptors/coordsGrid";
 import { ActionsController } from "./actions/controllers/actionsController";
 const DEFAULT_URL = "localhost:8000";
-
-/** @type {import("shapez/game/root").GameRoot} */
-let rootGame;
 
 class NeuroIntegration extends Mod {
 	/** @type {boolean} */ #booted = false;
@@ -25,7 +20,7 @@ class NeuroIntegration extends Mod {
 		});
 
 		this.signals.gameInitialized.add(root => {
-			rootGame = root;
+			this.#actionsController.newGameOpenned(root);
 		});
 
 		this.signals.stateEntered.add(state	=> {

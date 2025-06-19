@@ -1,6 +1,6 @@
 import { SettingsMenu } from "../../settings/settingsMenu";
 
-export class OpenGameAction {
+export class MapLoader {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */

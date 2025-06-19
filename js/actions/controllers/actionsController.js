@@ -1,7 +1,7 @@
 import { SdkClient } from "../../sdkClient";
+import { InGameActions } from "./inGameActions";
 import { MainMenuActions } from "./mainMenuActions";
 import { SettingsActions } from "./settingsActions";
-import { SdkActionList } from "../sdkActionList";
 /**
  * Listens and responds to all actions the SDK receives
  * @class ActionsListener
@@ -9,12 +9,12 @@ import { SdkActionList } from "../sdkActionList";
 export class ActionsController {
 	/** @type {string} */ #stateKey;
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {MainMenuActions} */ #mainMenuActions;
 	/** @type {SettingsActions} */ #settingsActions;
+	/** @type {InGameActions} */ #inGameActions;
 
-	/**
-	 * @param {import("shapez/mods/mod").Mod} mod
-	 */
+	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#mainMenuActions = new MainMenuActions(mod);
@@ -34,14 +34,27 @@ export class ActionsController {
 				this.#settingsActions.menuOpenned();
 				break;
 			case "InGameState":
+				if (this.#inGameActions) {
+					this.#inGameActions.gameOpenned();
+				}
 				break;
 		}
+	}
+
+	/** @param {import("shapez/game/root").GameRoot} root */
+	newGameOpenned(root) {
+		this.#inGameActions = new InGameActions(this.#mod, root);
+		this.#inGameActions.gameOpenned();
 	}
 
 	#notifyCloseOfMenus() {
 		switch (this.#stateKey) {
 			case "MainMenuState":
+				this.#inGameActions = undefined;
 				this.#mainMenuActions.menuClosed();
+				break;
+			case "InGameState":
+				this.#inGameActions.gameClosed();
 				break;
 		}
 	}
@@ -63,6 +76,9 @@ export class ActionsController {
 				break;
 			case "SettingsState":
 				this.#settingsActions.playerSentAction(action);
+				break;
+			case "InGameState":
+				this.#inGameActions.playerSentAction(action);
 				break;
 			default:
 				const menuName = this.#stateKey.slice(0, this.#stateKey.search("State"));

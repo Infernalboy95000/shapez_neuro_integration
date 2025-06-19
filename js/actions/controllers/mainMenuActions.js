@@ -3,19 +3,19 @@ import { SettingsMenu } from "../../settings/settingsMenu";
 import { EnumSchema } from "../definitions/schema/enumSchema";
 import { ActionList } from "../lists/actionList";
 import { MainMenuActionList } from "../lists/mainMenuActionList";
-import { OpenGameAction } from "../menu/openGameAction";
+import { MapLoader } from "../executers/mapLoader";
 
 export class MainMenuActions {
 	/** @type {import("shapez/states/main_menu").MainMenuState} */ #state;
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {Map<string, string>} */ #mapsAvailable = new Map();
-	/** @type {OpenGameAction} */ #openGameAction;
+	/** @type {MapLoader} */ #MapLoader;
 	/** @type {ActionList} */ #actions;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
-		this.#openGameAction = new OpenGameAction(mod);
+		this.#MapLoader = new MapLoader(mod);
 		this.#actions = new ActionList();
 	}
 
@@ -34,7 +34,6 @@ export class MainMenuActions {
 	}
 
 	playerSentAction(action) {
-		console.log(action);
 		if (this.#tryPlayMap(action)) {
 			SdkClient.tellActionResult(
 				action.id, true,
@@ -52,7 +51,7 @@ export class MainMenuActions {
 
 	#tryOpenGame() {
 		if (this.#mod.settings.forceOpenMap) {
-			this.#openGameAction.forceChosenMap(this.#state);
+			this.#MapLoader.forceChosenMap(this.#state);
 		}
 		else if (this.#mod.settings.playerChooseMap) {
 			this.#tellPlayerMapOptions();
@@ -67,24 +66,24 @@ export class MainMenuActions {
 		if (action.name == MainMenuActionList.PLAY_GAME.getName()) {
 			const availableMap = this.#mod.settings.mapAvailable;
 			if (availableMap ==  MainMenuActionList.CONTINUE_GAME.getName()) {
-				return this.#openGameAction.tryContinueLastMap(this.#state);
+				return this.#MapLoader.tryContinueLastMap(this.#state);
 			}
 			else if (availableMap ==  MainMenuActionList.NEW_GAME.getName()) {
-				return this.#openGameAction.tryCreateNewMap(this.#state);
+				return this.#MapLoader.tryCreateNewMap(this.#state);
 			}
 			else {
-				return this.#openGameAction.tryOpenMapByID(availableMap, this.#state);
+				return this.#MapLoader.tryOpenMapByID(availableMap, this.#state);
 			}
 		}
 		else if (action.name ==  MainMenuActionList.CONTINUE_GAME.getName()) {
-			return this.#openGameAction.tryContinueLastMap(this.#state);
+			return this.#MapLoader.tryContinueLastMap(this.#state);
 		}
 		else if (action.name ==  MainMenuActionList.NEW_GAME.getName()) {
-			return this.#openGameAction.tryCreateNewMap(this.#state);
+			return this.#MapLoader.tryCreateNewMap(this.#state);
 		}
 		else if (this.#mapsAvailable.has(action.params.map)) {
 			const mapID = this.#mapsAvailable.get(action.params.map);
-			return this.#openGameAction.tryOpenMapByID(mapID, this.#state);
+			return this.#MapLoader.tryOpenMapByID(mapID, this.#state);
 		}
 		else {
 			return false;
@@ -92,7 +91,7 @@ export class MainMenuActions {
 	}
 
 	#tellPlayerMapOptions() {
-		const options = this.#openGameAction.getAvailableOptions();
+		const options = this.#MapLoader.getAvailableOptions();
 
 		if (options.length <= 1) {
 			this.#actions.addAction(MainMenuActionList.PLAY_GAME);

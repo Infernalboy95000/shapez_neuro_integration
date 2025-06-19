@@ -1,6 +1,5 @@
 import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
-import { SdkActionList } from "../sdkActionList";
 
 export class SettingsActions {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
