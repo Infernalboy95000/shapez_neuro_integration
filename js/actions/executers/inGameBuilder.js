@@ -1,4 +1,5 @@
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
+import { Vector } from "shapez/core/vector";
 import { MetaBuilding } from "shapez/game/meta_building";
 
 export class InGameBuilder {
@@ -72,6 +73,15 @@ export class InGameBuilder {
 			}
 		});
 		return "UP";
+	}
+
+	/**
+	 * @param {number} posX
+	 * @param {number} posY
+	 * @returns {boolean} */
+	placeBuilding(posX, posY) {
+		const pos = new Vector(posX, posY);
+		return this.#root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(pos);
 	}
 
 	/**

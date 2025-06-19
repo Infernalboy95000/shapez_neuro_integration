@@ -1,6 +1,7 @@
 import { RandomUtils } from "../../custom/randomUtils";
 import { SdkClient } from "../../sdkClient";
 import { EnumSchema } from "../definitions/schema/enumSchema";
+import { NumberSchema } from "../definitions/schema/numberSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
 import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
@@ -65,12 +66,24 @@ export class InGameActions {
 			case InGameActionList.ROTATE_BUILDING.getName():
 				if (this.#builder.rotateBuilding(action.params.rotation)) {
 					SdkClient.tellActionResult(
-						action.id, true, `Building rotated facing ${action.params.rotation}`
+						action.id, true, `Building rotated facing ${action.params.rotation}.`
 					)
 				}
 				else {
 					SdkClient.tellActionResult(
-						action.id, false, `Failed to rotate the building`
+						action.id, false, `Failed to rotate the building.`
+					)
+				}
+				return true;
+			case InGameActionList.PLACE_BUILDING.getName():
+				if (this.#builder.placeBuilding(action.params.x_position, action.params.y_position)) {
+					SdkClient.tellActionResult(
+						action.id, true, `Building placed succesfully.`
+					)
+				}
+				else {
+					SdkClient.tellActionResult(
+						action.id, false, `Couldn't place the building.`
 					)
 				}
 				return true;
@@ -114,16 +127,19 @@ export class InGameActions {
 	#promptActions() {
 		this.#promptToolbelt();
 		this.#prepareRotation();
+		this.#preparePlacer();
 	}
 
 	#promptBuildingSelectedActions() {
 		this.#actions.addAction(InGameActionList.STOP_PLACEMENT);
 		this.#actions.addAction(InGameActionList.ROTATE_BUILDING);
+		this.#actions.addAction(InGameActionList.PLACE_BUILDING);
 	}
 
 	#clearBuildingSelectedActions() {
 		this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
 		this.#actions.removeAction(InGameActionList.ROTATE_BUILDING);
+		this.#actions.removeAction(InGameActionList.PLACE_BUILDING);
 	}
 
 	#promptToolbelt() {
@@ -142,5 +158,11 @@ export class InGameActions {
 		const rotations = ["UP", "DOWN", "LEFT", "RIGHT"];
 		const rotSchema = new EnumSchema("rotation", rotations);
 		InGameActionList.ROTATE_BUILDING.setOptions([rotSchema]);
+	}
+
+	#preparePlacer() {
+		const posX = new NumberSchema("x_position", 1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
+		const posY = new NumberSchema("y_position", 1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
+		InGameActionList.PLACE_BUILDING.setOptions([posX, posY]);
 	}
 }
