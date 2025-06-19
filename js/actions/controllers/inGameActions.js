@@ -161,8 +161,8 @@ export class InGameActions {
 	}
 
 	#preparePlacer() {
-		const posX = new NumberSchema("x_position", 1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
-		const posY = new NumberSchema("y_position", 1, Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
+		const posX = new NumberSchema("x_position", 1, -1000000, 1000000);
+		const posY = new NumberSchema("y_position", 1, -1000000, 1000000);
 		InGameActionList.PLACE_BUILDING.setOptions([posX, posY]);
 	}
 }
