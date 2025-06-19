@@ -37,7 +37,7 @@ export class InGameActions {
 		if (!this.#isActionValid(action)) {
 			SdkClient.tellActionResult(
 				action.id, false,
-				`Unknown action`
+				`Unknown action.`
 			)
 		}
 	}
@@ -51,8 +51,11 @@ export class InGameActions {
 				return true;
 			case InGameActionList.STOP_PLACEMENT.getName():
 				this.#builder.deselectCurrentBulding();
+				SdkClient.tellActionResult(
+					action.id, true, `Building deselected.`
+				)
 				this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
-				break;
+				return true;
 			default:
 				return false;
 		}
