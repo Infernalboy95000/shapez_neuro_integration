@@ -1,3 +1,4 @@
+import { RandomUtils } from "../../custom/randomUtils";
 import { SdkClient } from "../../sdkClient";
 import { EnumSchema } from "../definitions/schema/enumSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
@@ -22,6 +23,7 @@ export class InGameActions {
 
 	gameOpenned() {
 		if (SdkClient.isConnected()) {
+			this.#announceOpening();
 			this.#builder = new InGameBuilder(this.#root);
 			this.#actions.removeAllActions();
 			this.#promptActions();
@@ -42,6 +44,10 @@ export class InGameActions {
 		}
 	}
 
+	#announceOpening() {
+		SdkClient.sendMessage("A map has loaded. Now you can play the game!");
+	}
+
 	/** @retuns {boolean} */
 	#isActionValid(action) {
 		switch (action.name) {
@@ -54,7 +60,19 @@ export class InGameActions {
 				SdkClient.tellActionResult(
 					action.id, true, `Building deselected.`
 				)
-				this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
+				this.#clearBuildingSelectedActions();
+				return true;
+			case InGameActionList.ROTATE_BUILDING.getName():
+				if (this.#builder.rotateBuilding(action.params.rotation)) {
+					SdkClient.tellActionResult(
+						action.id, true, `Building rotated facing ${action.params.rotation}`
+					)
+				}
+				else {
+					SdkClient.tellActionResult(
+						action.id, false, `Failed to rotate the building`
+					)
+				}
 				return true;
 			default:
 				return false;
@@ -65,16 +83,20 @@ export class InGameActions {
 	#tellSelectionResult(action, result) {
 		switch (result) {
 			case "SELECTED":
+				const buildName = RandomUtils.capitalizeFirst(action.params.buildings);
+				//TODO: Current rotation cannot be in context easily because there's an option that stores the last rotation of a building and changes it after this call.
+				//const rot = this.#builder.getCurrentRotation();
 				SdkClient.tellActionResult(
-					action.id, true, `${action.params.buildings} building is selected`
+					action.id, true, `${buildName} building is selected.`// +
+					//`Is currently rotated facing ${rot}`
 				)
-				this.#actions.addAction(InGameActionList.STOP_PLACEMENT);
+				this.#promptBuildingSelectedActions();
 				break;
 			case "DESELECTED":
 				SdkClient.tellActionResult(
 					action.id, true, `${action.params.buildings} building is deselected. (It was already selected)`
 				)
-				this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
+				this.#clearBuildingSelectedActions();
 				break;
 			case "LOCKED":
 				SdkClient.tellActionResult(
@@ -91,8 +113,17 @@ export class InGameActions {
 
 	#promptActions() {
 		this.#promptToolbelt();
-		
-		//this.#promptRotation();
+		this.#prepareRotation();
+	}
+
+	#promptBuildingSelectedActions() {
+		this.#actions.addAction(InGameActionList.STOP_PLACEMENT);
+		this.#actions.addAction(InGameActionList.ROTATE_BUILDING);
+	}
+
+	#clearBuildingSelectedActions() {
+		this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
+		this.#actions.removeAction(InGameActionList.ROTATE_BUILDING);
 	}
 
 	#promptToolbelt() {
@@ -107,12 +138,9 @@ export class InGameActions {
 		this.#actions.addAction(InGameActionList.SELECT_BUILDING);
 	}
 
-	/*
-	#promptRotation() {
+	#prepareRotation() {
 		const rotations = ["UP", "DOWN", "LEFT", "RIGHT"];
 		const rotSchema = new EnumSchema("rotation", rotations);
 		InGameActionList.ROTATE_BUILDING.setOptions([rotSchema]);
-		this.#actions.addAction(InGameActionList.ROTATE_BUILDING);
 	}
-	*/
 }

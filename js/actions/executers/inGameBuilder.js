@@ -2,7 +2,8 @@ import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { MetaBuilding } from "shapez/game/meta_building";
 
 export class InGameBuilder {
-	/** @type {import("shapez/game/root").GameRoot} */ #root
+	/** @type {Map<string, number>} */ #rotations = this.#getRotationsMap();
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
@@ -52,6 +53,27 @@ export class InGameBuilder {
 		this.#root.hud.parts.buildingsToolbar.onSelectedPlacementBuildingChanged(null);
 	}
 
+	/** @returns {boolean} */
+	rotateBuilding(rotKey) {
+		if (this.#rotations.has(rotKey)) {
+			this.#root.hud.parts.buildingPlacer.currentBaseRotation = 
+				this.#rotations.get(rotKey);
+			return true;
+		}
+		return false;
+	}
+
+	/** @returns {string} */
+	getCurrentRotation() {
+		const rot = this.#root.hud.parts.buildingPlacer.currentBaseRotation;
+		this.#rotations.forEach((value, key) => {
+			if (value == rot) {
+				return key;
+			}
+		});
+		return "UP";
+	}
+
 	/**
 	 * @param {string} buildingName
 	 * @returns {(MetaBuilding)}
@@ -65,5 +87,15 @@ export class InGameBuilder {
 			}
 		}
 		return buildings[0];
+	}
+
+	/** @returns {Map<string, number>} */
+	#getRotationsMap() {
+		const map = new Map();
+		map.set("UP", 0);
+		map.set("RIGHT", 90);
+		map.set("DOWN", 180);
+		map.set("LEFT", 270);
+		return map;
 	}
 }
