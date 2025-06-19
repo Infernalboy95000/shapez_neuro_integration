@@ -47,6 +47,11 @@ export class InGameBuilder {
 		}
 	}
 
+	deselectCurrentBulding() {
+		this.#root.hud.signals.buildingSelectedForPlacement.dispatch(null);
+		this.#root.hud.parts.buildingsToolbar.onSelectedPlacementBuildingChanged(null);
+	}
+
 	/**
 	 * @param {string} buildingName
 	 * @returns {(MetaBuilding)}

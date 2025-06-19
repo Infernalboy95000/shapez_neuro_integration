@@ -3,7 +3,6 @@ import { EnumSchema } from "../definitions/schema/enumSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
 import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
-import { MetaBuilding } from "shapez/game/meta_building";
 
 export class InGameActions {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -25,8 +24,7 @@ export class InGameActions {
 		if (SdkClient.isConnected()) {
 			this.#builder = new InGameBuilder(this.#root);
 			this.#actions.removeAllActions();
-			this.#promptToolbelt();
-			this.#actions.addAction(InGameActionList.SELECT_BUILDING);
+			this.#promptActions();
 			this.#actions.activateActions();
 		}
 	}
@@ -49,28 +47,49 @@ export class InGameActions {
 		switch (action.name) {
 			case InGameActionList.SELECT_BUILDING.getName():
 				const result = this.#builder.selectBuilding(action.params.buildings);
-
-				switch (result) {
-					case "SELECTED":
-						SdkClient.tellActionResult(
-							action.id, true, `${action.params.buildings} building is selected`
-						)
-						break;
-					case "DESELECTED":
-						SdkClient.tellActionResult(
-							action.id, true, `${action.params.buildings} building is deselected. (It was already selected)`
-						)
-						break;
-					case "LOCKED":
-						SdkClient.tellActionResult(
-							action.id, true, `${action.params.buildings} is not unlocked, yet.`
-						)
-						break;
-				}
+				this.#tellSelectionResult(action, result);
 				return true;
+			case InGameActionList.STOP_PLACEMENT.getName():
+				this.#builder.deselectCurrentBulding();
+				this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
+				break;
 			default:
 				return false;
 		}
+	}
+
+	/** @param {("SELECTED" | "DESELECTED" | "LOCKED")} result */
+	#tellSelectionResult(action, result) {
+		switch (result) {
+			case "SELECTED":
+				SdkClient.tellActionResult(
+					action.id, true, `${action.params.buildings} building is selected`
+				)
+				this.#actions.addAction(InGameActionList.STOP_PLACEMENT);
+				break;
+			case "DESELECTED":
+				SdkClient.tellActionResult(
+					action.id, true, `${action.params.buildings} building is deselected. (It was already selected)`
+				)
+				this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
+				break;
+			case "LOCKED":
+				SdkClient.tellActionResult(
+					action.id, false, `${action.params.buildings} is not unlocked, yet.`
+				)
+				break;
+			default:
+				SdkClient.tellActionResult(
+					action.id, false, `Unknown error.`
+				)
+				break;
+		}
+	}
+
+	#promptActions() {
+		this.#promptToolbelt();
+		
+		//this.#promptRotation();
 	}
 
 	#promptToolbelt() {
@@ -82,5 +101,15 @@ export class InGameActions {
 
 		const buildingsSchema = new EnumSchema("buildings", buildingNames);
 		InGameActionList.SELECT_BUILDING.setOptions([buildingsSchema]);
+		this.#actions.addAction(InGameActionList.SELECT_BUILDING);
 	}
+
+	/*
+	#promptRotation() {
+		const rotations = ["UP", "DOWN", "LEFT", "RIGHT"];
+		const rotSchema = new EnumSchema("rotation", rotations);
+		InGameActionList.ROTATE_BUILDING.setOptions([rotSchema]);
+		this.#actions.addAction(InGameActionList.ROTATE_BUILDING);
+	}
+	*/
 }
