@@ -54,15 +54,15 @@ export class CoordsGrid {
 			for (let j = 0; j < chunk.tileSpaceRectangle.h; j++) {
 				context.fillText(
 					`x: ${chunk.tileX + i}`,
-					chunk.worldSpaceRectangle.x + (i * chunkWidth),
-					chunk.worldSpaceRectangle.y + (j * chunkHeight) - 8,
+					chunk.worldSpaceRectangle.x + (i * chunkWidth) + (chunkWidth / 6),
+					chunk.worldSpaceRectangle.y + (j * chunkHeight) + (chunkHeight / 3),
 					chunkWidth
 				);
 
 				context.fillText(
 					`y: ${chunk.tileY + j}`,
-					chunk.worldSpaceRectangle.x + (i * chunkWidth),
-					chunk.worldSpaceRectangle.y + (j * chunkHeight) - 2,
+					chunk.worldSpaceRectangle.x + (i * chunkWidth)  + (chunkWidth / 6),
+					chunk.worldSpaceRectangle.y + (j * chunkHeight) + (chunkHeight / 3) + 8,
 					chunkWidth
 				);
 			}
