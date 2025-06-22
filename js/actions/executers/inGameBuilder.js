@@ -29,24 +29,22 @@ export class InGameBuilder {
 
 	/**
 	 * @param {string} buildingName
-	 * @returns {("SELECTED"|"DESELECTED"|"LOCKED")}
+	 * @returns {boolean}
 	 * */
 	selectBuilding(buildingName) {
 		const building = this.#getBuildingByName(buildingName);
-		this.#root.hud.parts.buildingsToolbar
-			.selectBuildingForPlacement(building);
-		
-		const buildingHandle = this.#root.hud.parts.buildingsToolbar.
+		const handle = this.#root.hud.parts.buildingsToolbar.
 			buildingHandles[building.getId()];
-		if (!buildingHandle.unlocked) {
-			return "LOCKED";
+		
+		if (!handle.unlocked) {
+			return false;
 		}
-		else if (buildingHandle.selected) {
-			return "SELECTED";
+
+		if (!handle.selected) {
+			this.#root.hud.parts.buildingsToolbar
+				.selectBuildingForPlacement(building);
 		}
-		else {
-			return "DESELECTED";
-		}
+		return true;
 	}
 
 	deselectCurrentBulding() {
@@ -82,6 +80,16 @@ export class InGameBuilder {
 	placeBuilding(posX, posY) {
 		const pos = new Vector(posX, posY);
 		return this.#root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(pos);
+	}
+
+	/** @returns {Array<String>} */
+	getBuildingNames() {
+		const buildingNames = [];
+		const buildings = this.getToolbelt();
+		for (let i = 0; i < buildings.length; i++) {
+			buildingNames.push(buildings[i].getId());
+		}
+		return buildingNames;
 	}
 
 	/**

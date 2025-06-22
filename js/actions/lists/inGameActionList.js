@@ -1,56 +1,36 @@
 import { SdkAction } from "../definitions/sdkAction";
 
 export class InGameActionList {
-	static SELECT_BUILDING = new SdkAction(
-		"select_building", "Select a building from your toolbelt"
-	)
-
-	static STOP_PLACEMENT = new SdkAction(
-		"stop_placement", "Deselects your currently selected building"
-	)
-
-	static ROTATE_BUILDING = new SdkAction(
-		"rotate_building", "Choose in which direction should face your selected building"
-	)
-
 	static PLACE_BUILDING = new SdkAction(
-		"place_building", "Place your building at any position, if there's no other building there"
+		"place_building", "Select and place a building from your toolbelt."
+	)
+
+	static PLACE_BUILDINGS_LINE = new SdkAction(
+		"place_buildings_line", "Place an entire line of buildings at once. Just tell where to start, a direction and the length of that line."
 	)
 
 	static BELT_PLANNER = new SdkAction(
-		"use_belt_planner", "Place several belts in one go. Allows to rotate mid placement, drawing an L shape"
-	)
-
-	static PLACE_MULTIPLE = new SdkAction(
-		"place_multiple", "Place an entire line of buildings at once, just tell where to start, a direction and length"
+		"use_belt_planner", "Place several belts in one go. Allows to rotate mid placement, drawing an L shape."
 	)
 
 	static DELETE_BUILDING = new SdkAction(
-		"delete_building", "Delete an already placed building"
-	)
-
-	static SELECT_AREA = new SdkAction(
-		"select_area", "Select an area with buildings to perform actions on those"
+		"delete_building", "Delete an already placed building."
 	)
 
 	static DELETE_IN_AREA = new SdkAction(
-		"delete_in_area", "Delete all buildings in the selected area"
+		"delete_in_area", "Delete all buildings in an square area you choose."
 	)
 
 	static CLEAR_BELTS = new SdkAction(
-		"clear_belts", "Clear all belts in the selected area"
+		"clear_belts", "Clear all belts in an square area you choose."
 	)
 
 	static CUT_SELECTION = new SdkAction(
-		"cut_selection", "Cut the buildings in the selected area"
+		"cut_selection", "Cut the buildings in an square area you choose."
 	)
 
 	static COPY_SELECTION = new SdkAction(
-		"cut_selection", "Copy the buildings in the selected area"
-	)
-
-	static CLEAR_SELECTION = new SdkAction(
-		"clear_selection", "Deselect a selected area"
+		"cut_selection", "Copy the buildings in an square area you choose."
 	)
 
 	/*

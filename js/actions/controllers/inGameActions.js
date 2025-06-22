@@ -52,117 +52,169 @@ export class InGameActions {
 	/** @retuns {boolean} */
 	#isActionValid(action) {
 		switch (action.name) {
-			case InGameActionList.SELECT_BUILDING.getName():
-				const result = this.#builder.selectBuilding(action.params.buildings);
-				this.#tellSelectionResult(action, result);
-				return true;
-			case InGameActionList.STOP_PLACEMENT.getName():
-				this.#builder.deselectCurrentBulding();
-				SdkClient.tellActionResult(
-					action.id, true, `Building deselected.`
-				)
-				this.#clearBuildingSelectedActions();
-				return true;
-			case InGameActionList.ROTATE_BUILDING.getName():
-				if (this.#builder.rotateBuilding(action.params.rotation)) {
-					SdkClient.tellActionResult(
-						action.id, true, `Building rotated facing ${action.params.rotation}.`
-					)
-				}
-				else {
-					SdkClient.tellActionResult(
-						action.id, false, `Failed to rotate the building.`
-					)
-				}
-				return true;
 			case InGameActionList.PLACE_BUILDING.getName():
-				if (this.#builder.placeBuilding(action.params.x_position, action.params.y_position)) {
-					SdkClient.tellActionResult(
-						action.id, true, `Building placed succesfully.`
-					)
+				if (this.#trySinglePlacement(action)) {
+					this.#announceSinglePlacement(action);
 				}
-				else {
-					SdkClient.tellActionResult(
-						action.id, false, `Couldn't place the building.`
-					)
-				}
+				return true;
+			case InGameActionList.PLACE_BUILDINGS_LINE.getName():
+				this.#tryLinePlacement(action);
 				return true;
 			default:
 				return false;
 		}
 	}
 
-	/** @param {("SELECTED" | "DESELECTED" | "LOCKED")} result */
-	#tellSelectionResult(action, result) {
+	/** @retuns {boolean} */
+	#trySinglePlacement(action) {
+		return (
+			this.#trySelectBuilding(action) &&
+			this.#tryRotateBuilding(action) &&
+			this.#tryPlaceSingleBuilding(action)
+		)
+	}
+
+	/** @retuns {boolean} */
+	#tryLinePlacement(action) {
+		if (
+			this.#trySelectBuilding(action) &&
+			this.#tryRotateBuilding(action)
+		) {
+			const result = this.#tryPlaceBuildingLine(action);
+			this.#announceLanePlacement(action, result);
+		}
+	}
+
+	/** @retuns {boolean} */
+	#trySelectBuilding(action) {
+		if (!this.#builder.selectBuilding(action.params.building)) {
+			SdkClient.tellActionResult(
+				action.id, false, `${action.params.building} is not unlocked, yet.`
+			)
+			return false;
+		}
+		return true;
+	}
+
+	/** @retuns {boolean} */
+	#tryRotateBuilding(action) {
+		if (!this.#builder.rotateBuilding(action.params.rotation)) {
+			SdkClient.tellActionResult(
+				action.id, false, `${action.params.rotation} is not a valid rotation.`
+			)
+			return false;
+		}
+		return true;
+	}
+
+	/** @retuns {boolean} */
+	#tryPlaceSingleBuilding(action) {
+		if (!this.#builder.placeBuilding(
+			action.params.x_position, action.params.y_position
+		)) {
+			SdkClient.tellActionResult(
+				action.id, false, `Cannot place ${action.params.building} ` +
+				`at x: ${action.params.x_position}, y: ${action.params.y_position}. ` +
+				`Its probably overlapping another building.`
+			)
+		}
+		return true;
+	}
+
+	/** @retuns {("ALL"|"SOME"|"NONE")} */
+	#tryPlaceBuildingLine(action) {
+		let placedAll = true;
+		let placedSome = false;
+		let currentPos = [action.params.x_position, action.params.y_position];
+
+		for (let i = 0; i < action.params.line_length; i++) {
+			if (this.#builder.placeBuilding(currentPos[0], currentPos[1])) {
+				placedSome = true;
+			}
+			else {
+				placedAll = false;
+			}
+			currentPos = RandomUtils.vectorAddDir(currentPos, action.params.direction);
+		}
+		
+		if (placedAll) { return "ALL"; }
+		else if (placedSome) { return "SOME"; }
+		else { return "NONE"; }
+	}
+
+	#announceSinglePlacement(action) {
+		const buildName = RandomUtils.capitalizeFirst(action.params.building);
+		SdkClient.tellActionResult(
+			action.id, true, `${buildName} has been built ` +
+			`at x: ${action.params.x_position}, y: ${action.params.y_position}.`
+		)
+	}
+
+	/** @param {("ALL"|"SOME"|"NONE")} result */
+	#announceLanePlacement(action, result) {
+		const buildName = RandomUtils.capitalizeFirst(action.params.building);
+		const startPos = [action.params.x_position, action.params.y_position];
+		const endPos = RandomUtils.vectorAddDir([action.params.x_position, action.params.y_position], action.params.direction, action.params.line_length);
 		switch (result) {
-			case "SELECTED":
-				const buildName = RandomUtils.capitalizeFirst(action.params.buildings);
-				//TODO: Current rotation cannot be in context easily because there's an option that stores the last rotation of a building and changes it after this call.
-				//const rot = this.#builder.getCurrentRotation();
+			case "ALL":
 				SdkClient.tellActionResult(
-					action.id, true, `${buildName} building is selected.`// +
-					//`Is currently rotated facing ${rot}`
-				)
-				this.#promptBuildingSelectedActions();
-				break;
-			case "DESELECTED":
-				SdkClient.tellActionResult(
-					action.id, true, `${action.params.buildings} building is deselected. (It was already selected)`
-				)
-				this.#clearBuildingSelectedActions();
-				break;
-			case "LOCKED":
-				SdkClient.tellActionResult(
-					action.id, false, `${action.params.buildings} is not unlocked, yet.`
+					action.id, true, `A line of ${buildName} has been fully built ` +
+					`starting at x: ${startPos[0]}, y: ${startPos[1]} ` +
+					`and ending at x: ${endPos[0]}, y: ${endPos[1]}.`
 				)
 				break;
-			default:
+			case "SOME":
 				SdkClient.tellActionResult(
-					action.id, false, `Unknown error.`
+					action.id, true, `A line of ${buildName} has been partially built ` +
+					`starting at x: ${startPos[0]}, y: ${startPos[1]} ` +
+					`and ending at x: ${endPos[0]}, y: ${endPos[1]}. ` +
+					`Some pieces are missing in between, probably because there are other buildings beeing there.`
+				)
+				break;
+			case "NONE":
+				SdkClient.tellActionResult(
+					action.id, false, `Cannot place ${buildName} ` +
+					`from x: ${startPos[0]}, y: ${startPos[1]} ` +
+					`to x: ${endPos[0]}, y: ${endPos[1]}. ` +
+					`Maybe it's full of other buildings over there.`
 				)
 				break;
 		}
 	}
 
 	#promptActions() {
-		this.#promptToolbelt();
-		this.#prepareRotation();
-		this.#preparePlacer();
+		this.#promptPlacers();
 	}
 
-	#promptBuildingSelectedActions() {
-		this.#actions.addAction(InGameActionList.STOP_PLACEMENT);
-		this.#actions.addAction(InGameActionList.ROTATE_BUILDING);
-		this.#actions.addAction(InGameActionList.PLACE_BUILDING);
-	}
+	#promptPlacers() {
+		const buildingNames = this.#builder.getBuildingNames();
+		const buildings = new EnumSchema("building", buildingNames);
 
-	#clearBuildingSelectedActions() {
-		this.#actions.removeAction(InGameActionList.STOP_PLACEMENT);
-		this.#actions.removeAction(InGameActionList.ROTATE_BUILDING);
-		this.#actions.removeAction(InGameActionList.PLACE_BUILDING);
-	}
-
-	#promptToolbelt() {
-		const buildingNames = [];
-		const buildings = this.#builder.getToolbelt();
-		for (let i = 0; i < buildings.length; i++) {
-			buildingNames.push(buildings[i].getId());
-		}
-
-		const buildingsSchema = new EnumSchema("buildings", buildingNames);
-		InGameActionList.SELECT_BUILDING.setOptions([buildingsSchema]);
-		this.#actions.addAction(InGameActionList.SELECT_BUILDING);
-	}
-
-	#prepareRotation() {
-		const rotations = ["UP", "DOWN", "LEFT", "RIGHT"];
-		const rotSchema = new EnumSchema("rotation", rotations);
-		InGameActionList.ROTATE_BUILDING.setOptions([rotSchema]);
-	}
-
-	#preparePlacer() {
 		const posX = new NumberSchema("x_position", 1, -1000000, 1000000);
 		const posY = new NumberSchema("y_position", 1, -1000000, 1000000);
-		InGameActionList.PLACE_BUILDING.setOptions([posX, posY]);
+
+		const rotNames = ["UP", "DOWN", "LEFT", "RIGHT"];
+		const rotations = new EnumSchema("rotation", rotNames);
+
+		const direction = new EnumSchema("direction", rotNames);
+		const lineLength = new NumberSchema("line_length", 1, 2, 1000);
+
+		const direction2 = new EnumSchema("direction2", rotNames, false);
+		const lineLength2 = new NumberSchema("line_length2", 1, 1, 1000, false);
+
+		InGameActionList.PLACE_BUILDING.setOptions(
+			[buildings, posX, posY, rotations]
+		);
+		this.#actions.addAction(InGameActionList.PLACE_BUILDING);
+
+		InGameActionList.PLACE_BUILDINGS_LINE.setOptions(
+			[buildings, posX, posY, rotations, direction, lineLength]
+		);
+		this.#actions.addAction(InGameActionList.PLACE_BUILDINGS_LINE);
+
+		InGameActionList.BELT_PLANNER.setOptions(
+			[buildings, posX, posY, direction, lineLength, direction2, lineLength2]
+		);
+		//this.#actions.addAction(InGameActionList.BELT_PLANNER);
 	}
 }
