@@ -53,35 +53,46 @@ export class InGameActions {
 	#isActionValid(action) {
 		switch (action.name) {
 			case InGameActionList.PLACE_BUILDING.getName():
-				if (this.#trySinglePlacement(action)) {
-					this.#announceSinglePlacement(action);
-				}
+				this.#trySinglePlacementAction(action);
 				return true;
 			case InGameActionList.PLACE_BUILDINGS_LINE.getName():
-				this.#tryLinePlacement(action);
+				this.#tryLinePlacementAction(action);
+				return true;
+			case InGameActionList.DELETE_BUILDING.getName():
+				this.#trySingleDeletionAction(action);
 				return true;
 			default:
 				return false;
 		}
 	}
 
-	/** @retuns {boolean} */
-	#trySinglePlacement(action) {
-		return (
+	#trySinglePlacementAction(action) {
+		if (
 			this.#trySelectBuilding(action) &&
 			this.#tryRotateBuilding(action) &&
 			this.#tryPlaceSingleBuilding(action)
-		)
+		) {
+			this.#announceSinglePlacement(action);
+		}
 	}
 
-	/** @retuns {boolean} */
-	#tryLinePlacement(action) {
+	#tryLinePlacementAction(action) {
 		if (
 			this.#trySelectBuilding(action) &&
 			this.#tryRotateBuilding(action)
 		) {
 			const result = this.#tryPlaceBuildingLine(action);
 			this.#announceLanePlacement(action, result);
+		}
+	}
+
+	#trySingleDeletionAction(action) {
+		const msg = this.#builder.deleteBuilding(action.params.x_position, action.params.y_position);
+		if (msg.includes("Success")) {
+			SdkClient.tellActionResult(action.id, true, msg);
+		}
+		else {
+			SdkClient.tellActionResult(action.id, false, msg);
 		}
 	}
 
@@ -184,6 +195,7 @@ export class InGameActions {
 
 	#promptActions() {
 		this.#promptPlacers();
+		this.#promptDeleters();
 	}
 
 	#promptPlacers() {
@@ -208,5 +220,22 @@ export class InGameActions {
 			[buildings, posX, posY, rotations, direction, lineLength]
 		);
 		this.#actions.addAction(InGameActionList.PLACE_BUILDINGS_LINE);
+	}
+
+	#promptDeleters() {
+		const posX = new NumberSchema("x_position", 1, -1000000, 1000000);
+		const posY = new NumberSchema("y_position", 1, -1000000, 1000000);
+
+		const posX_1 = new NumberSchema("lower_corner_x_position", 1, -1000000, 1000000);
+		const posY_1 = new NumberSchema("lower_corner_y_position", 1, -1000000, 1000000);
+
+		const posX_2 = new NumberSchema("upper_corner_x_position", 1, -1000000, 1000000);
+		const posY_2 = new NumberSchema("upper_corner_y_position", 1, -1000000, 1000000);
+
+		InGameActionList.DELETE_BUILDING.setOptions([posX, posY]);
+		this.#actions.addAction(InGameActionList.DELETE_BUILDING);
+
+		//InGameActionList.DELETE_IN_AREA.setOptions([posX_1, posY_1, posX_2, posY_2]);
+		//this.#actions.addAction(InGameActionList.DELETE_IN_AREA);
 	}
 }

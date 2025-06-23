@@ -14,7 +14,7 @@ export class InGameActionList {
 	)
 
 	static DELETE_BUILDING = new SdkAction(
-		"delete_building", "Delete an already placed building."
+		"delete_building", "Delete an already placed building in the map."
 	)
 
 	static DELETE_IN_AREA = new SdkAction(

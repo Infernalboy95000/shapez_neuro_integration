@@ -1,6 +1,7 @@
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { Vector } from "shapez/core/vector";
 import { MetaBuilding } from "shapez/game/meta_building";
+import { SOUNDS } from "shapez/platform/sound";
 
 export class InGameBuilder {
 	/** @type {Map<string, number>} */ #rotations = this.#getRotationsMap();
@@ -80,6 +81,28 @@ export class InGameBuilder {
 	placeBuilding(posX, posY) {
 		const pos = new Vector(posX, posY);
 		return this.#root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(pos);
+	}
+
+	/**
+	 * @param {number} posX
+	 * @param {number} posY
+	 * @returns {string} */
+	deleteBuilding(posX, posY) {
+		const pos = new Vector(posX, posY);
+		const contents = this.#root.map.getTileContent(pos, this.#root.currentLayer);
+		if (contents) {
+			const buildName = contents.components.StaticMapEntity.getMetaBuilding().getId();
+			if (this.#root.logic.tryDeleteBuilding(contents)) {
+				this.#root.soundProxy.playUi(SOUNDS.destroyBuilding);
+				return `Successfully deleted a ${buildName} at x: ${posX}, y: ${posY}`;
+			}
+			else {
+				return `You cannot delete the ${buildName} building`;
+			}
+		}
+		else {
+			return `There's no building at x: ${posX}, y: ${posY}`;
+		}
 	}
 
 	/** @returns {Array<String>} */
