@@ -199,9 +199,6 @@ export class InGameActions {
 		const direction = new EnumSchema("direction", rotNames);
 		const lineLength = new NumberSchema("line_length", 1, 2, 1000);
 
-		const direction2 = new EnumSchema("direction2", rotNames, false);
-		const lineLength2 = new NumberSchema("line_length2", 1, 1, 1000, false);
-
 		InGameActionList.PLACE_BUILDING.setOptions(
 			[buildings, posX, posY, rotations]
 		);
@@ -211,10 +208,5 @@ export class InGameActions {
 			[buildings, posX, posY, rotations, direction, lineLength]
 		);
 		this.#actions.addAction(InGameActionList.PLACE_BUILDINGS_LINE);
-
-		InGameActionList.BELT_PLANNER.setOptions(
-			[buildings, posX, posY, direction, lineLength, direction2, lineLength2]
-		);
-		//this.#actions.addAction(InGameActionList.BELT_PLANNER);
 	}
 }
