@@ -3,6 +3,7 @@ import { SdkClient } from "../../sdkClient";
 import { EnumSchema } from "../definitions/schema/enumSchema";
 import { NumberSchema } from "../definitions/schema/numberSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
+import { InGameMassSelector } from "../executers/inGameMassSelector";
 import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
 
@@ -11,6 +12,7 @@ export class InGameActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ActionList} */ #actions;
 	/** @type {InGameBuilder} */ #builder;
+	/** @type {InGameMassSelector} */ #massSelector;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
@@ -26,6 +28,7 @@ export class InGameActions {
 		if (SdkClient.isConnected()) {
 			this.#announceOpening();
 			this.#builder = new InGameBuilder(this.#root);
+			this.#massSelector = new InGameMassSelector(this.#root);
 			this.#actions.removeAllActions();
 			this.#promptActions();
 			this.#actions.activateActions();
@@ -61,6 +64,9 @@ export class InGameActions {
 			case InGameActionList.DELETE_BUILDING.getName():
 				this.#trySingleDeletionAction(action);
 				return true;
+			case InGameActionList.DELETE_IN_AREA.getName():
+				this.#tryAreaDeletionAction(action);
+				return true;
 			default:
 				return false;
 		}
@@ -88,6 +94,22 @@ export class InGameActions {
 
 	#trySingleDeletionAction(action) {
 		const msg = this.#builder.deleteBuilding(action.params.x_position, action.params.y_position);
+		if (msg.includes("Success")) {
+			SdkClient.tellActionResult(action.id, true, msg);
+		}
+		else {
+			SdkClient.tellActionResult(action.id, false, msg);
+		}
+	}
+
+	#tryAreaDeletionAction(action) {
+		const msg = this.#massSelector.areaDelete(
+			action.params.lower_corner_x_position,
+			action.params.lower_corner_y_position,
+			action.params.upper_corner_x_position,
+			action.params.upper_corner_y_position,
+		);
+
 		if (msg.includes("Success")) {
 			SdkClient.tellActionResult(action.id, true, msg);
 		}
@@ -235,7 +257,7 @@ export class InGameActions {
 		InGameActionList.DELETE_BUILDING.setOptions([posX, posY]);
 		this.#actions.addAction(InGameActionList.DELETE_BUILDING);
 
-		//InGameActionList.DELETE_IN_AREA.setOptions([posX_1, posY_1, posX_2, posY_2]);
-		//this.#actions.addAction(InGameActionList.DELETE_IN_AREA);
+		InGameActionList.DELETE_IN_AREA.setOptions([posX_1, posY_1, posX_2, posY_2]);
+		this.#actions.addAction(InGameActionList.DELETE_IN_AREA);
 	}
 }
