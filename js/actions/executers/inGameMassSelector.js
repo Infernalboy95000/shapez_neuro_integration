@@ -25,6 +25,9 @@ export class InGameMassSelector {
 		if (selSize <= 0) {
 			msg = `No buildings selected`;
 		}
+		this.#doDelete();
+		msg = `Successfully deleted ${selSize} building${selSize > 1 ? "s": ""}`;
+		/*
 		else if (this.#confirmDelete()) {
 			this.#doDelete();
 			msg = `Successfully deleted ${selSize} building${selSize > 1 ? "s": ""}`;
@@ -32,6 +35,7 @@ export class InGameMassSelector {
 		else {
 			msg = `You're about to delete ${selSize} buildings. Are you sure?`;
 		}
+		*/
 		this.#selection = new Set();
 
 		return msg;
