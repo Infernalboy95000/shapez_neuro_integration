@@ -1,6 +1,8 @@
 import { Vector } from "shapez/core/vector";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
+import { ShapeCode } from "./shapeCode";
+import { RandomUtils } from "../../custom/randomUtils";
 
 export class ChunkDescriptor {
 	/** @type {MapChunkView} */ #chunk
@@ -37,11 +39,13 @@ export class ChunkDescriptor {
 
 		switch (patchType) {
 			case "shape":
-				msg = `${patch.item.getAsCopyableKey()} shape patch ` +
+				const code = ShapeCode.describeShapeCode(patch.item.getAsCopyableKey());
+				msg = `${code} shape patch ` +
 				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
 				break;
 			case "color":
-				msg = `${patch.item.getAsCopyableKey()} color patch ` +
+				const color = RandomUtils.capitalizeFirst(patch.item.getAsCopyableKey());
+				msg = `${color} color patch ` +
 				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
 				break;
 			default:
