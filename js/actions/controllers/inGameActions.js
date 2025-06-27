@@ -1,9 +1,11 @@
+import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../../custom/randomUtils";
 import { SdkClient } from "../../sdkClient";
 import { EnumSchema } from "../definitions/schema/enumSchema";
 import { NumberSchema } from "../definitions/schema/numberSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
 import { InGameMassSelector } from "../executers/inGameMassSelector";
+import { MapDescriptor } from "../executers/mapDescriptor";
 import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
 
@@ -13,6 +15,7 @@ export class InGameActions {
 	/** @type {ActionList} */ #actions;
 	/** @type {InGameBuilder} */ #builder;
 	/** @type {InGameMassSelector} */ #massSelector;
+	/** @type {MapDescriptor} */ #mapDescriptor;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
@@ -22,6 +25,7 @@ export class InGameActions {
 		this.#mod = mod;
 		this.#root = root;
 		this.#actions = new ActionList();
+		this.#mapDescriptor = new MapDescriptor(mod, root);
 	}
 
 	gameOpenned() {
@@ -66,6 +70,9 @@ export class InGameActions {
 				return true;
 			case InGameActionList.DELETE_IN_AREA.getName():
 				this.#tryAreaDeletionAction(action);
+				return true;
+			case InGameActionList.PATCHES_NEARBY.getName():
+				this.#tryDescribePatches(action);
 				return true;
 			default:
 				return false;
@@ -116,6 +123,11 @@ export class InGameActions {
 		else {
 			SdkClient.tellActionResult(action.id, false, msg);
 		}
+	}
+
+	#tryDescribePatches(action) {
+		const msg = this.#mapDescriptor.describePatches();
+		SdkClient.tellActionResult(action.id, true, msg);
 	}
 
 	/** @retuns {boolean} */
@@ -218,6 +230,7 @@ export class InGameActions {
 	#promptActions() {
 		this.#promptPlacers();
 		this.#promptDeleters();
+		this.#promptDescriptors();
 	}
 
 	#promptPlacers() {
@@ -259,5 +272,9 @@ export class InGameActions {
 
 		InGameActionList.DELETE_IN_AREA.setOptions([posX_1, posY_1, posX_2, posY_2]);
 		this.#actions.addAction(InGameActionList.DELETE_IN_AREA);
+	}
+
+	#promptDescriptors() {
+		this.#actions.addAction(InGameActionList.PATCHES_NEARBY);
 	}
 }

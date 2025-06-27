@@ -33,6 +33,10 @@ export class InGameActionList {
 		"cut_selection", "Copy the buildings in an square area you choose."
 	)
 
+	static PATCHES_NEARBY = new SdkAction(
+		"patches_nearby", "See if there's patches currently in view."
+	)
+
 	/*
 	- Select building [Buiilding name]
 	<- Tell building name, variant, speed, current rotation, etc...
