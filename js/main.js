@@ -19,7 +19,7 @@ class NeuroIntegration extends Mod {
 			this.#booted = true
 		});
 
-		this.signals.gameInitialized.add(root => {
+		this.signals.gameStarted.add(root => {
 			this.#actionsController.newGameOpenned(root);
 		});
 

@@ -8,6 +8,8 @@ import { InGameMassSelector } from "../executers/inGameMassSelector";
 import { MapDescriptor } from "../executers/mapDescriptor";
 import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
+import { Rectangle } from "shapez/core/rectangle";
+import { GameCore } from "shapez/game/core";
 
 export class InGameActions {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -16,16 +18,27 @@ export class InGameActions {
 	/** @type {InGameBuilder} */ #builder;
 	/** @type {InGameMassSelector} */ #massSelector;
 	/** @type {MapDescriptor} */ #mapDescriptor;
+	/** @type {boolean} */ #moving;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {import("shapez/game/root").GameRoot} root
 	 */
 	constructor(mod, root) {
+		const ourClass = this;
 		this.#mod = mod;
 		this.#root = root;
 		this.#actions = new ActionList();
 		this.#mapDescriptor = new MapDescriptor(mod, root);
+
+		this.#mod.modInterface.runAfterMethod(
+			GameCore,
+			"tick",
+			function(deltaMs) {
+				ourClass.#checkCameraMovement();
+				return true;
+			}
+		);
 	}
 
 	gameOpenned() {
@@ -73,6 +86,9 @@ export class InGameActions {
 				return true;
 			case InGameActionList.PATCHES_NEARBY.getName():
 				this.#tryDescribePatches(action);
+				return true;
+			case InGameActionList.MOVE_CAMERA.getName():
+				this.#moveCameraAction(action);
 				return true;
 			default:
 				return false;
@@ -128,6 +144,12 @@ export class InGameActions {
 	#tryDescribePatches(action) {
 		const msg = this.#mapDescriptor.describePatches();
 		SdkClient.tellActionResult(action.id, true, msg);
+	}
+
+	#moveCameraAction(action) {
+		const vector = new Vector(action.params.x_position, action.params.y_position);
+		this.#root.camera.setDesiredCenter(vector);
+		SdkClient.tellActionResult(action.id, true, `Moved camera to x: ${vector.x}, y: ${vector.y}`);
 	}
 
 	/** @retuns {boolean} */
@@ -231,20 +253,22 @@ export class InGameActions {
 		this.#promptPlacers();
 		this.#promptDeleters();
 		this.#promptDescriptors();
+		this.#promptPositioners();
 	}
 
 	#promptPlacers() {
+		const limits = this.#getVisibleLimits();
 		const buildingNames = this.#builder.getBuildingNames();
 		const buildings = new EnumSchema("building", buildingNames);
 
-		const posX = new NumberSchema("x_position", 1, -1000000, 1000000);
-		const posY = new NumberSchema("y_position", 1, -1000000, 1000000);
+		const posX = new NumberSchema("x_position", 1, limits.x, limits.x + limits.w - 1);
+		const posY = new NumberSchema("y_position", 1, limits.y, limits.y + limits.h - 1);
 
 		const rotNames = ["UP", "DOWN", "LEFT", "RIGHT"];
 		const rotations = new EnumSchema("rotation", rotNames);
 
 		const direction = new EnumSchema("direction", rotNames);
-		const lineLength = new NumberSchema("line_length", 1, 2, 1000);
+		const lineLength = new NumberSchema("line_length", 1, 2, limits.w);
 
 		InGameActionList.PLACE_BUILDING.setOptions(
 			[buildings, posX, posY, rotations]
@@ -258,14 +282,15 @@ export class InGameActions {
 	}
 
 	#promptDeleters() {
-		const posX = new NumberSchema("x_position", 1, -1000000, 1000000);
-		const posY = new NumberSchema("y_position", 1, -1000000, 1000000);
+		const limits = this.#getVisibleLimits();
+		const posX = new NumberSchema("x_position", 1, limits.x, limits.x + limits.w - 1);
+		const posY = new NumberSchema("y_position", 1, limits.y, limits.y + limits.h - 1);
 
-		const posX_1 = new NumberSchema("lower_corner_x_position", 1, -1000000, 1000000);
+		const posX_1 = new NumberSchema("lower_corner_x_position", 1, limits.x, limits.x + limits.w - 1);
 		const posY_1 = new NumberSchema("lower_corner_y_position", 1, -1000000, 1000000);
 
-		const posX_2 = new NumberSchema("upper_corner_x_position", 1, -1000000, 1000000);
-		const posY_2 = new NumberSchema("upper_corner_y_position", 1, -1000000, 1000000);
+		const posX_2 = new NumberSchema("upper_corner_x_position", 1, limits.x, limits.x + limits.w - 1);
+		const posY_2 = new NumberSchema("upper_corner_y_position", 1, limits.y, limits.y + limits.h - 1);
 
 		InGameActionList.DELETE_BUILDING.setOptions([posX, posY]);
 		this.#actions.addAction(InGameActionList.DELETE_BUILDING);
@@ -276,5 +301,43 @@ export class InGameActions {
 
 	#promptDescriptors() {
 		this.#actions.addAction(InGameActionList.PATCHES_NEARBY);
+	}
+
+	#promptPositioners() {
+		const tileRect = this.#getVisibleLimits().allScaled(2);
+
+		const limitX = new NumberSchema("x_position", 1, tileRect.x, tileRect.x + tileRect.w - 1);
+		const limitY = new NumberSchema("y_position", 1, tileRect.y, tileRect.y + tileRect.h - 1);
+
+		InGameActionList.MOVE_CAMERA.setOptions([limitX, limitY]);
+		this.#actions.addAction(InGameActionList.MOVE_CAMERA);
+	}
+
+	/** @returns {Rectangle} */
+	#getVisibleLimits() {
+		const visibleRect = this.#root.camera.getVisibleRect();
+		const tileRect = visibleRect.toTileCullRectangle();
+		return tileRect;
+	}
+
+	#checkCameraMovement() {
+		if (this.#moving) {
+			if (
+				!this.#root.camera.isCurrentlyInteracting() &&
+				!this.#root.camera.isCurrentlyMovingToDesiredCenter()
+			) {
+				this.#moving = false;
+				this.#promptActions();
+			}
+		}
+		else {
+			if (
+				this.#root.camera.isCurrentlyInteracting() ||
+				this.#root.camera.isCurrentlyMovingToDesiredCenter()
+			) {
+				this.#moving = true;
+				this.#actions.removeAllActions();
+			}
+		}
 	}
 }

@@ -37,6 +37,10 @@ export class InGameActionList {
 		"patches_nearby", "See if there's patches currently in view."
 	)
 
+	static MOVE_CAMERA = new SdkAction(
+		"move_camera", "Move the camera at a nearby position."
+	)
+
 	/*
 	- Select building [Buiilding name]
 	<- Tell building name, variant, speed, current rotation, etc...
