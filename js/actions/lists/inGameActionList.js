@@ -41,6 +41,10 @@ export class InGameActionList {
 		"move_camera", "Move the camera at a nearby position."
 	)
 
+	static CHANGE_ZOOM = new SdkAction(
+		"change_zoom", "Adjust your current camera zoom. If you zoom far enough, you will enter map overwiew mode."
+	)
+
 	/*
 	- Select building [Buiilding name]
 	<- Tell building name, variant, speed, current rotation, etc...

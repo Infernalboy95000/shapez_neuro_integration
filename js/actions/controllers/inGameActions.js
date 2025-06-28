@@ -90,6 +90,9 @@ export class InGameActions {
 			case InGameActionList.MOVE_CAMERA.getName():
 				this.#moveCameraAction(action);
 				return true;
+			case InGameActionList.CHANGE_ZOOM.getName():
+				this.#zoomCameraAction(action);
+				return true;
 			default:
 				return false;
 		}
@@ -149,7 +152,18 @@ export class InGameActions {
 	#moveCameraAction(action) {
 		const vector = new Vector(action.params.x_position, action.params.y_position);
 		this.#root.camera.setDesiredCenter(vector);
-		SdkClient.tellActionResult(action.id, true, `Moved camera to x: ${vector.x}, y: ${vector.y}`);
+		SdkClient.tellActionResult(action.id, true, `Moving camera to x: ${vector.x}, y: ${vector.y}.`);
+	}
+
+	#zoomCameraAction(action) {
+		const zoom = action.params.zoom_percent * 0.01;
+		if (zoom == this.#root.camera.zoomLevel) {
+			SdkClient.tellActionResult(action.id, true, `Zoom is already at ${action.params.zoom_percent}%.`);
+		}
+		else {
+			this.#root.camera.setDesiredZoom(zoom);
+			SdkClient.tellActionResult(action.id, true, `Adjusting zoom to ${action.params.zoom_percent}%.`);
+		}
 	}
 
 	/** @retuns {boolean} */
@@ -311,6 +325,13 @@ export class InGameActions {
 
 		InGameActionList.MOVE_CAMERA.setOptions([limitX, limitY]);
 		this.#actions.addAction(InGameActionList.MOVE_CAMERA);
+
+		const minZoom = Math.round(this.#root.camera.getMinimumZoom() * 100);
+		const maxZoom = Math.round(this.#root.camera.getMaximumZoom() * 100);
+		const zoomIn = new NumberSchema("zoom_percent", 1, minZoom, maxZoom);
+
+		InGameActionList.CHANGE_ZOOM.setOptions([zoomIn]);
+		this.#actions.addAction(InGameActionList.CHANGE_ZOOM);
 	}
 
 	/** @returns {Rectangle} */
@@ -321,10 +342,13 @@ export class InGameActions {
 	}
 
 	#checkCameraMovement() {
+		if (!this.#root.camera) {
+			return;
+		}
+
 		if (this.#moving) {
 			if (
-				!this.#root.camera.isCurrentlyInteracting() &&
-				!this.#root.camera.isCurrentlyMovingToDesiredCenter()
+				!this.#root.camera.viewportWillChange()
 			) {
 				this.#moving = false;
 				this.#promptActions();
@@ -332,8 +356,7 @@ export class InGameActions {
 		}
 		else {
 			if (
-				this.#root.camera.isCurrentlyInteracting() ||
-				this.#root.camera.isCurrentlyMovingToDesiredCenter()
+				this.#root.camera.viewportWillChange()
 			) {
 				this.#moving = true;
 				this.#actions.removeAllActions();
