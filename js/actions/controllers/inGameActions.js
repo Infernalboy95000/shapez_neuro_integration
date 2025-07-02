@@ -94,7 +94,13 @@ export class InGameActions {
 				this.#zoomCameraAction(action);
 				return true;
 			default:
-				return false;
+				if (action.name.match(/^describe_.*_patch$/)) {
+					
+					return true;
+				}
+				else {
+					return false;
+				}
 		}
 	}
 
@@ -147,6 +153,7 @@ export class InGameActions {
 	#tryDescribePatches(action) {
 		const msg = this.#mapDescriptor.describePatches();
 		SdkClient.tellActionResult(action.id, true, msg);
+		this.#mapDescriptor.announceFullDescriptors();
 	}
 
 	#moveCameraAction(action) {
@@ -352,6 +359,8 @@ export class InGameActions {
 			) {
 				this.#moving = false;
 				this.#promptActions();
+				this.#mapDescriptor.clearInvisibleDescriptors();
+				this.#mapDescriptor.announceFullDescriptors();
 			}
 		}
 		else {
@@ -360,6 +369,7 @@ export class InGameActions {
 			) {
 				this.#moving = true;
 				this.#actions.removeAllActions();
+				this.#mapDescriptor.removeAllDescriptors();
 			}
 		}
 	}

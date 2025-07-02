@@ -1,4 +1,3 @@
-import { Vector } from "shapez/core/vector";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { ChunkDescriptor } from "../helpers/chunkDescriptor";
 
@@ -21,6 +20,38 @@ export class MapDescriptor {
 	describePatches() {
 		this.#patches = this.#getPatchDescriptors(this.#getVisibleChunks());
 		return this.#simplePatchDescriptior(this.#patches);
+	}
+
+	announceFullDescriptors() {
+		if (!this.#patches) {
+			return;
+		}
+
+		this.#patches.forEach((chunk) => {
+			chunk.announce();
+		});
+	}
+
+	removeAllDescriptors() {
+		if (!this.#patches) {
+			return;
+		}
+
+		this.#patches.forEach((chunk) => {
+			chunk.remove();
+		});
+	}
+
+	clearInvisibleDescriptors() {
+		if (!this.#patches) {
+			return;
+		}
+		const visibleChunks = this.#getVisibleChunks();
+		visibleChunks.forEach((chunk, key) => {
+			if (this.#isChunkVisible(chunk) && this.#patches.has(key)) {
+				this.#patches.get(key).remove();
+			}
+		});
 	}
 
 	/**

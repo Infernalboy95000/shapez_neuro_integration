@@ -24,6 +24,25 @@ export class ShapeCode {
 	 * @param {string} code
 	 * @returns {string}
 	 * */
+	static nameShapeCode(code) {
+		const color = this.#decodeColor(code);
+		const shape = this.#decodeShape(code);
+
+		if (shape == "") {
+			return `[${code}]`;
+		}
+		else if (color == "") {
+			return `${shape}_[${code}]`;
+		}
+		else {
+			return `${color}_${shape}_[${code}]`;
+		}
+	}
+
+	/**
+	 * @param {string} code
+	 * @returns {string}
+	 * */
 	static #decodeShape(code) {
 		if (/^[C].[C].[C].[C].$/.test(code)) {
 			return "shpere";
