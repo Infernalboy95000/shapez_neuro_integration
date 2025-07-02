@@ -1,5 +1,7 @@
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { ChunkDescriptor } from "../helpers/chunkDescriptor";
+import { Vector } from "shapez/core/vector";
+import { RandomUtils } from "../../custom/randomUtils";
 
 export class MapDescriptor {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -15,43 +17,36 @@ export class MapDescriptor {
 		this.#root = root;
 	}
 
-	// Describe the current map view
+	// Scans for nearby patches
 	/** @returns {string} */
-	describePatches() {
+	scanNearbyPatches() {
 		this.#patches = this.#getPatchDescriptors(this.#getVisibleChunks());
 		return this.#simplePatchDescriptior(this.#patches);
 	}
 
-	announceFullDescriptors() {
+	/**
+	 * @param {Vector} pos 
+	 * @returns {string}
+	 */
+	fullyDescribePatch(pos) {
 		if (!this.#patches) {
-			return;
+			this.scanNearbyPatches();
 		}
-
-		this.#patches.forEach((chunk) => {
-			chunk.announce();
-		});
-	}
-
-	removeAllDescriptors() {
-		if (!this.#patches) {
-			return;
+		
+		const chunk = this.#getChunkOnPosition(pos);
+		if (chunk == null) {
+			return `Sorry. There's no chunk at x:${pos.x}, y:${pos.y} yet. Move closer to create it.`
 		}
-
-		this.#patches.forEach((chunk) => {
-			chunk.remove();
-		});
-	}
-
-	clearInvisibleDescriptors() {
-		if (!this.#patches) {
-			return;
-		}
-		const visibleChunks = this.#getVisibleChunks();
-		visibleChunks.forEach((chunk, key) => {
-			if (this.#isChunkVisible(chunk) && this.#patches.has(key)) {
-				this.#patches.get(key).remove();
+		else {
+			const formattedPos = RandomUtils.formatPosition(chunk.x, chunk.y);
+			if (this.#patches.has(formattedPos)) {
+				const chunkDescriptor = this.#patches.get(formattedPos);
+				return chunkDescriptor.advanced(pos);
 			}
-		});
+			else {
+				return `Sorry. There's no chunk at x:${pos.x}, y:${pos.y} yet. Move closer to create it.`
+			}
+		}
 	}
 
 	/**
@@ -79,9 +74,9 @@ export class MapDescriptor {
 		/** @type {Map<string, ChunkDescriptor>} */
 		const finds = new Map();
 
-		chunks.forEach((value, key) => {
-			if (value.patches.length > 0) {
-				finds.set(key, new ChunkDescriptor(value));
+		chunks.forEach((chunk, key) => {
+			if (chunk.patches.length > 0) {
+				finds.set(key, new ChunkDescriptor(chunk));
 			}
 		});
 		return finds;
@@ -91,7 +86,7 @@ export class MapDescriptor {
 	#getVisibleChunks() {
 		const chunks = this.#root.map.chunksById;
 		/** @type {Map<string, MapChunkView>} */
-		const visibleChunks = new Map()
+		const visibleChunks = new Map();
 
 		chunks.forEach((chunk, key) => {
 			if (this.#isChunkVisible(chunk)) {
@@ -108,5 +103,13 @@ export class MapDescriptor {
 	#isChunkVisible(chunk) {
 		const visible = this.#root.camera.getVisibleRect();
 		return visible.containsRect(chunk.worldSpaceRectangle);
+	}
+
+	/**
+	 * @param {Vector} pos 
+	 * @returns {MapChunkView}
+	 */
+	#getChunkOnPosition(pos) {
+		return this.#root.map.getChunkAtTileOrNull(pos.x, pos.y);
 	}
 }

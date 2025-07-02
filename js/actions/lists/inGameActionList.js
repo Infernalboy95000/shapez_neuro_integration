@@ -37,6 +37,10 @@ export class InGameActionList {
 		"patches_nearby", "See if there's patches currently in view."
 	)
 
+	static DESCRIBE_PATCH = new SdkAction(
+		"describe_patch", "Fully describe all positions that compose a patch. Scanning for patches nearby first might help you find them."
+	)
+
 	static MOVE_CAMERA = new SdkAction(
 		"move_camera", "Move the camera at a nearby position."
 	)

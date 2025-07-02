@@ -85,7 +85,10 @@ export class InGameActions {
 				this.#tryAreaDeletionAction(action);
 				return true;
 			case InGameActionList.PATCHES_NEARBY.getName():
-				this.#tryDescribePatches(action);
+				this.#tryScanPatches(action);
+				return true;
+			case InGameActionList.DESCRIBE_PATCH.getName():
+				this.#tryDescribePatch(action);
 				return true;
 			case InGameActionList.MOVE_CAMERA.getName():
 				this.#moveCameraAction(action);
@@ -94,13 +97,7 @@ export class InGameActions {
 				this.#zoomCameraAction(action);
 				return true;
 			default:
-				if (action.name.match(/^describe_.*_patch$/)) {
-					
-					return true;
-				}
-				else {
-					return false;
-				}
+				return false;
 		}
 	}
 
@@ -150,10 +147,20 @@ export class InGameActions {
 		}
 	}
 
-	#tryDescribePatches(action) {
-		const msg = this.#mapDescriptor.describePatches();
+	#tryScanPatches(action) {
+		const msg = this.#mapDescriptor.scanNearbyPatches();
 		SdkClient.tellActionResult(action.id, true, msg);
-		this.#mapDescriptor.announceFullDescriptors();
+	}
+
+	#tryDescribePatch(action) {
+		const pos = new Vector(action.params.x_position, action.params.y_position);
+		const msg = this.#mapDescriptor.fullyDescribePatch(pos);
+		if (msg.includes("Sorry") || msg.includes("Error")) {
+			SdkClient.tellActionResult(action.id, false, msg);
+		}
+		else {
+			SdkClient.tellActionResult(action.id, true, msg);
+		}
 	}
 
 	#moveCameraAction(action) {
@@ -322,6 +329,13 @@ export class InGameActions {
 
 	#promptDescriptors() {
 		this.#actions.addAction(InGameActionList.PATCHES_NEARBY);
+
+		const limits = this.#getVisibleLimits();
+		const posX = new NumberSchema("x_position", 1, limits.x, limits.x + limits.w - 1);
+		const posY = new NumberSchema("y_position", 1, limits.y, limits.y + limits.h - 1);
+
+		InGameActionList.DESCRIBE_PATCH.setOptions([posX, posY]);
+		this.#actions.addAction(InGameActionList.DESCRIBE_PATCH);
 	}
 
 	#promptPositioners() {
@@ -359,8 +373,6 @@ export class InGameActions {
 			) {
 				this.#moving = false;
 				this.#promptActions();
-				this.#mapDescriptor.clearInvisibleDescriptors();
-				this.#mapDescriptor.announceFullDescriptors();
 			}
 		}
 		else {
@@ -369,7 +381,6 @@ export class InGameActions {
 			) {
 				this.#moving = true;
 				this.#actions.removeAllActions();
-				this.#mapDescriptor.removeAllDescriptors();
 			}
 		}
 	}
