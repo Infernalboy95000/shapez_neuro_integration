@@ -155,7 +155,7 @@ export class InGameActions {
 	#tryDescribePatch(action) {
 		const pos = new Vector(action.params.x_position, action.params.y_position);
 		const msg = this.#mapDescriptor.fullyDescribePatch(pos);
-		if (msg.includes("Sorry") || msg.includes("Error")) {
+		if (msg.includes("Sorry")) {
 			SdkClient.tellActionResult(action.id, false, msg);
 		}
 		else {

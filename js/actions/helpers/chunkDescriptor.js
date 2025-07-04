@@ -45,10 +45,14 @@ export class ChunkDescriptor {
 		});
 
 		if (msg == "Error" && finds.size > 0) {
-			console.error("This thing is not finding chunks!");
+			msg = "";
 			finds.forEach((tiles, patchCode) => {
-				return this.#describeLayerInfo(patchCode, tiles);
+				msg += this.#describeLayerInfo(patchCode, tiles);
+				msg += "\n";
 			});
+		}
+		else {
+			msg = `Sorry. There're no patches nearby x:${pos.x}, y:${pos.y}`;
 		}
 
 		return msg;

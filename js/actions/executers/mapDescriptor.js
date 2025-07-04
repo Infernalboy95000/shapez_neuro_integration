@@ -35,7 +35,7 @@ export class MapDescriptor {
 		
 		const chunk = this.#getChunkOnPosition(pos);
 		if (chunk == null) {
-			return `Sorry. There's no chunk at x:${pos.x}, y:${pos.y} yet. Move closer to create it.`
+			return `Sorry. There's no terrain generated at x: ${pos.x}, y: ${pos.y} yet. Move closer to create it.`;
 		}
 		else {
 			const formattedPos = RandomUtils.formatPosition(chunk.x, chunk.y);
@@ -44,7 +44,7 @@ export class MapDescriptor {
 				return chunkDescriptor.advanced(pos);
 			}
 			else {
-				return `Sorry. There's no chunk at x:${pos.x}, y:${pos.y} yet. Move closer to create it.`
+				return `Sorry. There're no patches nearby x:${pos.x}, y:${pos.y}`;
 			}
 		}
 	}
