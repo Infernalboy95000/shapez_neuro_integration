@@ -18,7 +18,7 @@ export class InGameActionList {
 	)
 
 	static DELETE_IN_AREA = new SdkAction(
-		"delete_in_area", "Delete all buildings in an square area you choose. Please, define the area from the bottom corner to the top corner."
+		"delete_in_area", "Delete all buildings in an square area you choose. Please, define the area from the bottom left corner to the top right corner."
 	)
 
 	static CLEAR_BELTS = new SdkAction(
