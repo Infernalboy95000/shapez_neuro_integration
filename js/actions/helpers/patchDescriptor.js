@@ -4,7 +4,7 @@ import { MapChunkView } from "shapez/game/map_chunk_view";
 import { ShapeCode } from "./shapeCode";
 import { RandomUtils } from "../../custom/randomUtils";
 
-export class ChunkDescriptor {
+export class PatchDescriptor {
 	/** @type {MapChunkView} */ #chunk
 	/** @type {Vector} */ #pos;
 
@@ -48,7 +48,7 @@ export class ChunkDescriptor {
 			msg = "";
 			finds.forEach((tiles, patchCode) => {
 				msg += this.#describeLayerInfo(patchCode, tiles);
-				msg += "\n";
+				msg += "\r\n";
 			});
 		}
 		else {
@@ -128,7 +128,7 @@ export class ChunkDescriptor {
 			currentX = tiles.positions[i].vector.x;
 			if (currentX != lastX) {
 				if (yFinds.length > 0) {
-					msg += `\non x: ${lastX}, `;
+					msg += `\r\non x: ${lastX}, `;
 
 					if (yFinds.length == 1) {
 						msg += `y: ${yFinds[0]}`;

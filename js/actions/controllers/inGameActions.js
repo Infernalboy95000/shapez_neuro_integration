@@ -19,26 +19,21 @@ export class InGameActions {
 	/** @type {InGameMassSelector} */ #massSelector;
 	/** @type {MapDescriptor} */ #mapDescriptor;
 	/** @type {boolean} */ #moving;
+	/** @type {boolean} */ static #initialized = false;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {import("shapez/game/root").GameRoot} root
 	 */
 	constructor(mod, root) {
-		const ourClass = this;
 		this.#mod = mod;
 		this.#root = root;
 		this.#actions = new ActionList();
 		this.#mapDescriptor = new MapDescriptor(mod, root);
 
-		this.#mod.modInterface.runAfterMethod(
-			GameCore,
-			"tick",
-			function(deltaMs) {
-				ourClass.#checkCameraMovement();
-				return true;
-			}
-		);
+		if (!InGameActions.#initialized) {
+			this.#initialize();
+		}
 	}
 
 	gameOpenned() {
@@ -65,6 +60,19 @@ export class InGameActions {
 		}
 	}
 
+	#initialize() {
+		const ourClass = this;
+
+		this.#mod.modInterface.runAfterMethod(
+			GameCore,
+			"tick",
+			function(deltaMs) {
+				ourClass.#checkCameraMovement();
+				return true;
+			}
+		);
+	}
+
 	#announceOpening() {
 		SdkClient.sendMessage("A map has loaded. Now you can play the game!");
 	}
@@ -89,6 +97,9 @@ export class InGameActions {
 				return true;
 			case InGameActionList.DESCRIBE_PATCH.getName():
 				this.#tryDescribePatch(action);
+				return true;
+			case InGameActionList.DESCRIBE_BUILDINGS.getName():
+				this.#tryDescribeBuildings(action);
 				return true;
 			case InGameActionList.MOVE_CAMERA.getName():
 				this.#moveCameraAction(action);
@@ -161,6 +172,11 @@ export class InGameActions {
 		else {
 			SdkClient.tellActionResult(action.id, true, msg);
 		}
+	}
+
+	#tryDescribeBuildings(action) {
+		const msg = this.#mapDescriptor.scanBuilding();
+		SdkClient.tellActionResult(action.id, true, msg);
 	}
 
 	#moveCameraAction(action) {
@@ -336,6 +352,8 @@ export class InGameActions {
 
 		InGameActionList.DESCRIBE_PATCH.setOptions([posX, posY]);
 		this.#actions.addAction(InGameActionList.DESCRIBE_PATCH);
+
+		this.#actions.addAction(InGameActionList.DESCRIBE_BUILDINGS);
 	}
 
 	#promptPositioners() {

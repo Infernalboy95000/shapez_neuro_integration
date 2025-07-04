@@ -41,6 +41,15 @@ export class InGameActionList {
 		"describe_patch", "Fully describe all positions that compose a patch. Scanning for patches nearby first might help you find them."
 	)
 
+	static DESCRIBE_BUILDINGS = new SdkAction(
+		"describe_buildings", "Fully describe all buildings in view. This might get complex to understand so, sorry in advance."
+	)
+
+	// Only show if hub is visible?
+	static DESCRIBE_HUB = new SdkAction(
+		"describe_hub", "Describe all HUB's inputs positions and directions."
+	)
+
 	static MOVE_CAMERA = new SdkAction(
 		"move_camera", "Move the camera at a nearby position."
 	)
