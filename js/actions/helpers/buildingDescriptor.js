@@ -34,7 +34,9 @@ export class BuildingDescriptor {
 		const buildingName = building.StaticMapEntity.getMetaBuilding().getId();
 		switch (buildingName) {
 			case "belt":
-				return this.describeBelt(id, building);
+				return this.#describeBelt(id, building);
+			case "miner":
+				return this.#describeMiner(id, building);
 			default:
 				return {msg:"Unknown building", describedIDs:new Array()};
 		}
@@ -45,12 +47,11 @@ export class BuildingDescriptor {
 	 * @param {EntityComponentStorage} belt
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
-	static describeBelt(id, belt) {
-		console.log(belt);
-		let log = {msg:"", describedIDs:new Array()}
+	static #describeBelt(id, belt) {
+		let log = {msg:"", describedIDs:new Array()};
 		const path = belt.Belt.assignedPath.entityPath;
 		if (path.length > 1) {
-			log = this.describeBeltPath(path);
+			log = this.#describeBeltPath(path);
 		}
 		else {
 			const entity = belt.StaticMapEntity;
@@ -68,7 +69,7 @@ export class BuildingDescriptor {
 	 * @param {Entity[]} path
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
-	static describeBeltPath(path) {
+	static #describeBeltPath(path) {
 		const log = {msg:"", describedIDs:new Array()}
 		let origin = path[0].components.StaticMapEntity.origin;
 		const dir = path[0].components.StaticMapEntity.originalRotation;
@@ -99,6 +100,23 @@ export class BuildingDescriptor {
 			}
 			log.describedIDs.push(path[i].uid);
 		}
+
+		return log;
+	}
+
+	/**
+	 * @param {Number} id
+	 * @param {EntityComponentStorage} miner
+	 * @returns {{msg:string, describedIDs:Array<number>}}
+	 * */
+	static #describeMiner(id, miner) {
+		let log = {msg:"", describedIDs:new Array()};
+		const origin = miner.StaticMapEntity.origin;
+		const currentDirection = miner.StaticMapEntity.originalRotation;
+		const rotName = RotationCodes.getRotationName(currentDirection);
+		log.msg = `Found miner at x: ${origin.x}, y: ${origin.y} ` +
+		`facing ${rotName}`;
+		log.describedIDs.push(id);
 
 		return log;
 	}
