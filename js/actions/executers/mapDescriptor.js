@@ -3,6 +3,7 @@ import { PatchDescriptor } from "../helpers/patchDescriptor";
 import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../../custom/randomUtils";
 import { BuildingDescriptor } from "../helpers/buildingDescriptor";
+import { EntityComponentStorage } from "shapez/game/entity_components";
 
 export class MapDescriptor {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -52,7 +53,7 @@ export class MapDescriptor {
 	}
 
 	/** @returns {string} */
-	scanBuilding() {
+	scanBuildingsInView() {
 		this.#scanNearbyBuildings();
 		return this.#simpleBuildingsDescriptior(this.#buildings);
 	}
@@ -83,16 +84,41 @@ export class MapDescriptor {
 	 * @returns {string}
 	 * */
 	#simpleBuildingsDescriptior(chunks) {
-		let msg = "";
+		const allBuildings = this.#recompileAllBuildings(chunks);
+		const usedIDs = new Array();
+
+		let msg = "No buildings in view.";
+		allBuildings.forEach((building, key) => {
+			if (usedIDs.includes(key)) {
+				return; // This acts as a "continue"
+			}
+			const log = BuildingDescriptor.describe(key, building.entity);
+			msg += `\n${log.msg}`;
+
+			for (let i = 0; i < log.describedIDs.length; i++) {
+				if (!usedIDs.includes(log.describedIDs[i])) {
+					usedIDs.push(log.describedIDs[i]);
+				}
+			}
+		});
+		return msg;
+	}
+
+	/**
+	 * @param {Map<string, BuildingDescriptor>} chunks
+	 * @returns {Map<number, {name:string, entity:EntityComponentStorage, inspected:boolean}>}
+	 * */
+	#recompileAllBuildings(chunks) {
+		const allBuildings = new Map();
+
 		chunks.forEach(chunk => {
-			msg += chunk.test();
-			msg += "\r\n";
+			const chunkBuildings = chunk.get();
+			chunkBuildings.forEach((building, key) => {
+				allBuildings.set(key, building);
+			});
 		});
 
-		if (msg == "") {
-			msg = "No buildings found here.";
-		}
-		return msg;
+		return allBuildings;
 	}
 
 	/**

@@ -175,7 +175,7 @@ export class InGameActions {
 	}
 
 	#tryDescribeBuildings(action) {
-		const msg = this.#mapDescriptor.scanBuilding();
+		const msg = this.#mapDescriptor.scanBuildingsInView();
 		SdkClient.tellActionResult(action.id, true, msg);
 	}
 
