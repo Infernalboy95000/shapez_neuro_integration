@@ -101,6 +101,9 @@ export class InGameActions {
 			case InGameActionList.DESCRIBE_BUILDINGS.getName():
 				this.#tryDescribeBuildings(action);
 				return true;
+			case InGameActionList.DESCRIBE_TOOLBELT_BUILDING.getName():
+				this.#tryDescribeToolbeltBuilding(action);
+				return true;
 			case InGameActionList.MOVE_CAMERA.getName():
 				this.#moveCameraAction(action);
 				return true;
@@ -177,6 +180,16 @@ export class InGameActions {
 	#tryDescribeBuildings(action) {
 		const msg = this.#mapDescriptor.scanBuildingsInView();
 		SdkClient.tellActionResult(action.id, true, msg);
+	}
+
+	#tryDescribeToolbeltBuilding(action) {
+		const msg = this.#builder.getBuildingInfo(action.params.building);
+		if (msg.includes("not unlocked")) {
+			SdkClient.tellActionResult(action.id, false, msg);
+		}
+		else {
+			SdkClient.tellActionResult(action.id, true, msg);
+		}
 	}
 
 	#moveCameraAction(action) {
@@ -318,6 +331,11 @@ export class InGameActions {
 			[buildings, posX, posY, rotations]
 		);
 		this.#actions.addAction(InGameActionList.PLACE_BUILDING);
+
+		InGameActionList.DESCRIBE_TOOLBELT_BUILDING.setOptions(
+			[buildings]
+		)
+		this.#actions.addAction(InGameActionList.DESCRIBE_TOOLBELT_BUILDING);
 
 		InGameActionList.PLACE_BUILDINGS_LINE.setOptions(
 			[buildings, posX, posY, rotations, direction, lineLength]

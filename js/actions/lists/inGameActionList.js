@@ -5,6 +5,10 @@ export class InGameActionList {
 		"place_building", "Select and place a building from your toolbelt."
 	)
 
+	static DESCRIBE_TOOLBELT_BUILDING = new SdkAction(
+		"describe_toolbelt_building", "Get all the stats of one of your available builds, like work speed."
+	);
+
 	static PLACE_BUILDINGS_LINE = new SdkAction(
 		"place_buildings_line", "Place an entire line of buildings at once. Just tell where to start, a direction and the length of that line."
 	)

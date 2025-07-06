@@ -48,6 +48,30 @@ export class InGameBuilder {
 		return true;
 	}
 
+	/**
+	 * @param {string} buildingName
+	 * @returns {string}
+	 * */
+	getBuildingInfo(buildingName) {
+		let msg = `${buildingName} is not unlocked, yet.`;
+		if (this.selectBuilding(buildingName)) {
+			const building = this.#getBuildingByName(buildingName);
+			const stats = building.getAdditionalStatistics(this.#root, buildingName);
+			msg = `Stats for ${buildingName}:\r\n`;
+
+			for (let i = 0; i < stats.length; i++) {
+				for (let j = 0; j < stats[i].length; j += 2) {
+					const name = stats[i][j];
+					const stat = stats[i][j + 1];
+
+					msg += `${name}: ${stat}` +
+					`${i + 2 < stats.length ? "\r\n" : ""}`;
+				}
+			}
+		}
+		return msg;
+	}
+
 	deselectCurrentBulding() {
 		this.#root.hud.signals.buildingSelectedForPlacement.dispatch(null);
 		this.#root.hud.parts.buildingsToolbar.onSelectedPlacementBuildingChanged(null);
