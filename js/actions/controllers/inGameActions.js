@@ -113,6 +113,7 @@ export class InGameActions {
 				this.#tryDescribeGoalPiece(action);
 				return true;
 			case InGameActionList.GET_PINNED_SHAPES.getName():
+				this.#tryDescribePinnedShapes(action);
 				return true;
 			case InGameActionList.MOVE_CAMERA.getName():
 				this.#moveCameraAction(action);
@@ -204,6 +205,11 @@ export class InGameActions {
 
 	#tryDescribeGoalPiece(action) {
 		const msg = this.#goalsDescriptor.describeCurrentGoal();
+		SdkClient.tellActionResult(action.id, true, msg);
+	}
+
+	#tryDescribePinnedShapes(action) {
+		const msg = this.#goalsDescriptor.describePinnedShapes();
 		SdkClient.tellActionResult(action.id, true, msg);
 	}
 
@@ -327,11 +333,6 @@ export class InGameActions {
 		this.#promptDescriptors();
 		this.#promptPositioners();
 		this.#promptMenus();
-		//console.log("Trying to watch current goal");
-		//console.log(this.#root.hubGoals.currentGoal);
-
-		//console.log("Trying to watch pinned shapes");
-		//console.log(this.#root.hud.parts.pinnedShapes.pinnedShapes);
 	}
 
 	#promptPlacers() {
@@ -414,6 +415,7 @@ export class InGameActions {
 
 	#promptMenus() {
 		this.#actions.addAction(InGameActionList.DESCRIBE_CURRENT_GOAL);
+		this.#actions.addAction(InGameActionList.GET_PINNED_SHAPES);
 	}
 
 	/** @returns {Rectangle} */
