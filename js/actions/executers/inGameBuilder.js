@@ -14,7 +14,7 @@ export class InGameBuilder {
 
 	/** @returns {Array<MetaBuilding>} */
 	getToolbelt() {
-		const buildings = this.#root.hud.parts.buildingsToolbar.primaryBuildings;
+		const buildings = this.#root.hud.parts.buildingsToolbar.allBuildings;
 		const metaBuilds = [];
 
 		for (let i = 0; i < buildings.length; i++) {
