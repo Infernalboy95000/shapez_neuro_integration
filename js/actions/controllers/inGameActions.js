@@ -10,6 +10,9 @@ import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
+import { HUDPinnedShapes } from "shapez/game/hud/parts/pinned_shapes";
+import { RegularGameMode } from "shapez/game/modes/regular";
+import { GoalsDescriptor } from "../helpers/goalsDescriptor";
 
 export class InGameActions {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -18,6 +21,7 @@ export class InGameActions {
 	/** @type {InGameBuilder} */ #builder;
 	/** @type {InGameMassSelector} */ #massSelector;
 	/** @type {MapDescriptor} */ #mapDescriptor;
+	/** @type {GoalsDescriptor} */ #goalsDescriptor;
 	/** @type {boolean} */ #moving;
 	/** @type {boolean} */ static #initialized = false;
 
@@ -30,6 +34,7 @@ export class InGameActions {
 		this.#root = root;
 		this.#actions = new ActionList();
 		this.#mapDescriptor = new MapDescriptor(mod, root);
+		this.#goalsDescriptor = new GoalsDescriptor(root);
 
 		if (!InGameActions.#initialized) {
 			this.#initialize();
@@ -103,6 +108,11 @@ export class InGameActions {
 				return true;
 			case InGameActionList.DESCRIBE_TOOLBELT_BUILDING.getName():
 				this.#tryDescribeToolbeltBuilding(action);
+				return true;
+			case InGameActionList.DESCRIBE_CURRENT_GOAL.getName():
+				this.#tryDescribeGoalPiece(action);
+				return true;
+			case InGameActionList.GET_PINNED_SHAPES.getName():
 				return true;
 			case InGameActionList.MOVE_CAMERA.getName():
 				this.#moveCameraAction(action);
@@ -190,6 +200,11 @@ export class InGameActions {
 		else {
 			SdkClient.tellActionResult(action.id, true, msg);
 		}
+	}
+
+	#tryDescribeGoalPiece(action) {
+		const msg = this.#goalsDescriptor.describeCurrentGoal();
+		SdkClient.tellActionResult(action.id, true, msg);
 	}
 
 	#moveCameraAction(action) {
@@ -311,6 +326,12 @@ export class InGameActions {
 		this.#promptDeleters();
 		this.#promptDescriptors();
 		this.#promptPositioners();
+		this.#promptMenus();
+		//console.log("Trying to watch current goal");
+		//console.log(this.#root.hubGoals.currentGoal);
+
+		//console.log("Trying to watch pinned shapes");
+		//console.log(this.#root.hud.parts.pinnedShapes.pinnedShapes);
 	}
 
 	#promptPlacers() {
@@ -389,6 +410,10 @@ export class InGameActions {
 
 		InGameActionList.CHANGE_ZOOM.setOptions([zoomIn]);
 		this.#actions.addAction(InGameActionList.CHANGE_ZOOM);
+	}
+
+	#promptMenus() {
+		this.#actions.addAction(InGameActionList.DESCRIBE_CURRENT_GOAL);
 	}
 
 	/** @returns {Rectangle} */

@@ -62,6 +62,14 @@ export class InGameActionList {
 		"change_zoom", "Adjust your current camera zoom. If you zoom far enough, you will enter map overwiew mode."
 	)
 
+	static DESCRIBE_CURRENT_GOAL = new SdkAction(
+		"describe_current_goal", "Describe what's the current shape you have to deliver to the HUB in order to get to the next level."
+	)
+
+	static GET_PINNED_SHAPES = new SdkAction(
+		"get_pinned_shapes", "Get the list of shapes you have pinned. Those are probably related to upgrade goals."
+	)
+
 	/*
 	- Select building [Buiilding name]
 	<- Tell building name, variant, speed, current rotation, etc...
