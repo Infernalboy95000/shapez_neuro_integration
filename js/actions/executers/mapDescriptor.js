@@ -128,7 +128,6 @@ export class MapDescriptor {
 	#getPatchDescriptors(chunks) {
 		/** @type {Map<string, PatchDescriptor>} */
 		const finds = new Map();
-		console.log(chunks);
 		chunks.forEach((chunk, key) => {
 			if (chunk.patches.length > 0) {
 				finds.set(key, new PatchDescriptor(chunk));

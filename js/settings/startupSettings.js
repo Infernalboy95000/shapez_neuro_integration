@@ -97,8 +97,6 @@ export class StartupSettings {
 	}
 
 	#saveMapAvailableSetting(value) {
-		console.log("Original value: " + this.#mod.settings.mapAvailable);
-		console.log("New value: " + value);
 		this.#mod.settings.mapAvailable = value;
 		this.#mod.saveSettings();
 	}

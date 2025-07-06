@@ -44,15 +44,17 @@ export class PatchDescriptor {
 			}
 		});
 
-		if (msg == "Error" && finds.size > 0) {
-			msg = "";
-			finds.forEach((tiles, patchCode) => {
-				msg += this.#describeLayerInfo(patchCode, tiles);
-				msg += "\r\n";
-			});
-		}
-		else {
+		if (msg == "Error") {
+			if (finds.size > 0) {
+				msg = "";
+				finds.forEach((tiles, patchCode) => {
+					msg += this.#describeLayerInfo(patchCode, tiles);
+					msg += "\r\n";
+				});
+			}
+			else {
 			msg = `Sorry. There're no patches nearby x:${pos.x}, y:${pos.y}`;
+			}
 		}
 
 		return msg;
