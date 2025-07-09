@@ -2,13 +2,14 @@ ingame:
     interactiveTutorial:
         title: Tutorial
         hints:
-            1_1_extractor: Place an <strong>extractor</strong> on top of a <strong>circle shape</strong> to extract it!<br><br>Tip: Search for <strong>patches nearby</strong> to locate a circle shape patch!
+            1_1_extractor: >-
+                Place an <strong>extractor</strong> on top of a <strong>circle shape patch</strong> to extract it!<br><br>Tip: Place a <strong>line of belts</strong> at once!
             1_2_conveyor: >-
-                Connect the extractor with a <strong>conveyor belt</strong> to your hub!<br><br>Tip: Place a <strong>line of belts</strong> at once to build faster!
+                Connect the extractor with a <strong>conveyor belt</strong> to your hub!<br><br>Tip: Place a <strong>line of belts</strong> at once!
 
             1_3_expand: >-
                 This is <strong>NOT</strong> an idle game! Build more extractors and belts to finish the goal quicker.<br><br>Tip: Place <strong>lines of extractors</strong> and face them in the
-                <strong>right direction</strong> to build faster.
+                <strong>right direction</strong>.
 
             2_1_place_cutter: >-
                 Now place a <strong>Cutter</strong> to cut the circles in two halves!<br><br>
