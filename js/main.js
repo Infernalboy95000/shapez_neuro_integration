@@ -1,22 +1,26 @@
 import { Mod } from "shapez/mods/mod";
 import { CoordsGrid } from "./descriptors/coordsGrid";
 import { ActionsController } from "./actions/controllers/actionsController";
+import { TutorialMessager } from "./descriptors/tutorialMessager";
 const DEFAULT_URL = "localhost:8000";
 
-class NeuroIntegration extends Mod {
+export class NeuroIntegration extends Mod {
 	/** @type {boolean} */ #booted = false;
 	/** @type {CoordsGrid} */ #coordsGrid;
+	/** @type {TutorialMessager} */ #tutorialMessager;
 	/** @type {ActionsController} */ #actionsController;
 
 	init() {
+		// I wish I didn't need to do this check
 		if (this.settings.socketURL == undefined) {
 			this.#SaveDefaultSettings();
 		}
 
 		this.signals.appBooted.add(() => {
 			this.#coordsGrid = new CoordsGrid(this);
+			this.#tutorialMessager = new TutorialMessager(this);
 			this.#actionsController = new ActionsController(this);
-			this.#booted = true
+			this.#booted = true;
 		});
 
 		this.signals.gameStarted.add(root => {
@@ -26,8 +30,17 @@ class NeuroIntegration extends Mod {
 		this.signals.stateEntered.add(state	=> {
 			if (this.#booted) {
 				this.#actionsController.notifyStateChange(state);
+				this.#tutorialMessager.notifyStateChange(state);
 			}
 		});
+	}
+
+	/**
+	 * @param {string} message
+	 * @returns {boolean}
+	 * */
+	trySendTutorialMessage(message) {
+		return this.#tutorialMessager.TryAnnounceWithTutorial(message);
 	}
 
 	#SaveDefaultSettings() {

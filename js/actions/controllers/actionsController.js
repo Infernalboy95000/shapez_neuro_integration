@@ -8,13 +8,13 @@ import { SettingsActions } from "./settingsActions";
  */
 export class ActionsController {
 	/** @type {string} */ #stateKey;
-	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+	/** @type {import("../../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {MainMenuActions} */ #mainMenuActions;
 	/** @type {SettingsActions} */ #settingsActions;
 	/** @type {InGameActions} */ #inGameActions;
 
-	/** @param {import("shapez/mods/mod").Mod} mod */
+	/** @param {import("../../main").NeuroIntegration} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#mainMenuActions = new MainMenuActions(mod);

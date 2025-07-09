@@ -10,12 +10,10 @@ import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
-import { HUDPinnedShapes } from "shapez/game/hud/parts/pinned_shapes";
-import { RegularGameMode } from "shapez/game/modes/regular";
 import { GoalsDescriptor } from "../helpers/goalsDescriptor";
 
 export class InGameActions {
-	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+	/** @type {import("../../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ActionList} */ #actions;
 	/** @type {InGameBuilder} */ #builder;
@@ -26,7 +24,7 @@ export class InGameActions {
 	/** @type {boolean} */ static #initialized = false;
 
 	/**
-	 * @param {import("shapez/mods/mod").Mod} mod
+	 * @param {import("../../main").NeuroIntegration} mod
 	 * @param {import("shapez/game/root").GameRoot} root
 	 */
 	constructor(mod, root) {
@@ -79,7 +77,10 @@ export class InGameActions {
 	}
 
 	#announceOpening() {
-		SdkClient.sendMessage("A map has loaded. Now you can play the game!");
+		const welcomeMessage = "A map has loaded. Now you can play the game!";
+		if (!this.#mod.trySendTutorialMessage(welcomeMessage)) {
+			SdkClient.sendMessage(welcomeMessage);
+		}
 	}
 
 	/** @retuns {boolean} */
