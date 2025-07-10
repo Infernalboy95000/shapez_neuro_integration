@@ -1,0 +1,43 @@
+ingame:
+    interactiveTutorial:
+        title: Tutorial
+        hints:
+            1_1_extractor: >-
+                Place an <strong>extractor</strong> on top of a <strong>circle shape patch</strong> to extract it!<br><br>Tip: Place a <strong>line of belts</strong> at once!
+            1_2_conveyor: >-
+                Connect the extractor with a <strong>conveyor belt</strong> to your hub!<br><br>Tip: Place a <strong>line of belts</strong> at once!
+
+            1_3_expand: >-
+                This is <strong>NOT</strong> an idle game! Build more extractors and belts to finish the goal quicker.<br><br>Tip: Place <strong>lines of extractors</strong> and face them in the
+                <strong>right direction</strong>.
+
+            2_1_place_cutter: >-
+                Now place a <strong>Cutter</strong> to cut the circles in two halves!<br><br>
+                PS: The cutter always cuts from <strong>top to bottom</strong> regardless of its orientation.
+
+            2_2_place_trash: >-
+                The cutter can <strong>clog and stall</strong>!<br><br>
+                Use a <strong>trash</strong> to get rid of the currently (!) not needed waste.
+
+            2_3_more_cutters: >-
+                Good job! Now place <strong>2 more cutters</strong> to speed up this slow process!
+
+            3_1_rectangles: >-
+                Now let's extract some rectangles! <strong>Build 4 extractors</strong> and connect them to the hub.<br><br>
+                PS: Place a <strong>line of belts</strong>!
+
+            21_1_place_quad_painter: >-
+                Place the <strong>quad painter</strong> and get some <strong>circles</strong>, <strong>white</strong> and <strong>red</strong> color!
+
+            21_2_switch_to_wires: >-
+                Switch to the wires layer by pressing <strong>E</strong>!<br><br>
+                Then <strong>connect all four inputs</strong> of the painter with cables!
+
+            21_3_place_button: >-
+                Awesome! Now place a <strong>Switch</strong> and connect it with wires!
+
+            21_4_press_button: >-
+                Press the switch to make it <strong>emit a truthy signal</strong> and thus activate the painter.<br><br>
+                PS: You don't have to connect all inputs! Try wiring only two.
+
+            1_2_hold_and_drag: You can do it!
