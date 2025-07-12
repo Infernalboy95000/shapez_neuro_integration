@@ -31,8 +31,8 @@ export class MainMenuActions {
 			this.#actions.activateActions();
 		}
 
-		const parent = document.querySelector("#state_MainMenuState");
-		this.#StatusDisplay.show(parent);
+		const statusDisplayBox = this.#createStatusBox();
+		this.#StatusDisplay.show(statusDisplayBox);
 	}
 
 	menuClosed() {
@@ -141,5 +141,23 @@ export class MainMenuActions {
 				this.#actions.addAction(MainMenuActionList.LOAD_GAME);
 			}
 		}
+	}
+
+	/** @returns {HTMLDivElement} */
+	#createStatusBox() {
+		const parent = document.querySelector(".sideContainer");
+		const statusDisplay = document.createElement("div");
+		statusDisplay.className = "sdkStatusDisplay";
+		parent.appendChild(statusDisplay);
+
+		const header = document.createElement("div");
+		header.className = "header";
+		statusDisplay.appendChild(header);
+
+		const title = document.createElement("h3");
+		title.textContent = "Sdk Status";
+		header.appendChild(title);
+
+		return statusDisplay;
 	}
 }

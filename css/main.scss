@@ -47,11 +47,44 @@ html[data-theme=dark]
 	background-color: rgb(239, 80, 114);
 }
 
-#sdk_client_status_display {
-	position: absolute;
-	top: calc(10px * var(--ui-scale));
-	left: calc(10px * var(--ui-scale));
-	z-index: 0;
+#state_MainMenuState .sideContainer .sdkStatusDisplay {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	background: #fff;
+	grid-row: 1/2;
+	position: relative;
+	text-align: left;
+	align-items: flex-start;
+	width: calc(250px *var(--ui-scale));
+	padding: calc(15px *var(--ui-scale));
+	padding-bottom: calc(10px *var(--ui-scale));
+	border-radius: calc(6px *var(--ui-scale));
+	box-shadow: 0 calc(5px*var(--ui-scale)) calc(15px *var(--ui-scale)) rgba(0,0,0,.2);
+}
+
+html[data-theme=dark]
+#state_MainMenuState .sideContainer .sdkStatusDisplay {
+	background: #484c58;
+}
+
+#state_MainMenuState .sideContainer .sdkStatusDisplay .header {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	text-transform: uppercase;
+	margin-bottom: calc(10px*var(--ui-scale));
+}
+
+#state_MainMenuState .sideContainer .sdkStatusDisplay h3 {
+	font-size: calc(19px*var(--ui-scale));
+	line-height: calc(21px*var(--ui-scale));
+	font-weight: 400;
+	font-family: GameFont,sans-serif;
+	letter-spacing: .01em;
+	color:#d63ce4;
+	margin: 0;
 }
 
 #sdk_client_status_display.connected {
