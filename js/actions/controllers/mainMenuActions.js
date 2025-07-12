@@ -4,17 +4,20 @@ import { EnumSchema } from "../definitions/schema/enumSchema";
 import { ActionList } from "../lists/actionList";
 import { MainMenuActionList } from "../lists/mainMenuActionList";
 import { MapLoader } from "../executers/mapLoader";
+import { StatusDisplay } from "../../visuals/statusDisplay";
 
 export class MainMenuActions {
 	/** @type {import("shapez/states/main_menu").MainMenuState} */ #state;
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {Map<string, string>} */ #mapsAvailable = new Map();
+	/** @type {StatusDisplay} */ #StatusDisplay;
 	/** @type {MapLoader} */ #MapLoader;
 	/** @type {ActionList} */ #actions;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
+		this.#StatusDisplay = new StatusDisplay();
 		this.#MapLoader = new MapLoader(mod);
 		this.#actions = new ActionList();
 	}
@@ -27,6 +30,9 @@ export class MainMenuActions {
 			this.#tryOpenGame();
 			this.#actions.activateActions();
 		}
+
+		const parent = document.querySelector("#state_MainMenuState");
+		this.#StatusDisplay.show(parent);
 	}
 
 	menuClosed() {

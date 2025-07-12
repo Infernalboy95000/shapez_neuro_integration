@@ -13,14 +13,6 @@
 	background-color: #facece;
 }
 
-#neuro_action_test {
-	position: absolute;
-	top: calc(100px*var(--ui-scale));
-	left: calc(10px*var(--ui-scale));
-	color: red;
-	z-index: 300;
-}
-
 #state_SettingsState .container .content .categoryContainer .category .title:not(.first) {
 	margin-top: calc(10px*var(--ui-scale));
 }
@@ -53,4 +45,23 @@ html[data-theme=dark]
 
 #state_SettingsState button.settings.button.styledButton.bad {
 	background-color: rgb(239, 80, 114);
+}
+
+#sdk_client_status_display {
+	position: absolute;
+	top: calc(10px * var(--ui-scale));
+	left: calc(10px * var(--ui-scale));
+	z-index: 0;
+}
+
+#sdk_client_status_display.connected {
+	color: rgb(102, 187, 106);
+}
+
+#sdk_client_status_display.attempting {
+	color: rgb(215, 210, 111);
+}
+
+#sdk_client_status_display.error {
+	color: rgb(239, 80, 114);
 }
