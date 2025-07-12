@@ -25,14 +25,21 @@ export class MainMenuActions {
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	menuOpenned(state) {
 		this.#state = state;
-		if (SdkClient.isConnected()) {
-			this.#actions.removeAllActions();
-			this.#tryOpenGame();
-			this.#actions.activateActions();
-		}
-
 		const statusDisplayBox = this.#createStatusBox();
 		this.#StatusDisplay.show(statusDisplayBox);
+
+		if (SdkClient.isConnected()) {
+			this.#onConnectedActions();
+		}
+		else if (this.#mod.settings.autoConnect) {
+			SdkClient.connected.add(() => this.#onConnectedActions());
+			if (!SdkClient.isAttempting()) {
+				this.#StatusDisplay.setText(
+					"Connecting...", "connected"
+				);
+				SdkClient.tryConnect(this.#mod.settings.socketURL);
+			}
+		}
 	}
 
 	menuClosed() {
@@ -53,6 +60,12 @@ export class MainMenuActions {
 				`Error loading the map requested`
 			)
 		}
+	}
+
+	#onConnectedActions() {
+		this.#actions.removeAllActions();
+		this.#tryOpenGame();
+		this.#actions.activateActions();
 	}
 
 	#tryOpenGame() {

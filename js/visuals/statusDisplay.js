@@ -15,6 +15,17 @@ export class StatusDisplay {
 		this.#create(parent);
 	}
 
+	/**
+	 * @param {string} text
+	 * @param {string} className
+	 * */
+	setText(text, className) {
+		if (this.#display) {
+			this.#display.textContent = text;
+			this.#display.className = className;
+		}
+	}
+
 	/** @param {Element} parent */
 	#create(parent) {
 		this.#display = document.createElement("div");
@@ -60,7 +71,8 @@ export class StatusDisplay {
 	}
 
 	#onFailed() {
-		this.#onDisconnected();
+		this.#display.textContent = "Failed to connect!";
+		this.#display.className = "error";
 	}
 
 	#onClosed() {
@@ -68,6 +80,7 @@ export class StatusDisplay {
 	}
 
 	#onInitCrash() {
-		this.#onDisconnected();
+		this.#display.textContent = "Error on URL format!";
+		this.#display.className = "error";
 	}
 }

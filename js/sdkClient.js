@@ -163,7 +163,7 @@ export class SdkClient {
 	}
 }
 // Public events
-SdkClient.connected = new ActionEvent()
+SdkClient.connected = new ActionEvent();
 SdkClient.disconnected = new ActionEvent();
 SdkClient.reattempting = new ActionEvent();
 SdkClient.closed = new ActionEvent();
