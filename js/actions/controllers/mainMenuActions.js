@@ -35,7 +35,7 @@ export class MainMenuActions {
 			SdkClient.connected.add(() => this.#onConnectedActions());
 			if (!SdkClient.isAttempting()) {
 				this.#StatusDisplay.setText(
-					"Connecting...", "connected"
+					"Connecting...", "attempting"
 				);
 				SdkClient.tryConnect(this.#mod.settings.socketURL);
 			}

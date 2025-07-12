@@ -48,6 +48,7 @@ export class SdkClient {
 
 	static retryConnection() {
 		if (this.neuroClient) {
+			this.neuroClient.connect(() => { SdkClient.#onConnected(); });
 			SdkClient.reattempting.invoke();
 		}
 		else {
