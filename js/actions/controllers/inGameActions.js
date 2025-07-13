@@ -11,6 +11,7 @@ import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
 import { GoalsDescriptor } from "../helpers/goalsDescriptor";
+import { BoolSchema } from "../definitions/schema/boolSchema";
 
 export class InGameActions {
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
@@ -92,6 +93,9 @@ export class InGameActions {
 			case InGameActionList.PLACE_BUILDINGS_LINE.getName():
 				this.#tryLinePlacementAction(action);
 				return true;
+			case InGameActionList.BELT_PLANNER.getName():
+				this.#tryBeltPlannerAction(action);
+				return true;
 			case InGameActionList.DELETE_BUILDING.getName():
 				this.#trySingleDeletionAction(action);
 				return true;
@@ -144,6 +148,17 @@ export class InGameActions {
 		) {
 			const result = this.#tryPlaceBuildingLine(action);
 			this.#announceLanePlacement(action, result);
+		}
+	}
+
+	#tryBeltPlannerAction(action) {
+		if (this.#builder.selectBuilding("belt") ) {
+			const result = this.#builder.useBeltPlanner(
+				new Vector(action.params.x_position1, action.params.y_position1),
+				new Vector(action.params.x_position2, action.params.y_position2),
+				action.params.end_horizontal
+			)
+			this.#announceBeltPlanner(action, result);
 		}
 	}
 
@@ -273,15 +288,17 @@ export class InGameActions {
 		let placedSome = false;
 		let currentPos = [action.params.x_position, action.params.y_position];
 
-		for (let i = 0; i < action.params.line_length; i++) {
-			if (this.#builder.placeBuilding(currentPos[0], currentPos[1])) {
-				placedSome = true;
+		this.#root.logic.performBulkOperation(() => {
+			for (let i = 0; i < action.params.line_length; i++) {
+				if (this.#builder.placeBuilding(currentPos[0], currentPos[1])) {
+					placedSome = true;
+				}
+				else {
+					placedAll = false;
+				}
+				currentPos = RandomUtils.vectorAddDir(currentPos, action.params.direction);
 			}
-			else {
-				placedAll = false;
-			}
-			currentPos = RandomUtils.vectorAddDir(currentPos, action.params.direction);
-		}
+		})
 		
 		if (placedAll) { return "ALL"; }
 		else if (placedSome) { return "SOME"; }
@@ -328,6 +345,22 @@ export class InGameActions {
 		}
 	}
 
+	/** @param {boolean} result */
+	#announceBeltPlanner(action, result) {
+		if (result) {
+			SdkClient.tellActionResult(
+				action.id, true,
+				`Belt planner executed successfully.`
+			)
+		}
+		else {
+			SdkClient.tellActionResult(
+				action.id, false,
+				`Cannot place belts over that zone.`
+			)
+		}
+	}
+
 	#promptActions() {
 		this.#promptPlacers();
 		this.#promptDeleters();
@@ -343,6 +376,14 @@ export class InGameActions {
 
 		const posX = new NumberSchema("x_position", 1, limits.x, limits.x + limits.w - 1);
 		const posY = new NumberSchema("y_position", 1, limits.y, limits.y + limits.h - 1);
+
+		const posX_1 = new NumberSchema("x_position1", 1, limits.x, limits.x + limits.w - 1);
+		const posY_1 = new NumberSchema("y_position1", 1, limits.y, limits.y + limits.h - 1);
+
+		const posX_2 = new NumberSchema("x_position2", 1, limits.x, limits.x + limits.w - 1);
+		const posY_2 = new NumberSchema("y_position2", 1, limits.y, limits.y + limits.h - 1);
+
+		const endHor = new BoolSchema("end_horizontal");
 
 		const rotNames = ["UP", "DOWN", "LEFT", "RIGHT"];
 		const rotations = new EnumSchema("rotation", rotNames);
@@ -364,6 +405,11 @@ export class InGameActions {
 			[buildings, posX, posY, rotations, direction, lineLength]
 		);
 		this.#actions.addAction(InGameActionList.PLACE_BUILDINGS_LINE);
+		
+		InGameActionList.BELT_PLANNER.setOptions(
+			[posX_1, posY_1, posX_2, posY_2, endHor]
+		)
+		this.#actions.addAction(InGameActionList.BELT_PLANNER);
 	}
 
 	#promptDeleters() {

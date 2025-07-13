@@ -13,6 +13,7 @@ export class MainMenuActions {
 	/** @type {StatusDisplay} */ #StatusDisplay;
 	/** @type {MapLoader} */ #MapLoader;
 	/** @type {ActionList} */ #actions;
+	/** @type {boolean} */ #open = false;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
@@ -20,10 +21,12 @@ export class MainMenuActions {
 		this.#StatusDisplay = new StatusDisplay();
 		this.#MapLoader = new MapLoader(mod);
 		this.#actions = new ActionList();
+		SdkClient.connected.add(() => this.#onConnectedActions());
 	}
 
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	menuOpenned(state) {
+		this.#open = true;
 		this.#state = state;
 		const statusDisplayBox = this.#createStatusBox();
 		this.#StatusDisplay.show(statusDisplayBox);
@@ -32,7 +35,6 @@ export class MainMenuActions {
 			this.#onConnectedActions();
 		}
 		else if (this.#mod.settings.autoConnect) {
-			SdkClient.connected.add(() => this.#onConnectedActions());
 			if (!SdkClient.isAttempting()) {
 				this.#StatusDisplay.setText(
 					"Connecting...", "attempting"
@@ -43,6 +45,7 @@ export class MainMenuActions {
 	}
 
 	menuClosed() {
+		this.#open = false;
 		this.#actions.deactivateActions();
 	}
 
@@ -63,9 +66,11 @@ export class MainMenuActions {
 	}
 
 	#onConnectedActions() {
-		this.#actions.removeAllActions();
-		this.#tryOpenGame();
-		this.#actions.activateActions();
+		if (this.#open) {
+			this.#actions.removeAllActions();
+			this.#tryOpenGame();
+			this.#actions.activateActions();
+		}
 	}
 
 	#tryOpenGame() {
