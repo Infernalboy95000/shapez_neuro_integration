@@ -42,7 +42,7 @@ export class InGameActionList {
 	)
 
 	static DESCRIBE_PATCH = new SdkAction(
-		"describe_patch", "Fully describe all positions that compose a patch. Scanning terrain first might help you find them."
+		"deep_scan_patch", "Fully describe all positions that compose a patch. Scanning terrain first might help you find them."
 	)
 
 	static DESCRIBE_BUILDINGS = new SdkAction(

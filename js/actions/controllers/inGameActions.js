@@ -14,6 +14,10 @@ import { GoalsDescriptor } from "../helpers/goalsDescriptor";
 import { BoolSchema } from "../definitions/schema/boolSchema";
 
 export class InGameActions {
+	/** @type {boolean} */ static scanned = false;
+	/** @type {boolean} */ static deepScanned = false;
+	/** @type {boolean} */ static #initialized = false;
+
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ActionList} */ #actions;
@@ -22,7 +26,6 @@ export class InGameActions {
 	/** @type {MapDescriptor} */ #mapDescriptor;
 	/** @type {GoalsDescriptor} */ #goalsDescriptor;
 	/** @type {boolean} */ #moving;
-	/** @type {boolean} */ static #initialized = false;
 
 	/**
 	 * @param {import("../../main").NeuroIntegration} mod
@@ -52,6 +55,8 @@ export class InGameActions {
 	}
 
 	gameClosed() {
+		InGameActions.scanned = false;
+		InGameActions.deepScanned = false;
 		this.#actions.deactivateActions();
 	}
 
@@ -191,6 +196,7 @@ export class InGameActions {
 	#tryScanPatches(action) {
 		const msg = this.#mapDescriptor.scanNearbyPatches();
 		SdkClient.tellActionResult(action.id, true, msg);
+		InGameActions.scanned = true;
 	}
 
 	#tryDescribePatch(action) {
@@ -201,6 +207,7 @@ export class InGameActions {
 		}
 		else {
 			SdkClient.tellActionResult(action.id, true, msg);
+			InGameActions.deepScanned = true;
 		}
 	}
 
