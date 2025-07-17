@@ -7,16 +7,18 @@ ingame:
                 <strong>Scan terrain</stong> to find a sphere shape patch.
 
             1_0_deep_scan: >-
-                <strong>Deep scan</strong> the patch you just found!<br><br>
-                This will tell you exactly where you can extract the spahes.
+                <strong>Deep scan</strong> at the position of the uncolored sphere patch you just found!<br><br>
+                This will tell you exactly where you can extract the shapes.
 
             1_1_extractor: >-
                 Place an <strong>extractor</strong> on top of an <strong>uncolored sphere shape patch</strong> to extract it!
 
+            1_1_buildings_scan: >-
+                <strong>Scan buildings</strong> to locate where the hub is and accepts items.
+
             1_2_conveyor: >-
                 Connect the extractor with a <strong>conveyor belt</strong> to your hub!<br><br>
-                Tip:<strong>Scan</strong> buildings to find where the hub is!<br><br>
-                Tip2: Use the <strong>belt planner</strong> to connect the miner to the hub with belts.
+                Tip: Use the <strong>belt planner</strong> to connect the miner to the hub with belts.
 
             1_3_expand: >-
                 This is <strong>NOT</strong> an idle game! Build more extractors and belts to finish the goal quicker.<br><br>Tip: Place <strong>lines of extractors</strong> and face them in the

@@ -16,6 +16,7 @@ import { BoolSchema } from "../definitions/schema/boolSchema";
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
 	/** @type {boolean} */ static deepScanned = false;
+	/** @type {boolean} */ static buildingScanned = false;
 	/** @type {boolean} */ static #initialized = false;
 
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
@@ -57,6 +58,7 @@ export class InGameActions {
 	gameClosed() {
 		InGameActions.scanned = false;
 		InGameActions.deepScanned = false;
+		InGameActions.buildingScanned = false;
 		this.#actions.deactivateActions();
 	}
 
@@ -214,6 +216,7 @@ export class InGameActions {
 	#tryDescribeBuildings(action) {
 		const msg = this.#mapDescriptor.scanBuildingsInView();
 		SdkClient.tellActionResult(action.id, true, msg);
+		InGameActions.buildingScanned = true;
 	}
 
 	#tryDescribeToolbeltBuilding(action) {

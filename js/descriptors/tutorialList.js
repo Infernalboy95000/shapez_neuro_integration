@@ -44,6 +44,20 @@ export class TutorialList {
 				condition: /** @param {GameRoot} root */ root =>
 					root.entityMgr.getAllWithComponent(MinerComponent).length === 0,
 			},
+			// 1.1. scan the buildings
+			{
+				id: "1_1_buildings_scan",
+				condition: /** @param {GameRoot} root */ root => {
+					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
+
+					if (miners.length > 0 && InGameActions.buildingScanned == false) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+			},
 			// 1.2. connect to hub
 			{
 				id: "1_2_conveyor",
