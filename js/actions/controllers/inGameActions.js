@@ -12,6 +12,7 @@ import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
 import { GoalsDescriptor } from "../helpers/goalsDescriptor";
 import { BoolSchema } from "../definitions/schema/boolSchema";
+import { globalConfig } from "shapez/core/config";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -240,9 +241,12 @@ export class InGameActions {
 	}
 
 	#moveCameraAction(action) {
-		const vector = new Vector(action.params.x_position, action.params.y_position);
-		this.#root.camera.setDesiredCenter(vector);
-		SdkClient.tellActionResult(action.id, true, `Moving camera to x: ${vector.x}, y: ${vector.y}.`);
+		const tile = new Vector(action.params.x_position, action.params.y_position);
+		const worldPos = tile.toWorldSpace();
+		worldPos.x += globalConfig.halfTileSize;
+		worldPos.y += globalConfig.halfTileSize;
+		this.#root.camera.setDesiredCenter(worldPos);
+		SdkClient.tellActionResult(action.id, true, `Moving camera to x: ${tile.x}, y: ${tile.y}.`);
 	}
 
 	#zoomCameraAction(action) {
