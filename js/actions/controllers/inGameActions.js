@@ -13,6 +13,8 @@ import { GameCore } from "shapez/game/core";
 import { GoalsDescriptor } from "../helpers/goalsDescriptor";
 import { BoolSchema } from "../definitions/schema/boolSchema";
 import { globalConfig } from "shapez/core/config";
+import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
+import { T } from "shapez/translations";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -47,6 +49,7 @@ export class InGameActions {
 
 	gameOpenned() {
 		if (SdkClient.isConnected()) {
+			this.#connectEvents();
 			this.#announceOpening();
 			this.#builder = new InGameBuilder(this.#root);
 			this.#massSelector = new InGameMassSelector(this.#root);
@@ -506,6 +509,37 @@ export class InGameActions {
 				this.#moving = true;
 				this.#actions.removeAllActions();
 			}
+		}
+	}
+
+	#connectEvents() {
+		this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
+	}
+
+	/**
+	 * @param {number} level
+	 * @param {enumHubGoalRewards} reward
+	 */
+	#onStoryGoalCompleted(level, reward) {
+		const levels = this.#root.gameMode.getLevelDefinitions();
+
+		if (level <= levels.length) {
+			const desc = T.storyRewards[reward].desc;
+			const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");
+
+			SdkClient.sendMessage(
+				`Level ${level} completed! \r\n` +
+				`${descText}`
+			)
+
+			this.#actions.removeAllActions();
+			this.#promptActions();
+			this.#actions.activateActions();
+		}
+		else {
+			SdkClient.sendMessage(
+				`Level ${level} completed! Good luck on your next piece.`
+			)
 		}
 	}
 }
