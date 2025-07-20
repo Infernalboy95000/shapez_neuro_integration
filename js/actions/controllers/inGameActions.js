@@ -15,6 +15,8 @@ import { BoolSchema } from "../definitions/schema/boolSchema";
 import { globalConfig } from "shapez/core/config";
 import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 import { T } from "shapez/translations";
+import { NotificationsActionList } from "../lists/notificationsActionList";
+import { HUDUnlockNotification } from "shapez/game/hud/parts/unlock_notification";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -25,11 +27,16 @@ export class InGameActions {
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ActionList} */ #actions;
+	/** @type {ActionList} */ #notificationActions;
 	/** @type {InGameBuilder} */ #builder;
 	/** @type {InGameMassSelector} */ #massSelector;
 	/** @type {MapDescriptor} */ #mapDescriptor;
 	/** @type {GoalsDescriptor} */ #goalsDescriptor;
 	/** @type {boolean} */ #moving;
+
+	/** @type {boolean} */ #dialogOpen = false;
+
+	/** @type {HUDUnlockNotification}" */ #someDialog;
 
 	/**
 	 * @param {import("../../main").NeuroIntegration} mod
@@ -39,12 +46,15 @@ export class InGameActions {
 		this.#mod = mod;
 		this.#root = root;
 		this.#actions = new ActionList();
+		this.#notificationActions = new ActionList();
 		this.#mapDescriptor = new MapDescriptor(mod, root);
 		this.#goalsDescriptor = new GoalsDescriptor(root);
 
 		if (!InGameActions.#initialized) {
 			this.#initialize();
 		}
+
+		this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
 	}
 
 	gameOpenned() {
@@ -84,6 +94,15 @@ export class InGameActions {
 			function(deltaMs) {
 				ourClass.#checkCameraMovement();
 				return true;
+			}
+		);
+
+		this.#mod.modInterface.runAfterMethod(
+			HUDUnlockNotification,
+			"showForLevel",
+			function($original, args) {
+				console.log("Executing show for level method");
+				ourClass.#someDialog = this;
 			}
 		);
 	}
@@ -136,6 +155,9 @@ export class InGameActions {
 				return true;
 			case InGameActionList.CHANGE_ZOOM.getName():
 				this.#zoomCameraAction(action);
+				return true;
+			case NotificationsActionList.CLOSE_NOTIFICATION.getName():
+				this.#tryCloseDialog(action);
 				return true;
 			default:
 				return false;
@@ -322,6 +344,16 @@ export class InGameActions {
 		else { return "NONE"; }
 	}
 
+	#tryCloseDialog(action) {
+		if (this.#root.hud.parts.unlockNotification) {
+			this.#root.hud.parts.unlockNotification.requestClose();
+			SdkClient.tellActionResult(action.id, true, `Dialog closed.`);
+		}
+		else {
+			SdkClient.tellActionResult(action.id, false, `No dialog to close.`);
+		}
+	}
+
 	#announceSinglePlacement(action) {
 		const buildName = RandomUtils.capitalizeFirst(action.params.building);
 		SdkClient.tellActionResult(
@@ -495,17 +527,13 @@ export class InGameActions {
 		}
 
 		if (this.#moving) {
-			if (
-				!this.#root.camera.viewportWillChange()
-			) {
+			if (!this.#root.camera.viewportWillChange()) {
 				this.#moving = false;
 				this.#promptActions();
 			}
 		}
 		else {
-			if (
-				this.#root.camera.viewportWillChange()
-			) {
+			if (this.#root.camera.viewportWillChange()) {
 				this.#moving = true;
 				this.#actions.removeAllActions();
 			}
@@ -513,7 +541,13 @@ export class InGameActions {
 	}
 
 	#connectEvents() {
+		this.#root.hud.signals.unlockNotificationFinished.add(() => {this.#testCrazy()});
 		this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
+	}
+
+	#testCrazy() {
+		this.#notificationActions.removeAllActions();
+		this.#promptActions();
 	}
 
 	/**
@@ -524,6 +558,8 @@ export class InGameActions {
 		const levels = this.#root.gameMode.getLevelDefinitions();
 
 		if (level <= levels.length) {
+			this.#dialogOpen = true;
+			this.#actions.removeAllActions();
 			const desc = T.storyRewards[reward].desc;
 			const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");
 
@@ -531,10 +567,7 @@ export class InGameActions {
 				`Level ${level} completed! \r\n` +
 				`${descText}`
 			)
-
-			this.#actions.removeAllActions();
-			this.#promptActions();
-			this.#actions.activateActions();
+			this.#notificationActions.activateActions();
 		}
 		else {
 			SdkClient.sendMessage(
