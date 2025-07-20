@@ -4,32 +4,48 @@ import { EnumSchema } from "../definitions/schema/enumSchema";
 import { ActionList } from "../lists/actionList";
 import { MainMenuActionList } from "../lists/mainMenuActionList";
 import { MapLoader } from "../executers/mapLoader";
+import { StatusDisplay } from "../../visuals/statusDisplay";
 
 export class MainMenuActions {
 	/** @type {import("shapez/states/main_menu").MainMenuState} */ #state;
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {Map<string, string>} */ #mapsAvailable = new Map();
+	/** @type {StatusDisplay} */ #StatusDisplay;
 	/** @type {MapLoader} */ #MapLoader;
 	/** @type {ActionList} */ #actions;
+	/** @type {boolean} */ #open = false;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
+		this.#StatusDisplay = new StatusDisplay();
 		this.#MapLoader = new MapLoader(mod);
 		this.#actions = new ActionList();
+		SdkClient.connected.add(() => this.#onConnectedActions());
 	}
 
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	menuOpenned(state) {
+		this.#open = true;
 		this.#state = state;
+		const statusDisplayBox = this.#createStatusBox();
+		this.#StatusDisplay.show(statusDisplayBox);
+
 		if (SdkClient.isConnected()) {
-			this.#actions.removeAllActions();
-			this.#tryOpenGame();
-			this.#actions.activateActions();
+			this.#onConnectedActions();
+		}
+		else if (this.#mod.settings.autoConnect) {
+			if (!SdkClient.isAttempting()) {
+				this.#StatusDisplay.setText(
+					"Connecting...", "attempting"
+				);
+				SdkClient.tryConnect(this.#mod.settings.socketURL);
+			}
 		}
 	}
 
 	menuClosed() {
+		this.#open = false;
 		this.#actions.deactivateActions();
 	}
 
@@ -46,6 +62,14 @@ export class MainMenuActions {
 				action.id, false,
 				`Error loading the map requested`
 			)
+		}
+	}
+
+	#onConnectedActions() {
+		if (this.#open) {
+			this.#actions.removeAllActions();
+			this.#tryOpenGame();
+			this.#actions.activateActions();
 		}
 	}
 
@@ -136,4 +160,25 @@ export class MainMenuActions {
 			}
 		}
 	}
+<<<<<<< HEAD
+=======
+
+	/** @returns {HTMLDivElement} */
+	#createStatusBox() {
+		const parent = document.querySelector(".sideContainer");
+		const statusDisplay = document.createElement("div");
+		statusDisplay.className = "sdkStatusDisplay";
+		parent.appendChild(statusDisplay);
+
+		const header = document.createElement("div");
+		header.className = "header";
+		statusDisplay.appendChild(header);
+
+		const title = document.createElement("h3");
+		title.textContent = "Sdk Status";
+		header.appendChild(title);
+
+		return statusDisplay;
+	}
+>>>>>>> 2cc0edfcb59a3766ec6c554c3a831e21910697c6
 }

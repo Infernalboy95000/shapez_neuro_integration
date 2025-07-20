@@ -14,7 +14,7 @@ export class InGameActionList {
 	)
 
 	static BELT_PLANNER = new SdkAction(
-		"use_belt_planner", "Place several belts in one go. Allows to rotate mid placement, drawing an L shape."
+		"use_belt_planner", "Place belts in a path from one point to the other."
 	)
 
 	static DELETE_BUILDING = new SdkAction(
@@ -38,15 +38,15 @@ export class InGameActionList {
 	)
 
 	static PATCHES_NEARBY = new SdkAction(
-		"patches_nearby", "See if there's patches currently in view."
+		"scan_terrain", "See if there's patches currently in view."
 	)
 
 	static DESCRIBE_PATCH = new SdkAction(
-		"describe_patch", "Fully describe all positions that compose a patch. Scanning for patches nearby first might help you find them."
+		"deep_scan_patch", "Fully describe all positions that compose a patch. Scanning terrain first might help you find them."
 	)
 
 	static DESCRIBE_BUILDINGS = new SdkAction(
-		"describe_buildings", "Fully describe all buildings in view. This might get complex to understand so, sorry in advance."
+		"scan_buildings", "Fully describe all buildings in view."
 	)
 
 	// Only show if hub is visible?

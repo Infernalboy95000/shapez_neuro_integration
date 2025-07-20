@@ -1,5 +1,6 @@
 import { HUDInteractiveTutorial } from "shapez/game/hud/parts/interactive_tutorial";
 import { SdkClient } from "../sdkClient";
+import { TutorialList } from "./tutorialList";
 
 export class TutorialMessager {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -10,6 +11,30 @@ export class TutorialMessager {
 	constructor(mod) {
 		const currentClass = this;
 		this.#mod = mod;
+
+		this.#mod.modInterface.replaceMethod(
+			HUDInteractiveTutorial,
+			"update",
+			function() {
+				// Compute current hint
+				const thisLevelHints = TutorialList.tutorialsByLevel[this.root.hubGoals.level - 1];
+				let targetHintId = null;
+
+				if (thisLevelHints) {
+					for (let i = 0; i < thisLevelHints.length; ++i) {
+						const hint = thisLevelHints[i];
+						if (hint.condition(this.root)) {
+							targetHintId = hint.id;
+							break;
+						}
+					}
+				}
+				this.currentHintId.set(targetHintId);
+				this.domAttach.update(!!targetHintId);
+			}
+		)
+
+
 		this.#mod.modInterface.runAfterMethod(
 			HUDInteractiveTutorial,
 			"onHintChanged",

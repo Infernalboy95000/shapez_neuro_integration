@@ -11,17 +11,32 @@ import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
 import { GoalsDescriptor } from "../helpers/goalsDescriptor";
+import { BoolSchema } from "../definitions/schema/boolSchema";
+import { globalConfig } from "shapez/core/config";
+import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
+import { T } from "shapez/translations";
+import { NotificationsActionList } from "../lists/notificationsActionList";
+import { HUDUnlockNotification } from "shapez/game/hud/parts/unlock_notification";
 
 export class InGameActions {
+	/** @type {boolean} */ static scanned = false;
+	/** @type {boolean} */ static deepScanned = false;
+	/** @type {boolean} */ static buildingScanned = false;
+	/** @type {boolean} */ static #initialized = false;
+
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ActionList} */ #actions;
+	/** @type {ActionList} */ #notificationActions;
 	/** @type {InGameBuilder} */ #builder;
 	/** @type {InGameMassSelector} */ #massSelector;
 	/** @type {MapDescriptor} */ #mapDescriptor;
 	/** @type {GoalsDescriptor} */ #goalsDescriptor;
 	/** @type {boolean} */ #moving;
-	/** @type {boolean} */ static #initialized = false;
+
+	/** @type {boolean} */ #dialogOpen = false;
+
+	/** @type {HUDUnlockNotification}" */ #someDialog;
 
 	/**
 	 * @param {import("../../main").NeuroIntegration} mod
@@ -31,16 +46,20 @@ export class InGameActions {
 		this.#mod = mod;
 		this.#root = root;
 		this.#actions = new ActionList();
+		this.#notificationActions = new ActionList();
 		this.#mapDescriptor = new MapDescriptor(mod, root);
 		this.#goalsDescriptor = new GoalsDescriptor(root);
 
 		if (!InGameActions.#initialized) {
 			this.#initialize();
 		}
+
+		this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
 	}
 
 	gameOpenned() {
 		if (SdkClient.isConnected()) {
+			this.#connectEvents();
 			this.#announceOpening();
 			this.#builder = new InGameBuilder(this.#root);
 			this.#massSelector = new InGameMassSelector(this.#root);
@@ -51,6 +70,9 @@ export class InGameActions {
 	}
 
 	gameClosed() {
+		InGameActions.scanned = false;
+		InGameActions.deepScanned = false;
+		InGameActions.buildingScanned = false;
 		this.#actions.deactivateActions();
 	}
 
@@ -74,6 +96,15 @@ export class InGameActions {
 				return true;
 			}
 		);
+
+		this.#mod.modInterface.runAfterMethod(
+			HUDUnlockNotification,
+			"showForLevel",
+			function($original, args) {
+				console.log("Executing show for level method");
+				ourClass.#someDialog = this;
+			}
+		);
 	}
 
 	#announceOpening() {
@@ -91,6 +122,9 @@ export class InGameActions {
 				return true;
 			case InGameActionList.PLACE_BUILDINGS_LINE.getName():
 				this.#tryLinePlacementAction(action);
+				return true;
+			case InGameActionList.BELT_PLANNER.getName():
+				this.#tryBeltPlannerAction(action);
 				return true;
 			case InGameActionList.DELETE_BUILDING.getName():
 				this.#trySingleDeletionAction(action);
@@ -122,6 +156,9 @@ export class InGameActions {
 			case InGameActionList.CHANGE_ZOOM.getName():
 				this.#zoomCameraAction(action);
 				return true;
+			case NotificationsActionList.CLOSE_NOTIFICATION.getName():
+				this.#tryCloseDialog(action);
+				return true;
 			default:
 				return false;
 		}
@@ -144,6 +181,17 @@ export class InGameActions {
 		) {
 			const result = this.#tryPlaceBuildingLine(action);
 			this.#announceLanePlacement(action, result);
+		}
+	}
+
+	#tryBeltPlannerAction(action) {
+		if (this.#builder.selectBuilding("belt") ) {
+			const result = this.#builder.useBeltPlanner(
+				new Vector(action.params.x_position1, action.params.y_position1),
+				new Vector(action.params.x_position2, action.params.y_position2),
+				action.params.end_horizontal
+			)
+			this.#announceBeltPlanner(action, result);
 		}
 	}
 
@@ -176,6 +224,7 @@ export class InGameActions {
 	#tryScanPatches(action) {
 		const msg = this.#mapDescriptor.scanNearbyPatches();
 		SdkClient.tellActionResult(action.id, true, msg);
+		InGameActions.scanned = true;
 	}
 
 	#tryDescribePatch(action) {
@@ -186,12 +235,14 @@ export class InGameActions {
 		}
 		else {
 			SdkClient.tellActionResult(action.id, true, msg);
+			InGameActions.deepScanned = true;
 		}
 	}
 
 	#tryDescribeBuildings(action) {
 		const msg = this.#mapDescriptor.scanBuildingsInView();
 		SdkClient.tellActionResult(action.id, true, msg);
+		InGameActions.buildingScanned = true;
 	}
 
 	#tryDescribeToolbeltBuilding(action) {
@@ -215,9 +266,12 @@ export class InGameActions {
 	}
 
 	#moveCameraAction(action) {
-		const vector = new Vector(action.params.x_position, action.params.y_position);
-		this.#root.camera.setDesiredCenter(vector);
-		SdkClient.tellActionResult(action.id, true, `Moving camera to x: ${vector.x}, y: ${vector.y}.`);
+		const tile = new Vector(action.params.x_position, action.params.y_position);
+		const worldPos = tile.toWorldSpace();
+		worldPos.x += globalConfig.halfTileSize;
+		worldPos.y += globalConfig.halfTileSize;
+		this.#root.camera.setDesiredCenter(worldPos);
+		SdkClient.tellActionResult(action.id, true, `Moving camera to x: ${tile.x}, y: ${tile.y}.`);
 	}
 
 	#zoomCameraAction(action) {
@@ -273,19 +327,31 @@ export class InGameActions {
 		let placedSome = false;
 		let currentPos = [action.params.x_position, action.params.y_position];
 
-		for (let i = 0; i < action.params.line_length; i++) {
-			if (this.#builder.placeBuilding(currentPos[0], currentPos[1])) {
-				placedSome = true;
+		this.#root.logic.performBulkOperation(() => {
+			for (let i = 0; i < action.params.line_length; i++) {
+				if (this.#builder.placeBuilding(currentPos[0], currentPos[1])) {
+					placedSome = true;
+				}
+				else {
+					placedAll = false;
+				}
+				currentPos = RandomUtils.vectorAddDir(currentPos, action.params.direction);
 			}
-			else {
-				placedAll = false;
-			}
-			currentPos = RandomUtils.vectorAddDir(currentPos, action.params.direction);
-		}
+		})
 		
 		if (placedAll) { return "ALL"; }
 		else if (placedSome) { return "SOME"; }
 		else { return "NONE"; }
+	}
+
+	#tryCloseDialog(action) {
+		if (this.#root.hud.parts.unlockNotification) {
+			this.#root.hud.parts.unlockNotification.requestClose();
+			SdkClient.tellActionResult(action.id, true, `Dialog closed.`);
+		}
+		else {
+			SdkClient.tellActionResult(action.id, false, `No dialog to close.`);
+		}
 	}
 
 	#announceSinglePlacement(action) {
@@ -328,6 +394,22 @@ export class InGameActions {
 		}
 	}
 
+	/** @param {boolean} result */
+	#announceBeltPlanner(action, result) {
+		if (result) {
+			SdkClient.tellActionResult(
+				action.id, true,
+				`Belt planner executed successfully.`
+			)
+		}
+		else {
+			SdkClient.tellActionResult(
+				action.id, false,
+				`Cannot place belts over that zone.`
+			)
+		}
+	}
+
 	#promptActions() {
 		this.#promptPlacers();
 		this.#promptDeleters();
@@ -343,6 +425,14 @@ export class InGameActions {
 
 		const posX = new NumberSchema("x_position", 1, limits.x, limits.x + limits.w - 1);
 		const posY = new NumberSchema("y_position", 1, limits.y, limits.y + limits.h - 1);
+
+		const posX_1 = new NumberSchema("x_position1", 1, limits.x, limits.x + limits.w - 1);
+		const posY_1 = new NumberSchema("y_position1", 1, limits.y, limits.y + limits.h - 1);
+
+		const posX_2 = new NumberSchema("x_position2", 1, limits.x, limits.x + limits.w - 1);
+		const posY_2 = new NumberSchema("y_position2", 1, limits.y, limits.y + limits.h - 1);
+
+		const endHor = new BoolSchema("end_horizontal");
 
 		const rotNames = ["UP", "DOWN", "LEFT", "RIGHT"];
 		const rotations = new EnumSchema("rotation", rotNames);
@@ -364,6 +454,11 @@ export class InGameActions {
 			[buildings, posX, posY, rotations, direction, lineLength]
 		);
 		this.#actions.addAction(InGameActionList.PLACE_BUILDINGS_LINE);
+		
+		InGameActionList.BELT_PLANNER.setOptions(
+			[posX_1, posY_1, posX_2, posY_2, endHor]
+		)
+		this.#actions.addAction(InGameActionList.BELT_PLANNER);
 	}
 
 	#promptDeleters() {
@@ -432,20 +527,52 @@ export class InGameActions {
 		}
 
 		if (this.#moving) {
-			if (
-				!this.#root.camera.viewportWillChange()
-			) {
+			if (!this.#root.camera.viewportWillChange()) {
 				this.#moving = false;
 				this.#promptActions();
 			}
 		}
 		else {
-			if (
-				this.#root.camera.viewportWillChange()
-			) {
+			if (this.#root.camera.viewportWillChange()) {
 				this.#moving = true;
 				this.#actions.removeAllActions();
 			}
+		}
+	}
+
+	#connectEvents() {
+		this.#root.hud.signals.unlockNotificationFinished.add(() => {this.#testCrazy()});
+		this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
+	}
+
+	#testCrazy() {
+		this.#notificationActions.removeAllActions();
+		this.#promptActions();
+	}
+
+	/**
+	 * @param {number} level
+	 * @param {enumHubGoalRewards} reward
+	 */
+	#onStoryGoalCompleted(level, reward) {
+		const levels = this.#root.gameMode.getLevelDefinitions();
+
+		if (level <= levels.length) {
+			this.#dialogOpen = true;
+			this.#actions.removeAllActions();
+			const desc = T.storyRewards[reward].desc;
+			const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");
+
+			SdkClient.sendMessage(
+				`Level ${level} completed! \r\n` +
+				`${descText}`
+			)
+			this.#notificationActions.activateActions();
+		}
+		else {
+			SdkClient.sendMessage(
+				`Level ${level} completed! Good luck on your next piece.`
+			)
 		}
 	}
 }
