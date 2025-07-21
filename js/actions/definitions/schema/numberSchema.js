@@ -50,4 +50,44 @@ export class NumberSchema extends SchemaBase {
 
 		return schema;
 	}
+
+	/**
+	 * @param {object} data
+	 * @returns {boolean}
+	 */
+	check(data) {
+		if (!data.params[this.getName()]) {
+			console.error(`Missing parameter ${this.getName()}`);
+			return false;
+		}
+		
+		const value = data.params[this.getName()];
+		if (typeof(value) != "number") {
+			console.error(`Property ${this.getName()} is not a number`);
+			return false;
+		}
+
+		if (this.#multipleOf != null) {
+			if (value % this.#multipleOf != 0) {
+				console.error(`Property ${this.getName()} is not multiple of ${this.#multipleOf}`);
+				return false;
+			}
+		}
+
+		if (this.#min != null) {
+			if (value < this.#min) {
+				console.error(`Property ${this.getName()} is smaller than the minimum of: ${this.#min}`);
+				return false;
+			}
+		}
+
+		if (this.#max != null) {
+			if (value > this.#max) {
+				console.error(`Property ${this.getName()} is bigger than the maximum of: ${this.#max}`);
+				return false;
+			}
+		}
+
+		return true;
+	}
 }

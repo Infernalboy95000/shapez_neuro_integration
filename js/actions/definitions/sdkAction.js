@@ -40,6 +40,20 @@ export class SdkAction {
 		this.#actDesc = actDesc;
 	}
 
+	/**
+	 * @param {Object} data
+	 * @returns {boolean}
+	 * */
+	checkResponse(data) {
+		for (let i = 0; i < this.#options.length; i++) {
+			const value = this.#options[i].check(data);
+			if (!value) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	/** @returns {Object} */
 	#getSchema() {
 		if (this.#options.length > 0) {

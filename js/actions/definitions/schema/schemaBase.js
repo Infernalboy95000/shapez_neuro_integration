@@ -29,4 +29,12 @@ export class SchemaBase {
 	isRequired() {
 		return this.#required;
 	}
+
+	/**
+	 * @param {object} data
+	 * @returns {boolean}
+	 */
+	check(data) {
+		return true;
+	}
 }

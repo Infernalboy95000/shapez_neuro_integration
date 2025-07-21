@@ -19,4 +19,24 @@ export class BoolSchema extends SchemaBase {
 
 		return schema;
 	}
+
+		/**
+	 * @param {object} data
+	 * @returns {boolean}
+	 */
+	check(data) {
+		if (!data.params[this.getName()]) {
+			console.error(`Missing parameter ${this.getName()}`);
+			return false;
+		}
+		
+		const value = data.params[this.getName()];
+		if (typeof(value) != "boolean") {
+			console.error(`Property ${this.getName()} is not a boolean (true or false)`);
+			return false;
+		}
+
+		console.error(`Property ${this.getName()} is not a valid option`);
+		return true;
+	}
 }

@@ -118,7 +118,12 @@ export class InGameActions {
 	#isActionValid(action) {
 		switch (action.name) {
 			case InGameActionList.PLACE_BUILDING.getName():
-				this.#trySinglePlacementAction(action);
+				if (InGameActionList.PLACE_BUILDING.checkResponse(action)) {
+					this.#trySinglePlacementAction(action);
+				}
+				else {
+					SdkClient.tellActionResult(action.id, false, "Wrong data formation");
+				}
 				return true;
 			case InGameActionList.PLACE_BUILDINGS_LINE.getName():
 				this.#tryLinePlacementAction(action);
