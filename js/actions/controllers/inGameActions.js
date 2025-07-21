@@ -293,7 +293,9 @@ export class InGameActions {
 			)
 			return false;
 		}
-		return true;
+		else {
+			return true;
+		}
 	}
 
 	/** @retuns {boolean} */
@@ -304,7 +306,9 @@ export class InGameActions {
 			)
 			return false;
 		}
-		return true;
+		else {
+			return true;
+		}
 	}
 
 	/** @retuns {boolean} */
@@ -318,7 +322,9 @@ export class InGameActions {
 				`Its probably overlapping another building.`
 			)
 		}
-		return true;
+		else {
+			return true;
+		}
 	}
 
 	/** @retuns {("ALL"|"SOME"|"NONE")} */
