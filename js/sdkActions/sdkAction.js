@@ -1,5 +1,6 @@
 import { SchemaBase } from "./schema/schemaBase";
 
+/** Defines a player action. Can have none or multiple options. */
 export class SdkAction {
 	/** @type {string} */ #actName;
 	/** @type {string} */ #actDesc;
@@ -42,16 +43,20 @@ export class SdkAction {
 
 	/**
 	 * @param {Object} data
-	 * @returns {boolean}
+	 * @returns {{valid:boolean, msg:string}}
 	 * */
 	checkResponse(data) {
+		const action = {valid: true, msg:""};
 		for (let i = 0; i < this.#options.length; i++) {
 			const value = this.#options[i].check(data);
-			if (!value) {
-				return false;
+			if (!value.valid) {
+				action.msg += value.msg;
+				if (i + 1 < this.#options.length) {
+					action.msg += "\r\n";
+				}
 			}
 		}
-		return true;
+		return action;
 	}
 
 	/** @returns {Object} */

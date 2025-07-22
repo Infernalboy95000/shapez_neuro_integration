@@ -1,12 +1,19 @@
+/** Constains all allowed rotation angles for shapes. */
 export class RotationCodes {
+	static #codes = new Map([
+		["UP", 0],
+		["RIGHT", 90],
+		["DOWN", 180],
+		["LEFT", 270]
+	])
+
 	/**
 	 * @param {string} direction
 	 * @returns {Number}
 	 * */
 	static getAngle(direction) {
-		const rotations = this.#getRotationsMap();
-		if (rotations.has(direction)) {
-			return rotations.get(direction);
+		if (RotationCodes.#codes.has(direction)) {
+			return RotationCodes.#codes.get(direction);
 		}
 		else {
 			return 0;
@@ -19,8 +26,7 @@ export class RotationCodes {
 	 * */
 	static getRotationName(angle) {
 		let rotationName = "UP"
-		const rotations = this.#getRotationsMap();
-		rotations.forEach((value, key) => {
+		RotationCodes.#codes.forEach((value, key) => {
 			if (value == angle) {
 				rotationName = key;
 			}
@@ -33,17 +39,6 @@ export class RotationCodes {
 	 * @returns {boolean}
 	 * */
 	static isRotationValid(direction) {
-		const rotations = this.#getRotationsMap();
-		return rotations.has(direction);
-	}
-
-	/** @returns {Map<string, number>} */
-	static #getRotationsMap() {
-		const map = new Map();
-		map.set("UP", 0);
-		map.set("RIGHT", 90);
-		map.set("DOWN", 180);
-		map.set("LEFT", 270);
-		return map;
+		return RotationCodes.#codes.has(direction);
 	}
 }

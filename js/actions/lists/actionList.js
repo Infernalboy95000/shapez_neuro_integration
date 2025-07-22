@@ -1,5 +1,5 @@
 import { SdkClient } from "../../sdkClient";
-import { SdkAction } from "../definitions/sdkAction";
+import { SdkAction } from "../../sdkActions/sdkAction";
 
 export class ActionList {
 	/** @type {Map<string, SdkAction>} */ #actions = new Map();

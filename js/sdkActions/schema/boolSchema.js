@@ -1,5 +1,6 @@
 import { SchemaBase } from "./schemaBase";
 
+/** Schema that accepts a boolean (true or false)*/
 export class BoolSchema extends SchemaBase {
 	/**
 	 * @param {string} propertyName
@@ -20,23 +21,25 @@ export class BoolSchema extends SchemaBase {
 		return schema;
 	}
 
-		/**
+	/**
 	 * @param {object} data
-	 * @returns {boolean}
+	 * @returns {{valid:boolean, msg:string}}
 	 */
 	check(data) {
+		const result = {valid: false, msg:""};
+
 		if (!data.params[this.getName()]) {
-			console.error(`Missing parameter ${this.getName()}`);
-			return false;
-		}
-		
-		const value = data.params[this.getName()];
-		if (typeof(value) != "boolean") {
-			console.error(`Property ${this.getName()} is not a boolean (true or false)`);
-			return false;
+			result.msg = `Missing parameter ${this.getName()}`;
+			return result;
 		}
 
-		console.error(`Property ${this.getName()} is not a valid option`);
-		return true;
+		const value = data.params[this.getName()];
+		if (typeof(value) != "boolean") {
+			result.msg = `Property ${this.getName()} is not a boolean (true or false)`;
+			return result;
+		}
+
+		result.valid = true;
+		return result;
 	}
 }

@@ -1,3 +1,4 @@
+/** Base Schema for SDK actions */
 export class SchemaBase {
 	/** @type {string} */ #propertyName;
 	/** @type {boolean} */ #required;
@@ -32,9 +33,9 @@ export class SchemaBase {
 
 	/**
 	 * @param {object} data
-	 * @returns {boolean}
+	 * @returns {{valid:boolean, msg:string}}
 	 */
 	check(data) {
-		return true;
+		return {valid:false, msg:""};
 	}
 }

@@ -1,20 +1,18 @@
-import { SdkClient } from "../../sdkClient";
-import { InGameActions } from "./inGameActions";
-import { MainMenuActions } from "./mainMenuActions";
-import { SettingsActions } from "./settingsActions";
-/**
- * Listens and responds to all actions the SDK receives
- * @class ActionsListener
- */
+import { SdkClient } from "../sdkClient";
+import { InGameActions } from "./main/inGameActions";
+import { MainMenuActions } from "./main/mainMenuActions";
+import { SettingsActions } from "./main/settingsActions";
+
+/** Listens and responds to all actions the SDK receives */
 export class ActionsController {
 	/** @type {string} */ #stateKey;
-	/** @type {import("../../main").NeuroIntegration} */ #mod;
+	/** @type {import("../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {MainMenuActions} */ #mainMenuActions;
 	/** @type {SettingsActions} */ #settingsActions;
 	/** @type {InGameActions} */ #inGameActions;
 
-	/** @param {import("../../main").NeuroIntegration} mod */
+	/** @param {import("../main").NeuroIntegration} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#mainMenuActions = new MainMenuActions(mod);

@@ -1,6 +1,6 @@
 import { Mod } from "shapez/mods/mod";
 import { CoordsGrid } from "./descriptors/coordsGrid";
-import { ActionsController } from "./actions/controllers/actionsController";
+import { ActionsController } from "./actions/actionsController";
 import { TutorialMessager } from "./descriptors/tutorialMessager";
 const DEFAULT_URL = "localhost:8000";
 

@@ -1,8 +1,8 @@
 import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../../custom/randomUtils";
 import { SdkClient } from "../../sdkClient";
-import { EnumSchema } from "../definitions/schema/enumSchema";
-import { NumberSchema } from "../definitions/schema/numberSchema";
+import { EnumSchema } from "../../sdkActions/schema/enumSchema";
+import { NumberSchema } from "../../sdkActions/schema/numberSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
 import { InGameMassSelector } from "../executers/inGameMassSelector";
 import { MapDescriptor } from "../executers/mapDescriptor";
@@ -11,12 +11,13 @@ import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
 import { GoalsDescriptor } from "../helpers/goalsDescriptor";
-import { BoolSchema } from "../definitions/schema/boolSchema";
+import { BoolSchema } from "../../sdkActions/schema/boolSchema";
 import { globalConfig } from "shapez/core/config";
 import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 import { T } from "shapez/translations";
 import { NotificationsActionList } from "../lists/notificationsActionList";
 import { HUDUnlockNotification } from "shapez/game/hud/parts/unlock_notification";
+import { SingleBuilder } from "../executers/builders/singleBuilder";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -28,6 +29,8 @@ export class InGameActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ActionList} */ #actions;
 	/** @type {ActionList} */ #notificationActions;
+	/** @type {SingleBuilder} */ #singleBuilder;
+
 	/** @type {InGameBuilder} */ #builder;
 	/** @type {InGameMassSelector} */ #massSelector;
 	/** @type {MapDescriptor} */ #mapDescriptor;
@@ -49,6 +52,8 @@ export class InGameActions {
 		this.#notificationActions = new ActionList();
 		this.#mapDescriptor = new MapDescriptor(mod, root);
 		this.#goalsDescriptor = new GoalsDescriptor(root);
+
+		this.#singleBuilder = new SingleBuilder(root);
 
 		if (!InGameActions.#initialized) {
 			this.#initialize();
@@ -116,17 +121,22 @@ export class InGameActions {
 
 	/** @retuns {boolean} */
 	#isActionValid(action) {
+		const data = action.params;
 		switch (action.name) {
 			case InGameActionList.PLACE_BUILDING.getName():
-				if (InGameActionList.PLACE_BUILDING.checkResponse(action)) {
-					this.#trySinglePlacementAction(action);
+				let result = InGameActionList.PLACE_BUILDING.checkResponse(action);
+				if (result.valid) {
+					result = this.#singleBuilder.tryPlaceBuilding(
+						data.building, data.rotation,
+						data.x_position, data.y_position
+					)
+					//this.#trySinglePlacementAction(action);
 				}
-				else {
-					SdkClient.tellActionResult(action.id, false, "Wrong data formation");
-				}
+
+				SdkClient.tellActionResult(action.id, result.valid, result.msg);
 				return true;
 			case InGameActionList.PLACE_BUILDINGS_LINE.getName():
-				this.#tryLinePlacementAction(action);
+				//this.#tryLinePlacementAction(action);
 				return true;
 			case InGameActionList.BELT_PLANNER.getName():
 				this.#tryBeltPlannerAction(action);
@@ -162,7 +172,7 @@ export class InGameActions {
 				this.#zoomCameraAction(action);
 				return true;
 			case NotificationsActionList.CLOSE_NOTIFICATION.getName():
-				this.#tryCloseDialog(action);
+				//this.#tryCloseDialog(action);
 				return true;
 			default:
 				return false;
@@ -179,6 +189,7 @@ export class InGameActions {
 		}
 	}
 
+	/*
 	#tryLinePlacementAction(action) {
 		if (
 			this.#trySelectBuilding(action) &&
@@ -188,6 +199,7 @@ export class InGameActions {
 			this.#announceLanePlacement(action, result);
 		}
 	}
+	*/
 
 	#tryBeltPlannerAction(action) {
 		if (this.#builder.selectBuilding("belt") ) {
@@ -333,6 +345,7 @@ export class InGameActions {
 	}
 
 	/** @retuns {("ALL"|"SOME"|"NONE")} */
+	/*
 	#tryPlaceBuildingLine(action) {
 		let placedAll = true;
 		let placedSome = false;
@@ -354,7 +367,9 @@ export class InGameActions {
 		else if (placedSome) { return "SOME"; }
 		else { return "NONE"; }
 	}
+	*/
 
+	/*
 	#tryCloseDialog(action) {
 		if (this.#root.hud.parts.unlockNotification) {
 			this.#root.hud.parts.unlockNotification.requestClose();
@@ -364,6 +379,7 @@ export class InGameActions {
 			SdkClient.tellActionResult(action.id, false, `No dialog to close.`);
 		}
 	}
+	*/
 
 	#announceSinglePlacement(action) {
 		const buildName = RandomUtils.capitalizeFirst(action.params.building);
@@ -374,6 +390,7 @@ export class InGameActions {
 	}
 
 	/** @param {("ALL"|"SOME"|"NONE")} result */
+	/*
 	#announceLanePlacement(action, result) {
 		const buildName = RandomUtils.capitalizeFirst(action.params.building);
 		const startPos = [action.params.x_position, action.params.y_position];
@@ -404,6 +421,7 @@ export class InGameActions {
 				break;
 		}
 	}
+	*/
 
 	/** @param {boolean} result */
 	#announceBeltPlanner(action, result) {

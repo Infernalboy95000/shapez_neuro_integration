@@ -1,4 +1,4 @@
-import { SdkAction } from "../definitions/sdkAction";
+import { SdkAction } from "../../sdkActions/sdkAction";
 
 export class MainMenuActionList {
 	// This action is used when only one map is allowed, to simplify

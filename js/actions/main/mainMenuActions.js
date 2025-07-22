@@ -1,6 +1,6 @@
 import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
-import { EnumSchema } from "../definitions/schema/enumSchema";
+import { EnumSchema } from "../../sdkActions/schema/enumSchema";
 import { ActionList } from "../lists/actionList";
 import { MainMenuActionList } from "../lists/mainMenuActionList";
 import { MapLoader } from "../executers/mapLoader";
@@ -89,20 +89,20 @@ export class MainMenuActions {
 	#tryPlayMap(action) {
 		if (action.name == MainMenuActionList.PLAY_GAME.getName()) {
 			const availableMap = this.#mod.settings.mapAvailable;
-			if (availableMap ==  MainMenuActionList.CONTINUE_GAME.getName()) {
+			if (availableMap == MainMenuActionList.CONTINUE_GAME.getName()) {
 				return this.#MapLoader.tryContinueLastMap(this.#state);
 			}
-			else if (availableMap ==  MainMenuActionList.NEW_GAME.getName()) {
+			else if (availableMap == MainMenuActionList.NEW_GAME.getName()) {
 				return this.#MapLoader.tryCreateNewMap(this.#state);
 			}
 			else {
 				return this.#MapLoader.tryOpenMapByID(availableMap, this.#state);
 			}
 		}
-		else if (action.name ==  MainMenuActionList.CONTINUE_GAME.getName()) {
+		else if (action.name == MainMenuActionList.CONTINUE_GAME.getName()) {
 			return this.#MapLoader.tryContinueLastMap(this.#state);
 		}
-		else if (action.name ==  MainMenuActionList.NEW_GAME.getName()) {
+		else if (action.name == MainMenuActionList.NEW_GAME.getName()) {
 			return this.#MapLoader.tryCreateNewMap(this.#state);
 		}
 		else if (this.#mapsAvailable.has(action.params.map)) {

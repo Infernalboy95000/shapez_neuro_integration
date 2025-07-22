@@ -1,5 +1,6 @@
 import { SchemaBase } from "./schemaBase";
 
+/** Schema that accepts a number, with certain filters */
 export class NumberSchema extends SchemaBase {
 	/** @type {number} */ #multipleOf;
 	/** @type {number} */ #min;
@@ -53,41 +54,44 @@ export class NumberSchema extends SchemaBase {
 
 	/**
 	 * @param {object} data
-	 * @returns {boolean}
+	 * @returns {{valid:boolean, msg:string}}
 	 */
 	check(data) {
+		const result = {valid: false, msg:""};
+
 		if (!data.params[this.getName()]) {
-			console.error(`Missing parameter ${this.getName()}`);
-			return false;
+			result.msg = `Missing parameter ${this.getName()}`;
+			return result;
 		}
 		
 		const value = data.params[this.getName()];
 		if (typeof(value) != "number") {
-			console.error(`Property ${this.getName()} is not a number`);
-			return false;
+			result.msg = `Property ${this.getName()} is not a number`;
+			return result;
 		}
 
 		if (this.#multipleOf != null) {
 			if (value % this.#multipleOf != 0) {
-				console.error(`Property ${this.getName()} is not multiple of ${this.#multipleOf}`);
-				return false;
+				result.msg = `Property ${this.getName()} is not multiple of ${this.#multipleOf}`;
+				return result;
 			}
 		}
 
 		if (this.#min != null) {
 			if (value < this.#min) {
-				console.error(`Property ${this.getName()} is smaller than the minimum of: ${this.#min}`);
-				return false;
+				result.msg = `Property ${this.getName()} is smaller than the minimum of: ${this.#min}`;
+				return result;
 			}
 		}
 
 		if (this.#max != null) {
 			if (value > this.#max) {
-				console.error(`Property ${this.getName()} is bigger than the maximum of: ${this.#max}`);
-				return false;
+				result.msg = `Property ${this.getName()} is bigger than the maximum of: ${this.#max}`;
+				return result;
 			}
 		}
 
-		return true;
+		result.valid = true;
+		return result;
 	}
 }

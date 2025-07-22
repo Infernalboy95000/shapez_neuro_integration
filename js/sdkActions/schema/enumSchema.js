@@ -1,5 +1,6 @@
 import { SchemaBase } from "./schemaBase";
 
+/** Schema that accepts an option from a set list */
 export class EnumSchema extends SchemaBase {
 	/** @type {Array<any>} */ #options;
 
@@ -26,27 +27,30 @@ export class EnumSchema extends SchemaBase {
 
 	/**
 	 * @param {object} data
-	 * @returns {boolean}
+	 * @returns {{valid:boolean, msg:string}}
 	 */
 	check(data) {
+		const result = {valid: false, msg:""};
+		
 		if (!data.params[this.getName()]) {
-			console.error(`Missing parameter ${this.getName()}`);
-			return false;
+			result.msg = `Missing parameter ${this.getName()}`;
+			return result;
 		}
 		
 		const value = data.params[this.getName()];
 		if (typeof(value) != "string") {
-			console.error(`Property ${this.getName()} is not a string`);
-			return false;
+			result.msg = `Property ${this.getName()} is not a string`;
+			return result;
 		}
 
 		for (let i = 0; i < this.#options.length; i++) {
 			if (value == this.#options[i]) {
-				return true;
+				result.valid = true;
+				return result;
 			}
 		}
 
-		console.error(`Property ${this.getName()} is not a valid option`);
-		return false;
+		result.msg = `Property ${this.getName()} is not a valid option`;
+		return result;
 	}
 }
