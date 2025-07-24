@@ -47,6 +47,10 @@ export class MassBuilder {
 				currentPos = RandomUtils.vectorAddDir(currentPos, dir);
 			}
 		})
+
+		if (placedSome) {
+			this.#singleBuilder.playPlacementSound(buildName);
+		}
 		
 		if (placedAll) {
 			result.msg = `Placed a line of ${buildName}s ` +

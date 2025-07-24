@@ -41,6 +41,7 @@ export class SingleBuilder {
 		}
 
 		if (result.valid) {
+			this.playPlacementSound(buildName);
 			result.msg = `Placed ${buildName} at x: ${posX}, y: ${posY}.`;
 		}
 
@@ -62,6 +63,12 @@ export class SingleBuilder {
 	tryPlaceCurrentAt(posX, posY) {
 		const pos = new Vector(posX, posY)
 		return this.#root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(pos);
+	}
+
+	/** @param {string} buildName */
+	playPlacementSound(buildName) {
+		const building = this.#toolbelt.getBuildingByName(buildName);
+		this.#root.soundProxy.playUi(building.getPlacementSound());
 	}
 
 	/**

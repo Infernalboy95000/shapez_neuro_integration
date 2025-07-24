@@ -1,5 +1,4 @@
 import { Vector } from "shapez/core/vector";
-import { ToolbeltSelector } from "./toolbeltSelector";
 import { SingleBuilder } from "./singleBuilder";
 
 /** Allows operating the Belt Planner. Only allowed for belts. */
@@ -51,9 +50,9 @@ export class BeltPlannerBuilder {
 			}
 		});
 
-		// if (placedSome) {
-		// 	this.#root.soundProxy.playUi(belt.getPlacementSound());
-		// }
+		if (placedSome) {
+			this.#singleBuilder.playPlacementSound("belt");
+		}
 
 		result.valid = placedSome;
 		if (placedAll) {
