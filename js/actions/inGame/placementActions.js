@@ -1,65 +1,74 @@
-import { SdkAction } from "../../sdkActions/sdkAction";
-import { SdkClient } from "../../sdkClient";
-import { BaseAction } from "../baseAction";
+import { BaseActions } from "../baseActions";
+import { BeltPlannerBuilder } from "../executers/builders/beltPlannerBuilder";
+import { MassBuilder } from "../executers/builders/massBuilder";
+import { SingleBuilder } from "../executers/builders/singleBuilder";
+import { ToolbeltSelector } from "../executers/builders/toolbeltSelector";
+import { PlaceList } from "../lists/placementActionList";
 
 /** Manages all actions related to placement. */
-export class PlacementActions extends BaseAction {
-	#actions = {
-		place_building: {
-			action: new SdkAction(
-				"place_building",
-				"Select and place a building from your toolbelt."
-			),
-			function: this.#tryPlaceBuilding
-		},
-		place_line_of_buildings: {
-			action: new SdkAction(
-				"place_line_of_buildings",
-				"Place an entire straight line of buildings at once."
-			),
-			function: this.#tryPlaceBuildingsLine
-		},
-		use_belt_planner: {
-			action: new SdkAction(
-				"use_belt_planner",
-				"Place belts in a path from one point to the other."
-			),
-			function: this.#tryBeltPlanner
-		}
+export class PlacementActions extends BaseActions {
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
+	/** @type {ToolbeltSelector} */ #toolbelt;
+	/** @type {SingleBuilder} */ #singleBuilder;
+	/** @type {MassBuilder} */ #massBuilder;
+	/** @type {BeltPlannerBuilder} */ #beltPlanner;
+
+	/** @param {import("shapez/game/root").GameRoot} root */
+	constructor(root) {
+		super(PlaceList.actions);
+		super.addCallables(new Map([
+			[PlaceList.placeBuild, (e) => { return this.#tryPlaceBuilding(e)}],
+			[PlaceList.placeBuildLine, (e) => { return this.#tryPlaceBuildingsLine(e)}],
+			[PlaceList.beltPlanner, (e) => { return this.#tryBeltPlanner(e)}],
+		]));
+
+		this.#root = root;
+		this.#toolbelt = new ToolbeltSelector(root);
+		this.#singleBuilder = new SingleBuilder(root);
+		this.#massBuilder = new MassBuilder(root, this.#singleBuilder);
+		this.#beltPlanner = new BeltPlannerBuilder(root, this.#singleBuilder);
+	};
+
+	/**
+	 * @param {Object} params
+	 * @returns {{valid:boolean, msg:string}}
+	*/
+	#tryPlaceBuilding(params) {
+		return this.#singleBuilder.tryPlaceBuilding(
+			params[PlaceList.build], params[PlaceList.rot],
+			params[PlaceList.xPos], params[PlaceList.yPos],
+		);;
 	}
 
 	/**
-	 * @param {{id:string,name:string,params:{}}} data
-	 * @returns {boolean}
-	 */
-	tryAction(data) {
-		if (this.#actions[data.name]) {
-			const response = this.#actions[data.name].checkResponse(data);
-			if (response.valid) {
-				this.#actions[data.name].function(data.id, data.params);
-			}
-			else {
-				SdkClient.tellActionResult(data.id, false, response.error)
-			}
-			return true;
-		}
-		else {
-			return false;
-		}
+	 * @param {Object} params
+	 * @returns {{valid:boolean, msg:string}}
+	*/
+	#tryPlaceBuildingsLine(params) {
+		return this.#massBuilder.tryPlaceBuildingLine(
+			params[PlaceList.build], params[PlaceList.rot],
+			params[PlaceList.xPos], params[PlaceList.yPos],
+			params[PlaceList.dir], params[PlaceList.lineLength]
+		);
 	}
 
-	/** @param {number} id @param {{}} params */
-	#tryPlaceBuilding(id, params) {
-
+	/**
+	 * @param {Object} params
+	 * @returns {{valid:boolean, msg:string}}
+	*/
+	#tryBeltPlanner(params) {
+		return this.#beltPlanner.buildPlan(
+			params[PlaceList.xPos1], params[PlaceList.yPos1],
+			params[PlaceList.xPos2], params[PlaceList.yPos2],
+			params[PlaceList.endHorizontal]
+		)
 	}
 
-	/** @param {number} id @param {{}} params */
-	#tryPlaceBuildingsLine(id, params) {
-
-	}
-
-	/** @param {number} id @param {{}} params */
-	#tryBeltPlanner(id, params) {
-
+	activate() {
+		const options = PlaceList.getOptions(
+			this.#root, this.#toolbelt.getAvailableBuildings()
+		);
+		super.setOptions(options);
+		super.activate();
 	}
 }

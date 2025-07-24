@@ -3,16 +3,13 @@ import { Vector } from "shapez/core/vector";
 import { MetaBuilding } from "shapez/game/meta_building";
 import { SOUNDS } from "shapez/platform/sound";
 import { RotationCodes } from "../helpers/rotationCodes";
-import { InGameBeltPlanner } from "./InGameBeltPlanner";
 
 export class InGameBuilder {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
-	/** @type {InGameBeltPlanner} */ #beltPlanner;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
 		this.#root = root;
-		this.#beltPlanner = new InGameBeltPlanner(this.#root);
 	}
 
 	/** @returns {Array<MetaBuilding>} */
@@ -113,8 +110,7 @@ export class InGameBuilder {
 	 * */
 	useBeltPlanner(pos1, pos2, endHotizontal = true) {
 		const belt = this.#getBuildingByName("belt");
-		const result = this.#beltPlanner.build(pos1, pos2, belt, endHotizontal);
-		return result;
+		return false;
 	}
 
 	/**

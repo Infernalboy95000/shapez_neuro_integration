@@ -46,17 +46,17 @@ export class SdkAction {
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
 	checkResponse(data) {
-		const action = {valid: true, msg:""};
+		const result = {valid: true, msg:""};
 		for (let i = 0; i < this.#options.length; i++) {
 			const value = this.#options[i].check(data);
 			if (!value.valid) {
-				action.msg += value.msg;
+				result.msg += value.msg;
 				if (i + 1 < this.#options.length) {
-					action.msg += "\r\n";
+					result.msg += "\r\n";
 				}
 			}
 		}
-		return action;
+		return result;
 	}
 
 	/** @returns {Object} */

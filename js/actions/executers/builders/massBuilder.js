@@ -7,10 +7,13 @@ export class MassBuilder {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {SingleBuilder} */ #singleBuilder;
 
-	/** @param {import("shapez/game/root").GameRoot} root */
-	constructor(root) {
+	/**
+	 * @param {import("shapez/game/root").GameRoot} root
+	 * @param {SingleBuilder} singleBuilder
+	 * */
+	constructor(root, singleBuilder) {
 		this.#root = root;
-		this.#singleBuilder = new SingleBuilder(root);
+		this.#singleBuilder = singleBuilder;
 	}
 
 	/**
@@ -32,11 +35,10 @@ export class MassBuilder {
 
 		this.#root.logic.performBulkOperation(() => {
 			for (let i = 0; i < lineLength; i++) {
-				const msg = this.#singleBuilder.tryPlaceBuilding(
-					buildName, rotName, posX, posY
-				);
+				const isPlaced = this.#singleBuilder.tryPlaceCurrentAt(
+					currentPos.x, currentPos.y);
 
-				if (!result.msg) {
+				if (isPlaced) {
 					placedSome = true;
 				}
 				else {
@@ -47,16 +49,16 @@ export class MassBuilder {
 		})
 		
 		if (placedAll) {
-			result.msg = `Placed a line of ${buildName}` +
+			result.msg = `Placed a line of ${buildName}s ` +
 			`from x: ${posX}, y: ${posY} to x: ${currentPos.x}, y: ${currentPos.y}.`
 		}
 		else if (placedSome) {
-			result.msg = `Partially placed a line of ${buildName}` +
+			result.msg = `Partially placed a line of ${buildName}s ` +
 			`from x: ${posX}, y: ${posY} to x: ${currentPos.x}, y: ${currentPos.y}. ` + 
 			`There might be other buildings over there.`
 		}
 		else {
-			result.msg = `Cannot place any ${buildName}s` +
+			result.msg = `Cannot place any ${buildName}s ` +
 			`from x: ${posX}, y: ${posY} to x: ${currentPos.x}, y: ${currentPos.y}. ` +
 			`It's probably full of other buildings over there.`
 		}

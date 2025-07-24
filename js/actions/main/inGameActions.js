@@ -16,8 +16,9 @@ import { globalConfig } from "shapez/core/config";
 import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 import { T } from "shapez/translations";
 import { NotificationsActionList } from "../lists/notificationsActionList";
-import { HUDUnlockNotification } from "shapez/game/hud/parts/unlock_notification";
 import { SingleBuilder } from "../executers/builders/singleBuilder";
+import { BaseActions } from "../baseActions";
+import { PlacementActions } from "../inGame/placementActions";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -27,6 +28,9 @@ export class InGameActions {
 
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
+	/** @type {Array<BaseActions>} */ #actioners;
+
+
 	/** @type {ActionList} */ #actions;
 	/** @type {ActionList} */ #notificationActions;
 	/** @type {SingleBuilder} */ #singleBuilder;
@@ -37,10 +41,6 @@ export class InGameActions {
 	/** @type {GoalsDescriptor} */ #goalsDescriptor;
 	/** @type {boolean} */ #moving;
 
-	/** @type {boolean} */ #dialogOpen = false;
-
-	/** @type {HUDUnlockNotification}" */ #someDialog;
-
 	/**
 	 * @param {import("../../main").NeuroIntegration} mod
 	 * @param {import("shapez/game/root").GameRoot} root
@@ -48,29 +48,23 @@ export class InGameActions {
 	constructor(mod, root) {
 		this.#mod = mod;
 		this.#root = root;
-		this.#actions = new ActionList();
-		this.#notificationActions = new ActionList();
-		this.#mapDescriptor = new MapDescriptor(mod, root);
-		this.#goalsDescriptor = new GoalsDescriptor(root);
 
-		this.#singleBuilder = new SingleBuilder(root);
+		this.#actioners = [
+			new PlacementActions(root)
+		]
 
 		if (!InGameActions.#initialized) {
 			this.#initialize();
 		}
 
-		this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
+		//this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
 	}
 
 	gameOpenned() {
 		if (SdkClient.isConnected()) {
 			this.#connectEvents();
 			this.#announceOpening();
-			this.#builder = new InGameBuilder(this.#root);
-			this.#massSelector = new InGameMassSelector(this.#root);
-			this.#actions.removeAllActions();
-			this.#promptActions();
-			this.#actions.activateActions();
+			this.#activateActions();
 		}
 	}
 
@@ -78,16 +72,20 @@ export class InGameActions {
 		InGameActions.scanned = false;
 		InGameActions.deepScanned = false;
 		InGameActions.buildingScanned = false;
-		this.#actions.deactivateActions();
+		this.#deactivateActions();
 	}
 
 	playerSentAction(action) {
-		if (!this.#isActionValid(action)) {
-			SdkClient.tellActionResult(
-				action.id, false,
-				`Unknown action.`
-			)
+		let result = null;
+		for (let i = 0; i < this.#actioners.length && result == null; i++) {
+			result = this.#actioners[i].tryAction(action);
 		}
+
+		if (result == null) {
+			result = {valid:false, msg:"Unknown action."};
+		}
+
+		SdkClient.tellActionResult(action.id, result.valid, result.msg);
 	}
 
 	#initialize() {
@@ -101,15 +99,6 @@ export class InGameActions {
 				return true;
 			}
 		);
-
-		this.#mod.modInterface.runAfterMethod(
-			HUDUnlockNotification,
-			"showForLevel",
-			function($original, args) {
-				console.log("Executing show for level method");
-				ourClass.#someDialog = this;
-			}
-		);
 	}
 
 	#announceOpening() {
@@ -119,7 +108,20 @@ export class InGameActions {
 		}
 	}
 
+	#activateActions() {
+		for (let i = 0; i < this.#actioners.length; i++) {
+			this.#actioners[i].activate();
+		}
+	}
+
+	#deactivateActions() {
+		for (let i = 0; i < this.#actioners.length; i++) {
+			this.#actioners[i].deactivate();
+		}
+	}
+
 	/** @retuns {boolean} */
+	/*
 	#isActionValid(action) {
 		const data = action.params;
 		switch (action.name) {
@@ -178,6 +180,7 @@ export class InGameActions {
 				return false;
 		}
 	}
+	*/
 
 	#trySinglePlacementAction(action) {
 		if (
@@ -558,13 +561,13 @@ export class InGameActions {
 		if (this.#moving) {
 			if (!this.#root.camera.viewportWillChange()) {
 				this.#moving = false;
-				this.#promptActions();
+				this.#activateActions();
 			}
 		}
 		else {
 			if (this.#root.camera.viewportWillChange()) {
 				this.#moving = true;
-				this.#actions.removeAllActions();
+				this.#deactivateActions();
 			}
 		}
 	}
@@ -576,7 +579,7 @@ export class InGameActions {
 
 	#testCrazy() {
 		this.#notificationActions.removeAllActions();
-		this.#promptActions();
+		this.#activateActions();
 	}
 
 	/**
@@ -587,7 +590,6 @@ export class InGameActions {
 		const levels = this.#root.gameMode.getLevelDefinitions();
 
 		if (level <= levels.length) {
-			this.#dialogOpen = true;
 			this.#actions.removeAllActions();
 			const desc = T.storyRewards[reward].desc;
 			const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");

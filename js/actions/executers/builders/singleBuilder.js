@@ -25,7 +25,7 @@ export class SingleBuilder {
 		}
 
 		const pos = new Vector(posX, posY);
-		if (!this.tryPlaceCurrentBuildingAt(posX, posY)) {
+		if (!this.tryPlaceCurrentAt(posX, posY)) {
 			result.valid = false;
 			result.msg = `Cannot place ${buildName} at x: ${posX}, y: ${posY}.`
 
@@ -59,7 +59,7 @@ export class SingleBuilder {
 	 * @param {number} posX
 	 * @param {number} posY
 	 * @returns {boolean} */
-	tryPlaceCurrentBuildingAt(posX, posY) {
+	tryPlaceCurrentAt(posX, posY) {
 		const pos = new Vector(posX, posY)
 		return this.#root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(pos);
 	}
@@ -70,11 +70,8 @@ export class SingleBuilder {
 	 * @return {{buildName:string,position:Vector,removable:boolean}}
 	 */
 	#checkOverlap(buildName, tile) {
-		// I'm genuently not sure if all of this is even necessary
+		// I feel that this is too complex for what is doing.
 		const building = this.#toolbelt.getBuildingByName(buildName);
-		//console.log(this.#root.hud.parts.buildingPlacer.currentVariant);
-		//const size = build.(this.#root.hud.parts.buildingPlacer.currentVariant.lastSeenValue);
-		//console.log(`Building size: ${size}`);
 		
 		const { rotation, rotationVariant } = building.computeOptimalDirectionAndRotationVariantAtTile({
 			root: this.#root,
@@ -89,6 +86,7 @@ export class SingleBuilder {
 			rotation,
 			rotationVariant,
 			originalRotation: this.#root.hud.parts.buildingPlacer.currentBaseRotation,
+			// @ts-ignore
 			building: building,
 			variant: this.#root.hud.parts.buildingPlacer.currentVariant.lastSeenValue,
 		});
