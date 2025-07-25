@@ -19,6 +19,7 @@ import { NotificationsActionList } from "../lists/notificationsActionList";
 import { SingleBuilder } from "../executers/builders/singleBuilder";
 import { BaseActions } from "../baseActions";
 import { PlacementActions } from "../inGame/placementActions";
+import { DeletionActions } from "../inGame/deletionActions";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -50,7 +51,8 @@ export class InGameActions {
 		this.#root = root;
 
 		this.#actioners = [
-			new PlacementActions(root)
+			new PlacementActions(root),
+			new DeletionActions(root)
 		]
 
 		if (!InGameActions.#initialized) {

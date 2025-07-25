@@ -2,8 +2,8 @@ import { BaseActions } from "../baseActions";
 import { BeltPlannerBuilder } from "../executers/builders/beltPlannerBuilder";
 import { MassBuilder } from "../executers/builders/massBuilder";
 import { SingleBuilder } from "../executers/builders/singleBuilder";
-import { ToolbeltSelector } from "../executers/builders/toolbeltSelector";
-import { PlaceList } from "../lists/placementActionList";
+import { ToolbeltSelector } from "../executers/selectors/toolbeltSelector";
+import { PlaceList } from "../lists/placementActionsList";
 
 /** Manages all actions related to placement. */
 export class PlacementActions extends BaseActions {
@@ -28,6 +28,14 @@ export class PlacementActions extends BaseActions {
 		this.#massBuilder = new MassBuilder(root, this.#singleBuilder);
 		this.#beltPlanner = new BeltPlannerBuilder(root, this.#singleBuilder);
 	};
+
+	activate() {
+		const options = PlaceList.getOptions(
+			this.#root, this.#toolbelt.getAvailableBuildings()
+		);
+		super.setOptions(options);
+		super.activate();
+	}
 
 	/**
 	 * @param {Object} params
@@ -62,13 +70,5 @@ export class PlacementActions extends BaseActions {
 			params[PlaceList.xPos2], params[PlaceList.yPos2],
 			params[PlaceList.endHorizontal]
 		)
-	}
-
-	activate() {
-		const options = PlaceList.getOptions(
-			this.#root, this.#toolbelt.getAvailableBuildings()
-		);
-		super.setOptions(options);
-		super.activate();
 	}
 }

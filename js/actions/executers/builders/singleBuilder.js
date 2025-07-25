@@ -1,7 +1,7 @@
 import { Vector } from "shapez/core/vector";
-import { ToolbeltSelector } from "./toolbeltSelector";
+import { ToolbeltSelector } from "../selectors/toolbeltSelector";
 
-/** Allows building or deleting on a single position. */
+/** Allows building at a single position. */
 export class SingleBuilder {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ToolbeltSelector} */ #toolbelt;
