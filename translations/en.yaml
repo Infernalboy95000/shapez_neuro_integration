@@ -3,15 +3,15 @@ ingame:
         title: Tutorial
         hints:
             1_0_scan: >-
-                Welcome to shapez. Your current goal is to deliver 30 uncolored sphere shapes to the HUB.<br><br>
-                <strong>Scan terrain</stong> to find a sphere shape patch.
+                Welcome to shapez. Your current goal is to deliver 30 uncolored circle shapes to the HUB.<br><br>
+                <strong>Scan terrain</stong> to find a circle shape patch.
 
             1_0_deep_scan: >-
-                <strong>Deep scan</strong> at the position of the uncolored sphere patch you just found!<br><br>
+                <strong>Scan the circle patch</strong> you just found!<br><br>
                 This will tell you exactly where you can extract the shapes.
 
             1_1_extractor: >-
-                Place an <strong>extractor</strong> on top of an <strong>uncolored sphere shape patch</strong> to extract it!
+                Place an <strong>extractor</strong> on top of an <strong>uncolored circle shape patch</strong> to extract it!
 
             1_1_buildings_scan: >-
                 <strong>Scan buildings</strong> to locate where the hub is and accepts items.

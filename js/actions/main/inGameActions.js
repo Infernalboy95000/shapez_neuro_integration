@@ -4,22 +4,20 @@ import { SdkClient } from "../../sdkClient";
 import { EnumSchema } from "../../sdkActions/schema/enumSchema";
 import { NumberSchema } from "../../sdkActions/schema/numberSchema";
 import { InGameBuilder } from "../executers/inGameBuilder";
-import { InGameMassSelector } from "../executers/inGameMassSelector";
-import { MapDescriptor } from "../executers/mapDescriptor";
 import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
-import { GoalsDescriptor } from "../helpers/goalsDescriptor";
+import { GoalsDescriptor } from "../descriptors/menus/goalsDescriptor";
 import { BoolSchema } from "../../sdkActions/schema/boolSchema";
 import { globalConfig } from "shapez/core/config";
 import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 import { T } from "shapez/translations";
-import { NotificationsActionList } from "../lists/notificationsActionList";
 import { SingleBuilder } from "../executers/builders/singleBuilder";
 import { BaseActions } from "../baseActions";
 import { PlacementActions } from "../inGame/placementActions";
 import { DeletionActions } from "../inGame/deletionActions";
+import { ScannerActions } from "../inGame/scannerActions";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -37,8 +35,6 @@ export class InGameActions {
 	/** @type {SingleBuilder} */ #singleBuilder;
 
 	/** @type {InGameBuilder} */ #builder;
-	/** @type {InGameMassSelector} */ #massSelector;
-	/** @type {MapDescriptor} */ #mapDescriptor;
 	/** @type {GoalsDescriptor} */ #goalsDescriptor;
 	/** @type {boolean} */ #moving;
 
@@ -52,7 +48,8 @@ export class InGameActions {
 
 		this.#actioners = [
 			new PlacementActions(root),
-			new DeletionActions(root)
+			new DeletionActions(root),
+			new ScannerActions(root),
 		]
 
 		if (!InGameActions.#initialized) {
@@ -227,6 +224,7 @@ export class InGameActions {
 		}
 	}
 
+	/*
 	#tryAreaDeletionAction(action) {
 		const msg = this.#massSelector.areaDelete(
 			action.params.lower_corner_x_position,
@@ -242,7 +240,9 @@ export class InGameActions {
 			SdkClient.tellActionResult(action.id, false, msg);
 		}
 	}
+	*/
 
+	/*
 	#tryScanPatches(action) {
 		const msg = this.#mapDescriptor.scanNearbyPatches();
 		SdkClient.tellActionResult(action.id, true, msg);
@@ -266,6 +266,7 @@ export class InGameActions {
 		SdkClient.tellActionResult(action.id, true, msg);
 		InGameActions.buildingScanned = true;
 	}
+	*/
 
 	#tryDescribeToolbeltBuilding(action) {
 		const msg = this.#builder.getBuildingInfo(action.params.building);

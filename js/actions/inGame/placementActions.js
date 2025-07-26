@@ -45,7 +45,7 @@ export class PlacementActions extends BaseActions {
 		return this.#singleBuilder.tryPlaceBuilding(
 			params[PlaceList.build], params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
-		);;
+		);
 	}
 
 	/**
@@ -69,6 +69,6 @@ export class PlacementActions extends BaseActions {
 			params[PlaceList.xPos1], params[PlaceList.yPos1],
 			params[PlaceList.xPos2], params[PlaceList.yPos2],
 			params[PlaceList.endHorizontal]
-		)
+		);
 	}
 }

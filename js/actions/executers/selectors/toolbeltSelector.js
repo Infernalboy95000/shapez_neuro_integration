@@ -1,6 +1,6 @@
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { MetaBuilding } from "shapez/game/meta_building";
-import { RotationCodes } from "../../helpers/rotationCodes";
+import { RotationCodes } from "../../descriptors/shapes/rotationCodes";
 
 /** Helps manage the current toolbelt */
 export class ToolbeltSelector {

@@ -1,8 +1,8 @@
 import { Vector } from "shapez/core/vector";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
-import { ShapeCode } from "./shapeCode";
-import { RandomUtils } from "../../custom/randomUtils";
+import { ShapeCode } from "../shapes/shapeCode";
+import { RandomUtils } from "../../../custom/randomUtils";
 
 export class PatchDescriptor {
 	/** @type {MapChunkView} */ #chunk

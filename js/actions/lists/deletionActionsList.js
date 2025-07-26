@@ -1,7 +1,7 @@
 import { NumberSchema } from "../../sdkActions/schema/numberSchema";
 import { SchemaBase } from "../../sdkActions/schema/schemaBase";
 import { SdkAction } from "../../sdkActions/sdkAction";
-import { CameraLimits } from "../helpers/cameraLimits";
+import { ViewScanner } from "../descriptors/camera/viewScanner";
 
 export class DelList {
 	static deleteBuild = "delete_building";
@@ -27,7 +27,7 @@ export class DelList {
 	 * @returns {Map<string, Array<SchemaBase>>}
 	 * */
 	static getOptions(root) {
-		const limits = CameraLimits.getVisibleLimits(root);
+		const limits = ViewScanner.getVisibleLimits(root);
 		const options = {
 			[DelList.xPos]:
 			new NumberSchema(DelList.xPos, 1, limits.x, limits.x + limits.w - 1),

@@ -3,7 +3,7 @@ import { EnumSchema } from "../../sdkActions/schema/enumSchema";
 import { NumberSchema } from "../../sdkActions/schema/numberSchema";
 import { SchemaBase } from "../../sdkActions/schema/schemaBase";
 import { SdkAction } from "../../sdkActions/sdkAction";
-import { CameraLimits } from "../helpers/cameraLimits";
+import { ViewScanner } from "../descriptors/camera/viewScanner";
 
 export class PlaceList {
 	static placeBuild = "place_building";
@@ -39,7 +39,7 @@ export class PlaceList {
 	 * @returns {Map<string, Array<SchemaBase>>}
 	 * */
 	static getOptions(root, buildNames) {
-		const limits = CameraLimits.getVisibleLimits(root);
+		const limits = ViewScanner.getVisibleLimits(root);
 		const rotNames = ["UP", "DOWN", "LEFT", "RIGHT"];
 		const options = {
 			[PlaceList.build]: new EnumSchema(PlaceList.build, buildNames),

@@ -1,4 +1,4 @@
-import { RandomUtils } from "../../custom/randomUtils";
+import { RandomUtils } from "../../../custom/randomUtils";
 
 export class ShapeCode {
 	/**
@@ -26,7 +26,7 @@ export class ShapeCode {
 	 * */
 	static #decodeShape(code) {
 		if (/^[C].[C].[C].[C].$/.test(code)) {
-			return "shpere";
+			return "circle";
 		}
 		else if (/^[R].[R].[R].[R].$/.test(code)) {
 			return "square";

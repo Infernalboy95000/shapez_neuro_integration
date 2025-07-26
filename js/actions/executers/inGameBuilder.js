@@ -2,7 +2,7 @@ import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { Vector } from "shapez/core/vector";
 import { MetaBuilding } from "shapez/game/meta_building";
 import { SOUNDS } from "shapez/platform/sound";
-import { RotationCodes } from "../helpers/rotationCodes";
+import { RotationCodes } from "../descriptors/shapes/rotationCodes";
 
 export class InGameBuilder {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;

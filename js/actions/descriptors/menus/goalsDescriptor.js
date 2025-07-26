@@ -1,4 +1,4 @@
-import { ShapeCode } from "./shapeCode";
+import { ShapeCode } from "../shapes/shapeCode";
 
 export class GoalsDescriptor {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
