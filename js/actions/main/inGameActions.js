@@ -8,7 +8,7 @@ import { ActionList } from "../lists/actionList";
 import { InGameActionList } from "../lists/inGameActionList";
 import { Rectangle } from "shapez/core/rectangle";
 import { GameCore } from "shapez/game/core";
-import { GoalsDescriptor } from "../descriptors/menus/goalsDescriptor";
+import { GoalsDescriptor } from "../descriptors/pins/goalsDescriptor";
 import { BoolSchema } from "../../sdkActions/schema/boolSchema";
 import { globalConfig } from "shapez/core/config";
 import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
@@ -18,6 +18,8 @@ import { BaseActions } from "../baseActions";
 import { PlacementActions } from "../inGame/placementActions";
 import { DeletionActions } from "../inGame/deletionActions";
 import { ScannerActions } from "../inGame/scannerActions";
+import { CameraActions } from "../inGame/cameraActions";
+import { PinnedActions } from "../inGame/pinnedActions";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -50,6 +52,8 @@ export class InGameActions {
 			new PlacementActions(root),
 			new DeletionActions(root),
 			new ScannerActions(root),
+			new CameraActions(root),
+			new PinnedActions(root)
 		]
 
 		if (!InGameActions.#initialized) {
@@ -276,16 +280,6 @@ export class InGameActions {
 		else {
 			SdkClient.tellActionResult(action.id, true, msg);
 		}
-	}
-
-	#tryDescribeGoalPiece(action) {
-		const msg = this.#goalsDescriptor.describeCurrentGoal();
-		SdkClient.tellActionResult(action.id, true, msg);
-	}
-
-	#tryDescribePinnedShapes(action) {
-		const msg = this.#goalsDescriptor.describePinnedShapes();
-		SdkClient.tellActionResult(action.id, true, msg);
 	}
 
 	#moveCameraAction(action) {
