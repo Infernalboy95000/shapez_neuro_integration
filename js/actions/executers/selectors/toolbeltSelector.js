@@ -13,24 +13,37 @@ export class ToolbeltSelector {
 
 	/**
 	 * @param {string} buildingName
-	 * @param {string} rotKey
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	trySelectAndRotate(buildingName, rotKey) {
+	trySelectBuilding(buildingName) {
 		if (!this.#doesBuildingExist(buildingName)) {
 			return {valid:false, msg: `Building ${buildingName} does not exist`};
 		}
 
 		const building = this.getBuildingByName(buildingName);
-		if (!this.#hasBuildingUnlocked(building)) {
-			return {valid:false, msg:`Building ${buildingName} not unlocked`};
+		if (!this.#isUnlocked(building)) {
+			return {valid:false, msg:`Building ${buildingName} is not unlocked`};
+		}
+
+		this.#selectBuilding(building);
+		return {valid:true, msg:""};
+	}
+
+	/**
+	 * @param {string} buildingName
+	 * @param {string} rotKey
+	 * @returns {{valid:boolean, msg:string}}
+	 * */
+	trySelectAndRotate(buildingName, rotKey) {
+		const result = this.trySelectBuilding(buildingName);
+		if (!result.valid) {
+			return result;
 		}
 
 		if (!RotationCodes.isRotationValid(rotKey)) {
 			return {valid:false, msg:`Rotation ${rotKey} is invalid`};
 		}
 
-		this.#selectBuilding(building);
 		this.#rotateBuilding(RotationCodes.getAngle(rotKey));
 		return {valid:true, msg:""};
 	}
@@ -38,19 +51,21 @@ export class ToolbeltSelector {
 	/** @returns {Array<String>} */
 	getAvailableBuildings() {
 		const buildingNames = [];
-		const buildings = this.#getUnlockedToolbelt();
+		const buildings = this.#getToolbelt();
 		for (let i = 0; i < buildings.length; i++) {
-			buildingNames.push(buildings[i].getId());
+			if (this.#isUnlocked(buildings[i])) {
+				buildingNames.push(buildings[i].getId());
+			}
 		}
 		return buildingNames;
 	}
 
 	/**
 	 * @param {string} buildingName
-	 * @returns {(MetaBuilding)}
+	 * @returns {MetaBuilding}
 	 */
 	getBuildingByName(buildingName) {
-		const buildings = this.#getUnlockedToolbelt();
+		const buildings = this.#getToolbelt();
 
 		for (let i = 0; i < buildings.length; i++)  {
 			if (buildings[i].getId() == buildingName) {
@@ -81,32 +96,32 @@ export class ToolbeltSelector {
 	 * @returns {boolean}
 	 * */
 	#doesBuildingExist(buildingName) {
-		const buildings = this.getAvailableBuildings();
-		return buildings.includes(buildingName);
+		const buildings = this.#getToolbelt();
+		for (let i = 0; i < buildings.length; i++) {
+			if (buildings[i].getId() == buildingName) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
 	 * @param {MetaBuilding} building
 	 * @returns {boolean}
 	 * */
-	#hasBuildingUnlocked(building) {
-		const handle = this.#root.hud.parts.buildingsToolbar.
-			buildingHandles[building.getId()];
-		
-		return handle.unlocked;
+	#isUnlocked(building) {
+		return building.getIsUnlocked(this.#root);
 	}
 
 	/** @returns {Array<MetaBuilding>} */
-	#getUnlockedToolbelt() {
+	#getToolbelt() {
 		const buildings = this.#root.hud.parts.buildingsToolbar.allBuildings;
 		const metaBuilds = [];
 
 		for (let i = 0; i < buildings.length; i++) {
 			/** @type {MetaBuilding} */
 			const meta = gMetaBuildingRegistry.findByClass(buildings[i]);
-			if (meta.getIsUnlocked(this.#root)) {
-				metaBuilds.push(meta);
-			}
+			metaBuilds.push(meta);
 		}
 
 		return metaBuilds;

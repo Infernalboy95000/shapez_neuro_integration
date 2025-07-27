@@ -20,6 +20,7 @@ import { DeletionActions } from "../inGame/deletionActions";
 import { ScannerActions } from "../inGame/scannerActions";
 import { CameraActions } from "../inGame/cameraActions";
 import { PinnedActions } from "../inGame/pinnedActions";
+import { ToolbeltActions } from "../inGame/toolbeltActions";
 
 export class InGameActions {
 	/** @type {boolean} */ static scanned = false;
@@ -53,7 +54,8 @@ export class InGameActions {
 			new DeletionActions(root),
 			new ScannerActions(root),
 			new CameraActions(root),
-			new PinnedActions(root)
+			new PinnedActions(root),
+			new ToolbeltActions(root),
 		]
 
 		if (!InGameActions.#initialized) {

@@ -1,10 +1,12 @@
 import { Vector } from "shapez/core/vector";
 import { SingleBuilder } from "./singleBuilder";
+import { ToolbeltSelector } from "../selectors/toolbeltSelector";
 
 /** Allows operating the Belt Planner. Only allowed for belts. */
 export class BeltPlannerBuilder {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {SingleBuilder} */ #singleBuilder;
+	/** @type {ToolbeltSelector} */ #toolbelt;
 
 	/**
 	 * @param {import("shapez/game/root").GameRoot} root
@@ -13,6 +15,7 @@ export class BeltPlannerBuilder {
 	constructor(root, singleBuilder) {
 		this.#root = root;
 		this.#singleBuilder = singleBuilder;
+		this.toolbelt = new ToolbeltSelector(root);
 	}
 
 	/**
@@ -26,7 +29,7 @@ export class BeltPlannerBuilder {
 		let placedSome = false;
 
 		// @ts-ignore
-		const result = this.#singleBuilder.trySelectAndRotate("belt", "UP");
+		const result = this.#toolbelt.trySelectBuilding("belt");
 		if (!result.valid) {
 			return result;
 		}
