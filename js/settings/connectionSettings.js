@@ -12,7 +12,7 @@ export class ConnectionSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/**@type {ButtonSetting} */ #sdkButton;
 	/**@type {TextSetting} */#sdkURL;
-	/**@type {ToggleSetting} */ #coordsGridToogle;
+	/**@type {ToggleSetting} */ #hideURL;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
@@ -30,19 +30,24 @@ export class ConnectionSettings {
 		if (SdkClient.isConnected()) {
 			this.#showDisconnect();
 		}
+		else if (SdkClient.isAttempting()) {
+			this.#onReattempting();
+			this.#showCancel();
+		}
 	}
 
 	/** @param {TextSetting} textSetting */
 	addSdkURL(textSetting) {
 		this.#sdkURL = textSetting;
-		this.#setSdkURLEvents()
+		this.#setSdkURLEvents();
+		this.#updateSdkURLinputType();
 	}
 
 	/** @param {ToggleSetting} toogleSetting */
-	addCorodsGridToogle(toogleSetting) {
-		this.#coordsGridToogle = toogleSetting;
-		this.#setCoordsGridEvents();
-		this.#coordsGridToogle.set(this.#mod.settings.coordsGrid);
+	addHideURL(toogleSetting) {
+		this.#hideURL = toogleSetting;
+		this.#setHideURLEvents();
+		this.#hideURL.set(this.#mod.settings.hideURL);
 	}
 
 	#setSdkButtonEvents() {
@@ -53,8 +58,8 @@ export class ConnectionSettings {
 		this.#sdkURL.onFocusOut = (e) => { this.#onSdkUrlFocusOut(e) };
 	}
 
-	#setCoordsGridEvents() {
-		this.#coordsGridToogle.onClicked = () => { this.#onCoordsGridToogleClicked() };
+	#setHideURLEvents() {
+		this.#hideURL.onClicked = () => { this.#onHideURLToogled() };
 	}
 
 	#setSdkClientEvents() {
@@ -70,19 +75,31 @@ export class ConnectionSettings {
 		this.#sdkButtonAction();
 	}
 
+	#onSdkUrlFocusOut(value) {
+		this.#saveUrlSetting(value);
+	}
+
+	#onHideURLToogled() {
+		const value = !this.#mod.settings.hideURL;
+		this.#hideURL.set(value);
+		this.#saveHideURLSetting(value);
+		this.#updateConnectionDescription();
+		this.#updateSdkURLinputType();
+	}
+
 	#sdkButtonAction() {
 		if (SdkClient.isConnected()) {
 			SdkClient.disconnect();
 			this.#showConnect();
 		}
 		else if (SdkClient.isAttempting()) {
-			this.#sdkButton.changeDescription("Requested cancellation ...");
+			this.#sdkButton.changeDescription("Requested cancellation...");
 			this.#showCancel();
 			SdkClient.requestCancell();
 		}
 		else if (SdkClient.tryConnect(this.#mod.settings.socketURL)) {
 			this.#sdkButton.changeTitle("Connecting...");
-			this.#sdkButton.changeDescription(`Attempting connection at: ${SdkClient.getCurrentURL()} ...`);
+			this.#updateConnectionDescription();
 			this.#showCancel();
 		}
 	}
@@ -102,8 +119,34 @@ export class ConnectionSettings {
 		this.#sdkButton.changeStyle(ButtonSetting.Style.BAD);
 	}
 
-	#onSdkUrlFocusOut(value) {
-		this.#saveUrlSetting(value);
+	#updateSdkURLinputType() {
+		if (this.#mod.settings.hideURL) {
+			this.#sdkURL.changeType("password");
+		}
+		else {
+			this.#sdkURL.changeType("text");
+		}
+	}
+
+	#updateConnectionDescription() {
+		if (SdkClient.isConnected()) {
+			if (this.#mod.settings.hideURL) {
+				this.#sdkButton.changeDescription(`Connected.`);
+			} else {
+				this.#sdkButton.changeDescription(`Connected to: ${SdkClient.getCurrentURL()}`);
+			}
+		}
+		else if (SdkClient.isAttempting()) {
+			if (this.#mod.settings.hideURL) {
+				this.#sdkButton.changeDescription(`Attempting connection...`);
+			}
+			else {
+				this.#sdkButton.changeDescription(`Attempting connection at: ${SdkClient.getCurrentURL()}...`);
+			}
+		}
+		else {
+			this.#sdkButton.resetDescription();
+		}
 	}
 
 	#saveUrlSetting(value) {
@@ -111,15 +154,15 @@ export class ConnectionSettings {
 		this.#mod.saveSettings();
 	}
 
-	#saveCoordsGridSetting(value) {
-		this.#mod.settings.coordsGrid = value;
+	#saveHideURLSetting(value) {
+		this.#mod.settings.hideURL = value;
 		this.#mod.saveSettings();
 	}
 
 	#onConnected() {
 		this.#showDisconnect();
 		this.#sdkButton.resetTitle();
-		this.#sdkButton.changeDescription(`Connected to: ${SdkClient.getCurrentURL()}`);
+		this.#updateConnectionDescription();
 	}
 
 	#onDisconnected() {
@@ -128,8 +171,14 @@ export class ConnectionSettings {
 
 	#onReattempting() {
 		this.#showCancel();
-		this.#sdkButton.changeTitle(`Connecting... (${SdkClient.getRetriesFormatted()})`);
-		this.#sdkButton.changeDescription(`Attempting connection at: ${SdkClient.getCurrentURL()} ...`);
+		const reattempts = SdkClient.getRetriesFormatted();
+		if (reattempts.includes("0")) {
+			this.#sdkButton.changeTitle(`Connecting...`);
+		}
+		else {
+			this.#sdkButton.changeTitle(`Connecting... (${reattempts})`);
+		}
+		this.#updateConnectionDescription();
 	}
 
 	#onClosed() {
@@ -146,11 +195,5 @@ export class ConnectionSettings {
 		this.#onFailed();
 		this.#sdkURL.markAsError();
 		this.#mod.app.sound.playUiSound(SOUNDS.uiError);
-	}
-
-	#onCoordsGridToogleClicked() {
-		const value = !this.#mod.settings.coordsGrid;
-		this.#coordsGridToogle.set(value);
-		this.#saveCoordsGridSetting(value);
 	}
 }

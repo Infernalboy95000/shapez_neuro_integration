@@ -1,7 +1,7 @@
 {
     "entry": "main.js",
     "id": "neuro_integration",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "name": "Shapez Neuro Integration",
     "author": "Infernal_Ekoro",
     "description": "Let's Neuro and Evil play Shapez on their own",
@@ -10,6 +10,7 @@
 		"socketURL": "localhost:8000",
 		"coordsGrid": false,
 		"autoConnect": false,
+		"hideURL": true,
 		"playerChooseMap": false,
 		"forceOpenMap": false,
 		"mapAvailable" : "any_map"

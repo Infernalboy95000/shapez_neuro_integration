@@ -114,6 +114,13 @@ export class SettingsMenu {
 			this.#mod.settings.socketURL,
 			256
 		));
+		
+		connSettings.addHideURL(new ToggleSetting (
+			this.#mod, this.#menu,
+			"Hide URL",
+			"Hides the connection URL everywhere, even on it's input field.",
+			"sdkHideURL"
+		));
 	}
 
 	#contextSettings() {

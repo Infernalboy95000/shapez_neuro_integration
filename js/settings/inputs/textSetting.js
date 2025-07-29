@@ -32,6 +32,11 @@ export class TextSetting extends SettingBase {
 		this.#showAsErrored();
 	}
 
+	/** @param {string} type */
+	changeType(type) {
+		this.#inputElement.type = type;
+	}
+
 	/** @param {string} attribute */
 	#createInputParent(attribute) {
 		this.#inputParent = document.createElement("div");
