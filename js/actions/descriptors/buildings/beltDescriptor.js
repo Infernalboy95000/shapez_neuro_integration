@@ -3,6 +3,9 @@ import { RotationCodes } from "../shapes/rotationCodes";
 import { Entity } from "shapez/game/entity";
 
 export class BeltDescriptor {
+	static info = `Transports shapes from it's back to the side it's facing.\r\n` +
+	`Can bend to it's left or right if connected to other buildings or belts.`;
+
 	/**
 	 * @param {EntityComponentStorage} belt
 	 * @returns {{msg:string, describedIDs:Array<number>}}

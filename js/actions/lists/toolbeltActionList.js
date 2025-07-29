@@ -3,10 +3,10 @@ import { SchemaBase } from "../../sdkActions/schema/schemaBase";
 import { SdkAction } from "../../sdkActions/sdkAction";
 
 export class ToolsList {
-	static getStats = "get_building_stats";
+	static getStats = "get_building_info";
 	static actions = [
 		new SdkAction(ToolsList.getStats,
-			"Get all the stats of one of your available builds, like work speed."
+			"Get all the information of one of your available builds, like what it does and it's work speed."
 		)
 	];
 

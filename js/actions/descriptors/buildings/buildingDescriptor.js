@@ -29,13 +29,19 @@ export class BuildingDescriptor {
 	 * @param {MetaBuilding} building
 	 * @returns {string}
 	 * */
-	static getInfo(root, building) {
+	static getInfoAndStats(root, building) {
 		const stats = building.getAdditionalStatistics(root, "default");
 		if (stats.length <= 0) {
 			return "";
 		}
-
-		let msg = `Stats for ${building.getId()}:\r\n`;
+		let msg = "";
+		let info = this.#getInfo(building);
+		if (info != "") {
+			msg = `${building.getId()}: ${info}\r\nStats:\r\n`;
+		}
+		else {
+			msg = `Stats for ${building.getId()}:\r\n`;
+		}
 		for (let i = 0; i < stats.length; i++) {
 			for (let j = 0; j < stats[i].length; j += 2) {
 				const name = stats[i][j];
@@ -46,5 +52,20 @@ export class BuildingDescriptor {
 			}
 		}
 		return msg;
+	}
+
+	/**
+	 * @param {MetaBuilding} building
+	 * @returns {string}
+	 * */
+	static #getInfo(building) {
+		switch (building.getId()) {
+			case "belt":
+				return BeltDescriptor.info;
+			case "miner":
+				return MinerDescriptor.info;
+			default:
+				return "";
+		}
 	}
 }

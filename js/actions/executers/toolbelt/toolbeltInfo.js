@@ -22,7 +22,7 @@ export class ToolbeltInfo {
 		}
 
 		const building = this.#selector.getBuildingByName(buildingName);
-		const msg = BuildingDescriptor.getInfo(this.#root, building);
+		const msg = BuildingDescriptor.getInfoAndStats(this.#root, building);
 		if (msg == "") {
 			result.valid = false;
 			result.msg = "Building has no stats.";
