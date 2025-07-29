@@ -1,4 +1,4 @@
-import { SdkAction } from "../definitions/sdkAction";
+import { SdkAction } from "../../sdkActions/sdkAction";
 
 export class NotificationsActionList {
 	static CLOSE_NOTIFICATION = new SdkAction(

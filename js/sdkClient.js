@@ -1,5 +1,5 @@
 import { NeuroClient } from 'neuro-game-sdk';
-import { SdkAction } from './actions/definitions/sdkAction';
+import { SdkAction } from './sdkActions/sdkAction';
 import { ActionEvent } from './custom/actionEvent';
 // Private constants
 const GAME_NAME = 'Shapez';

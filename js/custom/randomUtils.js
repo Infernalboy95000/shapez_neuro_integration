@@ -28,24 +28,24 @@ export class RandomUtils {
 	}
 
 	/**
-	 * @param {Array<number>} vector
+	 * @param {Vector} vector
 	 * @param {("UP"|"DOWN"|"LEFT"|"RIGHT")} direction
 	 * @param {number} ammount
-	 * @returns {Array<number>}
+	 * @returns {Vector}
 	 */
 	static vectorAddDir(vector, direction, ammount = 1) {
 		switch (direction) {
 			case "UP":
-				vector[1] = vector[1] - ammount;
+				vector.y = vector.y - ammount;
 				break;
 			case "DOWN":
-				vector[1] = vector[1] + ammount;
+				vector.y = vector.y + ammount;
 				break;
 			case "LEFT":
-				vector[0] = vector[0] - ammount;
+				vector.x = vector.x - ammount;
 				break;
 			case "RIGHT":
-				vector[0] = vector[0] + ammount;
+				vector.x = vector.x + ammount;
 				break;
 		}
 		return vector;
