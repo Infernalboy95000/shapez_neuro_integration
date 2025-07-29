@@ -13,6 +13,7 @@
 		"hideURL": true,
 		"playerChooseMap": false,
 		"forceOpenMap": false,
+		"forcedMapTime": 5,
 		"mapAvailable" : "any_map"
 	}
 }

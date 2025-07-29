@@ -45,6 +45,7 @@ export class NeuroIntegration extends Mod {
 
 	#SaveDefaultSettings() {
 		this.settings.socketURL = DEFAULT_URL;
+		this.settings.forcedMapTime = 5;
 		this.saveSettings();
 	}
 }

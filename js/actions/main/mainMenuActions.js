@@ -9,6 +9,7 @@ export class MainMenuActions {
 	/** @type {Array<BaseActions>} */ #actioners;
 	/** @type {StatusDisplay} */ #StatusDisplay;
 	/** @type {boolean} */ #open = false;
+	/** @type {number} */ #timeout;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
@@ -44,6 +45,9 @@ export class MainMenuActions {
 	menuClosed() {
 		this.#open = false;
 		this.#deactivateActions();
+		if (this.#timeout) {
+			clearTimeout(this.#timeout);
+		}
 	}
 
 	playerSentAction(action) {
@@ -67,7 +71,16 @@ export class MainMenuActions {
 
 	#tryOpenGame() {
 		if (this.#mod.settings.forceOpenMap) {
-			this.#playGameActions.forcePlayMap();
+			const seconds = this.#mod.settings.forcedMapTime;
+			if (seconds > 0) {
+				this.#timeout = setTimeout(() => {
+					this.#playGameActions.forcePlayMap();
+					this.#timeout = null;
+				}, seconds * 1000);
+			}
+			else {
+				this.#playGameActions.forcePlayMap();
+			}
 		}
 		else if (this.#mod.settings.playerChooseMap) {
 			this.#activateActions();
