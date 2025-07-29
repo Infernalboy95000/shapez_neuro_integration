@@ -43,16 +43,7 @@ export class PlayGameActions extends BaseActions {
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#playGame() {
-		const allowedMap = this.#mod.settings.mapAvailable;
-		if (allowedMap == SettingsMenu.NEW_MAP) {
-			return this.#newGame();
-		}
-		else if (allowedMap == SettingsMenu.LAST_MAP) {
-			return this.#continueGame();
-		}
-		else {
-			return this.#tryLoadMapByID(allowedMap);
-		}
+		return this.#playGameOption();
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
@@ -123,5 +114,42 @@ export class PlayGameActions extends BaseActions {
 		}
 
 		return {actions:actions, maps:maps};
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#playGameOption() {
+		const options = [];
+		let maps = [];
+		const allowedMap = this.#mod.settings.mapAvailable;
+		const saves = MapLoader.getCurrentMaps(this.#mod);
+
+		if (saves.length <= 0 || allowedMap == SettingsMenu.NEW_MAP) {
+			options.push(() => {return this.#newGame()});
+		}
+		else if (allowedMap == SettingsMenu.LAST_MAP) {
+			options.push(() => {return this.#continueGame()});
+		}
+		else if (
+			allowedMap == SettingsMenu.ANY_MAP ||
+			allowedMap == SettingsMenu.ANY_OPTION
+		) {
+			for (let i = 0; i < saves.length; i++) {
+				options.push(() => {return this.#tryLoadMap({
+					[PlayGameActionList.map]:saves[i]
+				})});
+			}
+
+			if (allowedMap == SettingsMenu.ANY_OPTION) {
+				options.push(() => {return this.#newGame()});
+				if (saves.length > 0) {
+					options.push(() => {return this.#continueGame()});
+				}
+			}
+		}
+		else {
+			options.push(() => this.#tryLoadMapByID(allowedMap));
+		}
+		const random = Math.floor(Math.random() * options.length);
+		return options[random]();
 	}
 }
