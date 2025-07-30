@@ -1,4 +1,5 @@
 import { Vector } from "shapez/core/vector";
+import { RotationCodes } from "../actions/descriptors/shapes/rotationCodes";
 
 export class RandomUtils {
 
@@ -49,5 +50,33 @@ export class RandomUtils {
 				break;
 		}
 		return vector;
+	}
+
+	/**
+	 * @param {Vector} size
+	 * @param {number} direction
+	 * @returns {Vector}
+	 */
+	static directionalSize(size, direction) {
+		const sizedDirection = new Vector();
+		switch (direction) {
+			case RotationCodes.getAngle("RIGHT"):
+				sizedDirection.x = size.y;
+				sizedDirection.y = size.x;
+				break;
+			case RotationCodes.getAngle("DOWN"):
+				sizedDirection.x = -size.x;
+				sizedDirection.y = size.y;
+				break;
+			case RotationCodes.getAngle("LEFT"):
+				sizedDirection.x = -size.y;
+				sizedDirection.y = -size.x;
+				break;
+			default:
+				sizedDirection.x = size.x;
+				sizedDirection.y = size.y;
+		}
+
+		return sizedDirection;
 	}
 }

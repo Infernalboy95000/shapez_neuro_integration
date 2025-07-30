@@ -7,13 +7,23 @@ export class RotationCodes {
 		["LEFT", 270]
 	])
 
+	static #directions = new Map([
+		["top", this.#codes.get("UP")],
+		["right", this.#codes.get("RIGHT")],
+		["bottom", this.#codes.get("DOWN")],
+		["left", this.#codes.get("LEFT")],
+	])
+
 	/**
 	 * @param {string} direction
 	 * @returns {Number}
 	 * */
 	static getAngle(direction) {
-		if (RotationCodes.#codes.has(direction)) {
-			return RotationCodes.#codes.get(direction);
+		if (this.#codes.has(direction)) {
+			return this.#codes.get(direction);
+		}
+		else if (this.#directions.has(direction)) {
+			return this.#directions.get(direction);
 		}
 		else {
 			return 0;
@@ -25,8 +35,8 @@ export class RotationCodes {
 	 * @returns {string}
 	 * */
 	static getRotationName(angle) {
-		let rotationName = "UP"
-		RotationCodes.#codes.forEach((value, key) => {
+		let rotationName = "UP";
+		this.#codes.forEach((value, key) => {
 			if (value == angle) {
 				rotationName = key;
 			}
@@ -35,10 +45,24 @@ export class RotationCodes {
 	}
 
 	/**
+	 * @param {Number} angle
+	 * @returns {string}
+	 * */
+	static getDirectionName(angle) {
+		let directionName = "top";
+		this.#directions.forEach((value, key) => {
+			if (value == angle) {
+				directionName = key;
+			}
+		});
+		return directionName;
+	}
+
+	/**
 	 * @param {string} direction
 	 * @returns {boolean}
 	 * */
 	static isRotationValid(direction) {
-		return RotationCodes.#codes.has(direction);
+		return this.#codes.has(direction);
 	}
 }

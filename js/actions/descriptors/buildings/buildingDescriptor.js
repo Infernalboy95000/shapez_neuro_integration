@@ -1,27 +1,26 @@
 import { Entity } from "shapez/game/entity";
 import { BeltDescriptor } from "./beltDescriptor";
 import { MinerDescriptor } from "./minerDescriptor";
-import { HubDescriptor } from "./hubDescriptor";
 import { GameRoot } from "shapez/game/root";
 import { MetaBuilding } from "shapez/game/meta_building";
+import { StaticEntityInfo } from "./staticEntityInfo";
+import { ComponentsInfo } from "./components/componentsInfo";
 
 export class BuildingDescriptor {
 	/**
-	 * @param {Entity} building
+	 * @param {Entity} entity
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
-	static describe(building) {
-		const buildingName = building.components.StaticMapEntity.getMetaBuilding().getId();
-		switch (buildingName) {
-			case "belt":
-				return BeltDescriptor.describe(building.components);
-			case "miner":
-				return MinerDescriptor.describe(building.components);
-			case "hub":
-				return HubDescriptor.describe(building.components);
-			default:
-				return {msg:"Unknown building", describedIDs:[]};
+	static describe(entity) {
+		const response = {msg:"", describedIDs:[entity.uid]};
+		response.msg += StaticEntityInfo.describe(entity.components).msg;
+		const description = ComponentsInfo.describe(entity);
+		response.msg += description.msg;
+		for(let i = 0; i < description.describedIDs.length; i++) {
+			response.describedIDs.push(description.describedIDs[i]);
 		}
+
+		return response;
 	}
 
 	/**
