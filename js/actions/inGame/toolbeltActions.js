@@ -21,9 +21,8 @@ export class ToolbeltActions extends BaseActions {
 	};
 
 	activate() {
-		const options = ToolsList.getOptions(
-			this.#toolbeltSelector.getAvailableBuildings()
-		);
+		const buildings = this.#toolbeltSelector.getTranslatedBuildings();
+		const options = ToolsList.getOptions(Array.from(buildings.keys()));
 		super.setOptions(options);
 		super.activate();
 	}
@@ -33,8 +32,9 @@ export class ToolbeltActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryGetBuildingStats(params) {
+		const buildings = this.#toolbeltSelector.getTranslatedBuildings();
 		return this.#toolbeltInfo.buildingInfo(
-			params[ToolsList.build]
-		)
+			buildings.get(params[ToolsList.build])
+		);
 	}
 }

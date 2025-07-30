@@ -1,5 +1,6 @@
 import { Vector } from "shapez/core/vector";
 import { ToolbeltSelector } from "../selectors/toolbeltSelector";
+import { T } from "shapez/translations";
 
 /** Allows building at a single position. */
 export class SingleBuilder {
@@ -108,7 +109,7 @@ export class SingleBuilder {
 					const staticComp = otherEntity.components.StaticMapEntity;
 					const meta = staticComp.getMetaBuilding();
 					return {
-						buildName: meta.getId(),
+						buildName: T.buildings[meta.getId()].default.name,
 						position: new Vector(x, y),
 						removable: meta.getIsRemovable(this.#root)
 					}

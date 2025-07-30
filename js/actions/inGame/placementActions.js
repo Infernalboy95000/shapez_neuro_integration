@@ -30,11 +30,21 @@ export class PlacementActions extends BaseActions {
 	};
 
 	activate() {
+		const buildings = this.#toolbelt.getTranslatedBuildings();
 		const options = PlaceList.getOptions(
-			this.#root, this.#toolbelt.getAvailableBuildings()
+			this.#root, Array.from(buildings.keys())
 		);
 		super.setOptions(options);
 		super.activate();
+	}
+
+	/**
+	 * @param {string} buildName
+	 * @returns {string}
+	 * */
+	#buildKey(buildName) {
+		const buildings = this.#toolbelt.getTranslatedBuildings();
+		return buildings.get(buildName);
 	}
 
 	/**
@@ -43,7 +53,7 @@ export class PlacementActions extends BaseActions {
 	*/
 	#tryPlaceBuilding(params) {
 		return this.#singleBuilder.tryPlaceBuilding(
-			params[PlaceList.build], params[PlaceList.rot],
+			params[this.#buildKey(PlaceList.build)], params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
 		);
 	}
@@ -54,7 +64,7 @@ export class PlacementActions extends BaseActions {
 	*/
 	#tryPlaceBuildingsLine(params) {
 		return this.#massBuilder.tryPlaceBuildingLine(
-			params[PlaceList.build], params[PlaceList.rot],
+			params[this.#buildKey(PlaceList.build)], params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
 			params[PlaceList.dir], params[PlaceList.lineLength]
 		);

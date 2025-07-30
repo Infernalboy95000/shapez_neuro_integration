@@ -1,7 +1,7 @@
 import { Vector } from "shapez/core/vector";
 import { EntityComponentStorage } from "shapez/game/entity_components";
-import { RotationCodes } from "../shapes/rotationCodes";
 import { RandomUtils } from "../../../custom/randomUtils";
+import { T } from "shapez/translations";
 
 export class StaticEntityInfo {
 
@@ -20,9 +20,10 @@ export class StaticEntityInfo {
 		const staticEntity = components.StaticMapEntity;
 		const origin = staticEntity.origin;
 		const entitiyName = staticEntity.getMetaBuilding().getId();
+		const buildName = T.buildings[entitiyName].default.name;
 		const variant = staticEntity.getVariant();
 
-		log.msg = `Found${variant == "default" ? " " : ` ${variant} `}${entitiyName} ` +
+		log.msg = `Found${variant == "default" ? " " : ` ${variant} `}${buildName} ` +
 			`at x: ${origin.x}, y: ${origin.y}.`;
 
 		const direction = staticEntity.rotation;
