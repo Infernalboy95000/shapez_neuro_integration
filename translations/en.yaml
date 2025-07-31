@@ -11,14 +11,15 @@ ingame:
                 This will tell you exactly where you can extract the shapes.
 
             1_1_extractor: >-
-                Place an <strong>extractor</strong> on top of an <strong>uncolored circle shape patch</strong> to extract it!
+                Place an <strong>extractor</strong> on top of an <strong>uncolored circle shape patch</strong> to extract it!<br><br>
+                The extractor outputs shapes to the side it's facing.
 
             1_1_buildings_scan: >-
                 <strong>Scan buildings</strong> to locate where the hub is and accepts items.
 
             1_2_conveyor: >-
-                Connect the extractor with a <strong>conveyor belt</strong> to your hub!<br><br>
-                Tip: Use the <strong>belt planner</strong> to connect the miner to the hub with belts.
+                Connect the extractor with some <strong>conveyor belts</strong> to your hub!<br><br>
+                Tip: Use the <strong>belt planner</strong> to connect the miner to the hub with conveyor belts.
 
             1_3_expand: >-
                 This is <strong>NOT</strong> an idle game! Build more extractors and belts to finish the goal quicker.<br><br>Tip: Place <strong>lines of extractors</strong> and face them in the
@@ -73,11 +74,11 @@ buildings:
     miner:
         default:
             name: &miner Extractor
-            description: Place over a shape or color to extract it. Extracts to the side it's facing.
+            description: Place over a shape or color to extract it. Outputs to the side it's facing.
 
         chainable:
             name: Extractor (Chain)
-            description: Place over a shape or color to extract it. Extracts to the side it's facing. Can be chained.
+            description: Place over a shape or color to extract it. Outputs to the it's facing. Can be chained.
 
     # Internal name for the Tunnel
     underground_belt:

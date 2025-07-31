@@ -53,7 +53,7 @@ export class PlacementActions extends BaseActions {
 	*/
 	#tryPlaceBuilding(params) {
 		return this.#singleBuilder.tryPlaceBuilding(
-			params[this.#buildKey(PlaceList.build)], params[PlaceList.rot],
+			this.#buildKey(params[PlaceList.build]), params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
 		);
 	}
@@ -64,7 +64,7 @@ export class PlacementActions extends BaseActions {
 	*/
 	#tryPlaceBuildingsLine(params) {
 		return this.#massBuilder.tryPlaceBuildingLine(
-			params[this.#buildKey(PlaceList.build)], params[PlaceList.rot],
+			this.#buildKey(params[PlaceList.build]), params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
 			params[PlaceList.dir], params[PlaceList.lineLength]
 		);
