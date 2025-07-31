@@ -4,7 +4,7 @@ import { MinerComponent } from "shapez/game/components/miner";
 import { WireComponent } from "shapez/game/components/wire";
 import { ShapeItem } from "shapez/game/items/shape_item";
 import { GameRoot } from "shapez/game/root";
-import { InGameActions } from "../actions/main/inGameActions";
+import { TutorialChecks } from "../actions/tutorialChecks";
 
 export class TutorialList {
 	static tutorialsByLevel = [
@@ -16,7 +16,7 @@ export class TutorialList {
 				condition: /** @param {GameRoot} root */ root => {
 					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
 
-					if (miners.length === 0 && InGameActions.scanned == false) {
+					if (miners.length === 0 && TutorialChecks.scanned == false) {
 						return true;
 					}
 					else {
@@ -30,7 +30,7 @@ export class TutorialList {
 				condition: /** @param {GameRoot} root */ root => {
 					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
 
-					if (miners.length === 0 && InGameActions.deepScanned == false) {
+					if (miners.length === 0 && TutorialChecks.deepScanned == false) {
 						return true;
 					}
 					else {
@@ -50,7 +50,7 @@ export class TutorialList {
 				condition: /** @param {GameRoot} root */ root => {
 					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
 
-					if (miners.length > 0 && InGameActions.buildingScanned == false) {
+					if (miners.length > 0 && TutorialChecks.buildingScanned == false) {
 						return true;
 					}
 					else {

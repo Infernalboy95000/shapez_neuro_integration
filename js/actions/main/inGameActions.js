@@ -9,11 +9,9 @@ import { ScannerActions } from "../inGame/scannerActions";
 import { CameraActions } from "../inGame/cameraActions";
 import { PinnedActions } from "../inGame/pinnedActions";
 import { ToolbeltActions } from "../inGame/toolbeltActions";
+import { TutorialChecks } from "../tutorialChecks";
 
 export class InGameActions {
-	/** @type {boolean} */ static scanned = false;
-	/** @type {boolean} */ static deepScanned = false;
-	/** @type {boolean} */ static buildingScanned = false;
 	/** @type {boolean} */ static #initialized = false;
 
 	/** @type {import("../../main").NeuroIntegration} */ #mod;
@@ -54,9 +52,9 @@ export class InGameActions {
 	}
 
 	gameClosed() {
-		InGameActions.scanned = false;
-		InGameActions.deepScanned = false;
-		InGameActions.buildingScanned = false;
+		TutorialChecks.scanned = false;
+		TutorialChecks.deepScanned = false;
+		TutorialChecks.buildingScanned = false;
 		this.#deactivateActions();
 	}
 
