@@ -3,7 +3,7 @@ import { SdkAction } from "../sdkActions/sdkAction";
 import { SdkClient } from "../sdkClient";
 
 export class BaseActions {
-	/** @type {Map<string, {action:SdkAction, function:CallableFunction}>} */
+	/** @type {Map<string, {action:SdkAction, active:boolean, function:CallableFunction}>} */
 	#actions = new Map();
 
 	/** @param {Array<SdkAction>} actions */
@@ -15,6 +15,7 @@ export class BaseActions {
 		for (let i = 0; i < actions.length; i++) {
 			this.#actions.set(actions[i].getName(), {
 				action: actions[i],
+				active: false,
 				function: null,
 			});
 		}
@@ -44,11 +45,11 @@ export class BaseActions {
 
 	/** @param {Array<string>} actionNames */
 	activate(actionNames = []) {
-		SdkClient.registerActions(this.#getActionsArray(actionNames));
+		SdkClient.registerActions(this.#getActionsToActivate(actionNames));
 	}
 
 	deactivate() {
-		SdkClient.removeActions(this.#getKeysArray());
+		SdkClient.removeActions(this.#getKeysToDeactivate());
 	}
 
 	/**
@@ -58,6 +59,10 @@ export class BaseActions {
 	tryAction(data) {
 		if (this.#actions.has(data.name)) {
 			const obj = this.#actions.get(data.name);
+			if (!obj.active) {
+				return {valid: false, msg: "You can't execute this action now"};
+			}
+
 			const response = obj.action.checkResponse(data);
 			if (response.valid) {
 				return obj.function(data.params);
@@ -75,20 +80,26 @@ export class BaseActions {
 	 * @param {Array<string>} filter
 	 * @returns {Array<SdkAction>}
 	 * */
-	#getActionsArray(filter = []) {
+	#getActionsToActivate(filter = []) {
 		const actions = [];
 		this.#actions.forEach((value, key) => {
-			if (filter.length <= 0 || filter.includes(key))
-			actions.push(value.action);
+			if (!value.active && (filter.length <= 0 || filter.includes(key))) {
+				actions.push(value.action);
+				value.active = true;
+				this.#actions.set(key, value);
+			}
 		});
+
 		return actions;
 	}
 
 	/** @returns {Array<string>} */
-	#getKeysArray() {
+	#getKeysToDeactivate() {
 		const keys = [];
-		this.#actions.forEach((_, key) => {
+		this.#actions.forEach((value, key) => {
 			keys.push(key);
+			value.active = false;
+			this.#actions.set(key, value);
 		});
 		return keys;
 	}
