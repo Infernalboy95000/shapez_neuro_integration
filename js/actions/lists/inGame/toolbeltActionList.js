@@ -1,6 +1,6 @@
-import { EnumSchema } from "../../sdkActions/schema/enumSchema";
-import { SchemaBase } from "../../sdkActions/schema/schemaBase";
-import { SdkAction } from "../../sdkActions/sdkAction";
+import { EnumSchema } from "../../../sdkActions/schema/enumSchema";
+import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
+import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class ToolsList {
 	static getStats = "get_building_info";

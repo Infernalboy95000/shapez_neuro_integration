@@ -10,6 +10,8 @@ import { CameraActions } from "../inGame/cameraActions";
 import { PinnedActions } from "../inGame/pinnedActions";
 import { ToolbeltActions } from "../inGame/toolbeltActions";
 import { TutorialChecks } from "../tutorialChecks";
+import { GameMenusActions } from "../inGame/gameMenusActions";
+import { InGameState } from "shapez/states/ingame";
 
 export class InGameActions {
 	/** @type {boolean} */ static #initialized = false;
@@ -27,15 +29,6 @@ export class InGameActions {
 		this.#mod = mod;
 		this.#root = root;
 
-		this.#actioners = [
-			new PlacementActions(root),
-			new DeletionActions(root),
-			new ScannerActions(root),
-			new CameraActions(root),
-			new PinnedActions(root),
-			new ToolbeltActions(root),
-		]
-
 		if (!InGameActions.#initialized) {
 			this.#initialize();
 		}
@@ -43,8 +36,10 @@ export class InGameActions {
 		//this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
 	}
 
-	gameOpenned() {
+	/** @param {InGameState} state */
+	gameOpenned(state) {
 		if (SdkClient.isConnected()) {
+			this.#declareActions(state);
 			this.#connectEvents();
 			this.#announceOpening();
 			this.#activateActions();
@@ -82,6 +77,20 @@ export class InGameActions {
 				return true;
 			}
 		);
+	}
+
+	/** @param {InGameState} state */
+	#declareActions(state) {
+		if (this.#actioners) { return; }
+		this.#actioners = [
+			new PlacementActions(this.#root),
+			new DeletionActions(this.#root),
+			new ScannerActions(this.#root),
+			new CameraActions(this.#root),
+			new PinnedActions(this.#root),
+			new ToolbeltActions(this.#root),
+			new GameMenusActions(this.#root, state),
+		]
 	}
 
 	#announceOpening() {

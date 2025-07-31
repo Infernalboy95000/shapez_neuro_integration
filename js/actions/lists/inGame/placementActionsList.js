@@ -1,9 +1,9 @@
-import { BoolSchema } from "../../sdkActions/schema/boolSchema";
-import { EnumSchema } from "../../sdkActions/schema/enumSchema";
-import { NumberSchema } from "../../sdkActions/schema/numberSchema";
-import { SchemaBase } from "../../sdkActions/schema/schemaBase";
-import { SdkAction } from "../../sdkActions/sdkAction";
-import { ViewScanner } from "../descriptors/camera/viewScanner";
+import { BoolSchema } from "../../../sdkActions/schema/boolSchema";
+import { EnumSchema } from "../../../sdkActions/schema/enumSchema";
+import { NumberSchema } from "../../../sdkActions/schema/numberSchema";
+import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
+import { SdkAction } from "../../../sdkActions/sdkAction";
+import { ViewScanner } from "../../descriptors/camera/viewScanner";
 
 export class PlaceList {
 	static placeBuild = "place_building";

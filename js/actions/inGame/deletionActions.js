@@ -1,7 +1,7 @@
 import { BaseActions } from "../baseActions";
 import { MassDeleter } from "../executers/deleters/massDeleter";
 import { SingleDeleter } from "../executers/deleters/singleDeleter";
-import { DelList } from "../lists/deletionActionsList";
+import { DelList } from "../lists/inGame/deletionActionsList";
 
 /** Manages all actions related to deletion. */
 export class DeletionActions extends BaseActions {

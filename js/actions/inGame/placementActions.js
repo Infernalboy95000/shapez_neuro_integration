@@ -3,7 +3,7 @@ import { BeltPlannerBuilder } from "../executers/builders/beltPlannerBuilder";
 import { MassBuilder } from "../executers/builders/massBuilder";
 import { SingleBuilder } from "../executers/builders/singleBuilder";
 import { ToolbeltSelector } from "../executers/selectors/toolbeltSelector";
-import { PlaceList } from "../lists/placementActionsList";
+import { PlaceList } from "../lists/inGame/placementActionsList";
 
 /** Manages all actions related to placement. */
 export class PlacementActions extends BaseActions {

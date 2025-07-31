@@ -1,7 +1,7 @@
-import { NumberSchema } from "../../sdkActions/schema/numberSchema";
-import { SchemaBase } from "../../sdkActions/schema/schemaBase";
-import { SdkAction } from "../../sdkActions/sdkAction";
-import { ViewScanner } from "../descriptors/camera/viewScanner";
+import { NumberSchema } from "../../../sdkActions/schema/numberSchema";
+import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
+import { SdkAction } from "../../../sdkActions/sdkAction";
+import { ViewScanner } from "../../descriptors/camera/viewScanner";
 
 export class ScanList {
 	static scanTerrain = "scan_terrain";

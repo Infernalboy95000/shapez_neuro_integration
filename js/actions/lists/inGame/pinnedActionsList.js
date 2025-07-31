@@ -1,4 +1,4 @@
-import { SdkAction } from "../../sdkActions/sdkAction";
+import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class PinList {
 	static goal = "show_current_goal";

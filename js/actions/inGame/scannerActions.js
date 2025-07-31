@@ -1,7 +1,7 @@
 import { BaseActions } from "../baseActions";
 import { BuildingScanner } from "../executers/scanners/buildingScanner";
 import { PatchScanner } from "../executers/scanners/patchScanner";
-import { ScanList } from "../lists/scannerActionList";
+import { ScanList } from "../lists/inGame/scannerActionList";
 import { TutorialChecks } from "../tutorialChecks";
 
 export class ScannerActions extends BaseActions {

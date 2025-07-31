@@ -1,7 +1,7 @@
 import { BaseActions } from "../baseActions";
 import { ToolbeltSelector } from "../executers/selectors/toolbeltSelector";
 import { ToolbeltInfo } from "../executers/toolbelt/toolbeltInfo";
-import { ToolsList } from "../lists/toolbeltActionList";
+import { ToolsList } from "../lists/inGame/toolbeltActionList";
 
 export class ToolbeltActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;

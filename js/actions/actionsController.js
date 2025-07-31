@@ -1,3 +1,4 @@
+import { InGameState } from "shapez/states/ingame";
 import { SdkClient } from "../sdkClient";
 import { InGameActions } from "./main/inGameActions";
 import { MainMenuActions } from "./main/mainMenuActions";
@@ -11,6 +12,7 @@ export class ActionsController {
 	/** @type {MainMenuActions} */ #mainMenuActions;
 	/** @type {SettingsActions} */ #settingsActions;
 	/** @type {InGameActions} */ #inGameActions;
+	/** @type {InGameState} */ #gameState;
 
 	/** @param {import("../main").NeuroIntegration} mod */
 	constructor(mod) {
@@ -32,8 +34,9 @@ export class ActionsController {
 				this.#settingsActions.menuOpenned();
 				break;
 			case "InGameState":
+				this.#gameState = state;
 				if (this.#inGameActions) {
-					this.#inGameActions.gameOpenned();
+					this.#inGameActions.gameOpenned(state);
 				}
 				break;
 		}
@@ -42,7 +45,7 @@ export class ActionsController {
 	/** @param {import("shapez/game/root").GameRoot} root */
 	newGameOpenned(root) {
 		this.#inGameActions = new InGameActions(this.#mod, root);
-		this.#inGameActions.gameOpenned();
+		this.#inGameActions.gameOpenned(this.#gameState);
 	}
 
 	#notifyCloseOfMenus() {
