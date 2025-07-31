@@ -1,11 +1,8 @@
 import { EntityComponentStorage } from "shapez/game/entity_components";
-import { RotationCodes } from "../shapes/rotationCodes";
+import { RotationCodes } from "../../shapes/rotationCodes";
 import { Entity } from "shapez/game/entity";
 
-export class BeltDescriptor {
-	static info = `Transports shapes from it's back to the side it's facing.\r\n` +
-	`Can bend to it's left or right if connected to other buildings or belts.`;
-
+export class BeltInfo {
 	/**
 	 * @param {EntityComponentStorage} belt
 	 * @returns {{msg:string, describedIDs:Array<number>}}
@@ -18,10 +15,8 @@ export class BeltDescriptor {
 		}
 		else {
 			const entity = belt.StaticMapEntity;
-			const origin = entity.origin;
-			const rotName = RotationCodes.getRotationName(entity.rotation);
-			log.msg = `Found belt at x: ${origin.x}, y: ${origin.y} ` + 
-			`facing ${rotName}`;
+			const rotName = RotationCodes.getRotationName(entity.originalRotation);
+			log.msg = `It's facing ${rotName}`;
 		}
 
 		return log;
@@ -36,7 +31,7 @@ export class BeltDescriptor {
 		let origin = path[0].components.StaticMapEntity.origin;
 		const dir = path[0].components.StaticMapEntity.originalRotation;
 		const dirName = RotationCodes.getRotationName(dir);
-		log.msg = `Found belt line. Starts it's path at: ` +
+		log.msg = `Belt line starting it's path at: ` +
 		`x: ${origin.x}, y: ${origin.y} facing ${dirName}.`;
 
 		let lastDirection = path[0].components.StaticMapEntity.originalRotation;
@@ -44,6 +39,8 @@ export class BeltDescriptor {
 			const entity = path[i].components.StaticMapEntity;
 			const currentDirection = entity.originalRotation;
 			const rotName = RotationCodes.getRotationName(currentDirection);
+			const altDir = entity.rotation;
+			const rotRot = RotationCodes.getRotationName(altDir);
 			origin = entity.origin;
 
 			if (i + 1 >= path.length) {
@@ -56,9 +53,12 @@ export class BeltDescriptor {
 				}
 			}
 			else if (lastDirection != currentDirection) {
-				
 				log.msg += ` Faces ${rotName} at x: ${origin.x}, y: ${origin.y}.`;
 				lastDirection = currentDirection;
+			}
+			else if (lastDirection != altDir) {
+				log.msg += ` Faces ${rotRot} at x: ${origin.x}, y: ${origin.y}.`;
+				lastDirection = altDir;
 			}
 			log.describedIDs.push(path[i].uid);
 		}

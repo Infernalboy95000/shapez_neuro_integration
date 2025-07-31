@@ -60,6 +60,9 @@ buildings:
         toUnlock: to unlock
         levelShortcut: LVL
         endOfDemo: End of Demo
+        default:
+            name: Hub
+            description: Main building. Give it the shape it wants to progress to the next level.
 
     belt:
         default:

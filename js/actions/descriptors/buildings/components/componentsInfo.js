@@ -1,11 +1,13 @@
 import { Entity } from "shapez/game/entity";
 import { ItemAcceptorInfo } from "./ItemAcceptorInfo";
 import { ItemEjectorInfo } from "./ItemEjectorInfo";
+import { BeltInfo } from "./beltInfo";
 
 export class ComponentsInfo {
 	static components = {
 		"ItemAcceptor": (e) => {return ItemAcceptorInfo.describe(e)},
-		"ItemEjector": (e) => {return ItemEjectorInfo.describe(e)}
+		"ItemEjector": (e) => {return ItemEjectorInfo.describe(e)},
+		"Belt": (e) => {return BeltInfo.describe(e)}
 	}
 
 	/**
