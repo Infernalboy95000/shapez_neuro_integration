@@ -4,13 +4,14 @@ import { ComponentsInfo } from "./components/componentsInfo";
 
 export class BuildingDescriptor {
 	/**
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {Entity} entity
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
-	static describe(entity) {
+	static describe(root, entity) {
 		//console.log(entity);
 		const response = {msg:"", describedIDs:[entity.uid]};
-		response.msg += `${StaticEntityInfo.describe(entity.components).msg}\r\n`;
+		response.msg += `${StaticEntityInfo.describe(root, entity.components).msg}\r\n`;
 		const description = ComponentsInfo.describe(entity);
 		response.msg += description.msg;
 		for(let i = 0; i < description.describedIDs.length; i++) {

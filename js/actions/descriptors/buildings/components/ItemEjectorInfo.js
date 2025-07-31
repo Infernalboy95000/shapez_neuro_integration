@@ -41,7 +41,9 @@ export class ItemEjectorInfo {
 			rotation += baseRot;
 			if (rotation >= 360) { rotation -= 360; }
 			const direction = RotationCodes.getDirectionName(rotation);
+			
 			let rotPos = RandomUtils.directionalSize(slots[i].pos, baseRot);
+			rotPos = RandomUtils.vectorAddDir(rotPos, direction, 1);
 			const pos = rotPos.add(origin);
 
 			let accceptors;

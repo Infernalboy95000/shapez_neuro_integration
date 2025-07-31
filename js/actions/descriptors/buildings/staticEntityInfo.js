@@ -6,14 +6,15 @@ import { T } from "shapez/translations";
 export class StaticEntityInfo {
 
 	/**
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {EntityComponentStorage} components
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 */
-	static describe(components) {
+	static describe(root, components) {
 		const log = {msg:"", describedIDs:[]};
 		// We skip belts due to them having diferent introductions
 		const belt = components.Belt;
-		if (belt && belt.assignedPath.entityPath.length > 0) {
+		if (belt && belt.assignedPath.entityPath.length > 1) {
 			return log;
 		}
 
@@ -29,13 +30,13 @@ export class StaticEntityInfo {
 		const direction = staticEntity.rotation;
 		const size = RandomUtils.directionalSize(staticEntity.getTileSize(), direction);
 		const sizeAbs = size.abs();
-		if (size != new Vector(1, 1)) {
+		if (!size.equals(new Vector(1, 1))) {
 			log.msg +=`\r\nIt's ` +
 			`${sizeAbs.x} tile${sizeAbs.x > 1 ? "s" : ""} long in x ${size.x > 0 ? "positive" : "negative"}, `+
 			`${sizeAbs.y} tile${sizeAbs.y > 1 ? "s" : ""} tall in y ${size.y > 0 ? "positive" : "negative"}.`;
 		}
 
-		if (!staticEntity.getMetaBuilding().getIsRemovable) {
+		if (!staticEntity.getMetaBuilding().getIsRemovable(root)) {
 			log.msg += "\r\nWarning: It cannot be removed!"
 		}
 		return log;

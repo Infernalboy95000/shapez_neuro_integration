@@ -30,22 +30,26 @@ export class RandomUtils {
 
 	/**
 	 * @param {Vector} vector
-	 * @param {("UP"|"DOWN"|"LEFT"|"RIGHT")} direction
+	 * @param {string} direction
 	 * @param {number} ammount
 	 * @returns {Vector}
 	 */
 	static vectorAddDir(vector, direction, ammount = 1) {
 		switch (direction) {
 			case "UP":
+			case "top":
 				vector.y = vector.y - ammount;
 				break;
 			case "DOWN":
+			case "bottom":
 				vector.y = vector.y + ammount;
 				break;
 			case "LEFT":
+			case "left":
 				vector.x = vector.x - ammount;
 				break;
 			case "RIGHT":
+			case "right":
 				vector.x = vector.x + ammount;
 				break;
 		}
@@ -54,12 +58,12 @@ export class RandomUtils {
 
 	/**
 	 * @param {Vector} size
-	 * @param {number} direction
+	 * @param {number} angle
 	 * @returns {Vector}
 	 */
-	static directionalSize(size, direction) {
+	static directionalSize(size, angle) {
 		const sizedDirection = new Vector();
-		switch (direction) {
+		switch (angle) {
 			case RotationCodes.getAngle("RIGHT"):
 				sizedDirection.x = size.y;
 				sizedDirection.y = size.x;

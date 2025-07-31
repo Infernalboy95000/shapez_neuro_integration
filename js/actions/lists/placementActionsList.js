@@ -17,7 +17,7 @@ export class PlaceList {
 			"Place an entire straight line of buildings at once."
 		),
 		new SdkAction(PlaceList.beltPlanner,
-			"Place belts in a path from one point to the other."
+			"Place belts from one point to the other, in an 'L' shaped path."
 		)
 	];
 

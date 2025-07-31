@@ -46,6 +46,7 @@ export class ItemAcceptorInfo {
 			const direction = RotationCodes.getDirectionName(rotation);
 
 			let rotPos = RandomUtils.directionalSize(slots[i].pos, baseRot);
+			rotPos = RandomUtils.vectorAddDir(rotPos, direction, 1);
 			const pos = rotPos.add(origin);
 			let filter = slots[i].filter;
 			let inputs;

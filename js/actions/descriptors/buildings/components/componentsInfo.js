@@ -19,7 +19,9 @@ export class ComponentsInfo {
 		for (const [key, _] of Object.entries(entity.components)) {
 			if (this.components[key]) {
 				const response = this.components[key](entity.components);
-				result.msg += `${response.msg}\r\n`;
+				if (response.msg != "\n" && response.msg != "\r\n" && response.msg != "") {
+					result.msg += `${response.msg}`;
+				}
 				for (let i = 0; i < response.describedIDs.length; i++) {
 					result.describedIDs.push(response.describedIDs[i]);
 				}
