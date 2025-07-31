@@ -12,15 +12,23 @@ export class BuildingStats {
 		let msg = "";
 		//TODO: Add variants to this
 		const displayName = T.buildings[building.getId()].default.name;
-		const info = T.buildings[building.getId()].default.description;
+		let info = "";
+
+		if (!root.app.settings.getAllSettings().compactBuildingInfo) {
+			info = T.buildings[building.getId()].default.description;
+		}
+
 		if (info != "") {
 			msg = `${displayName}: ${info}\r\n`;
+			if (stats.length > 0) {
+				msg += "Stats: "
+			}
 		}
 		else if (stats.length > 0) {
 			msg = `Stats for ${displayName}: `;
 		}
 		else {
-			msg += "Stats: "
+			msg = `No stats on this building.`;
 		}
 
 		for (let i = 0; i < stats.length; i++) {
