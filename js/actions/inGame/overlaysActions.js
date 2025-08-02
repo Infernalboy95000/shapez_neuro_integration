@@ -1,7 +1,8 @@
 import { InGameState } from "shapez/states/ingame";
 import { BaseActions } from "../baseActions";
-import { GameMenusActionList } from "../lists/inGame/gameMenusActionList";
-export class GameMenusActions extends BaseActions {
+import { OverlaysActionList } from "../lists/inGame/overlaysActionList";
+import { TestShop } from "../descriptors/overlays/testShop";
+export class OverlaysActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {InGameState} */ #state;
 
@@ -10,15 +11,15 @@ export class GameMenusActions extends BaseActions {
 	 * @param {InGameState} state
 	 * */
 	constructor(root, state) {
-		super(GameMenusActionList.actions);
+		super(OverlaysActionList.actions);
 		super.addCallables(new Map([
-			[GameMenusActionList.openUpgrades,
+			[OverlaysActionList.openUpgrades,
 				() => { return this.#openUpgradesMenu()}],
-			[GameMenusActionList.openStats,
+			[OverlaysActionList.openStats,
 				() => { return this.#openStatsMenu()}],
-			[GameMenusActionList.saveGame,
+			[OverlaysActionList.saveGame,
 				() => { return this.#saveGame()}],
-			[GameMenusActionList.pauseGame,
+			[OverlaysActionList.pauseGame,
 				() => { return this.#pauseGame()}],
 		]));
 
@@ -28,8 +29,7 @@ export class GameMenusActions extends BaseActions {
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#openUpgradesMenu() {
-		this.#root.hud.parts.shop.show();
-		return {valid:true, msg:"openned the upgrades menu"};
+		return TestShop.test(this.#root);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */

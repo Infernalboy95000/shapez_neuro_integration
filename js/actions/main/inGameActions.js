@@ -10,8 +10,9 @@ import { CameraActions } from "../inGame/cameraActions";
 import { PinnedActions } from "../inGame/pinnedActions";
 import { ToolbeltActions } from "../inGame/toolbeltActions";
 import { TutorialChecks } from "../tutorialChecks";
-import { GameMenusActions } from "../inGame/gameMenusActions";
+import { OverlaysActions } from "../inGame/overlaysActions";
 import { InGameState } from "shapez/states/ingame";
+import { UpgradesActions } from "../overlay/upgradesActions";
 
 export class InGameActions {
 	/** @type {boolean} */ static #initialized = false;
@@ -89,7 +90,8 @@ export class InGameActions {
 			new CameraActions(this.#root),
 			new PinnedActions(this.#root),
 			new ToolbeltActions(this.#root),
-			new GameMenusActions(this.#root, state),
+			new OverlaysActions(this.#root, state),
+			new UpgradesActions(this.#root)
 		]
 	}
 

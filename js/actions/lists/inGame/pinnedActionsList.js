@@ -8,7 +8,7 @@ export class PinList {
 			"Describe what's the current shape you have to deliver to the HUB in order to get to the next level."
 		),
 		new SdkAction(PinList.pinned,
-			"Get the list of shapes you have pinned. Those are probably related to upgrade goals."
+			"Get the list of shapes you have pinned. Those are related to upgrade goals."
 		)
 	];
 }

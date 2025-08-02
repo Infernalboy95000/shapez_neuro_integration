@@ -1,6 +1,6 @@
 import { SdkAction } from "../../../sdkActions/sdkAction";
 
-export class GameMenusActionList {
+export class OverlaysActionList {
 	static openUpgrades = "open_upgrades";
 	static openStats = "open_statistics";
 	static saveGame = "save_game";
