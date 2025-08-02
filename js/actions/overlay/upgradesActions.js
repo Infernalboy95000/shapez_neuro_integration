@@ -1,10 +1,12 @@
 import { BaseActions } from "../baseActions";
 import { UpgradesPanelController } from "../executers/overlays/upgradesPanelController";
+import { ShapesPinner } from "../executers/pinners/shapesPinner";
 import { UpgradesActionList } from "../lists/overlays/upgradesActionList";
 
 export class UpgradesActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {UpgradesPanelController} */ #panel;
+	/** @type {ShapesPinner} */ #pinner;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
@@ -20,6 +22,7 @@ export class UpgradesActions extends BaseActions {
 
 		this.#root = root;
 		this.#panel = new UpgradesPanelController(root);
+		this.#pinner = new ShapesPinner(root);
 	};
 
 	activate() {
@@ -52,6 +55,7 @@ export class UpgradesActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryPinShape(params) {
+		return this.#pinner.pinShape(params[UpgradesActionList.shapeToPin]);
 	}
 
 	/**
@@ -60,6 +64,7 @@ export class UpgradesActions extends BaseActions {
 	*/
 
 	#tryUnpinShape(params) {
+		return this.#pinner.unpinShape(params[UpgradesActionList.shapeToUnpin]);
 	}
 
 	/**
