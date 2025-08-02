@@ -91,6 +91,30 @@ export class UpgradesPanelController {
 		return result;
 	}
 
+	/**
+	 * @param {string} shapeCode
+	 * @returns {{valid:boolean, msg:string}}
+	 */
+	tryShowAsPinned(shapeCode) {
+		const result = this.#tryGetPinnedShape(shapeCode);
+		if (result.valid) {
+			UpgradesDescriptor.showAsPinned(shapeCode);
+		}
+		return result;
+	}
+
+	/**
+	 * @param {string} shapeCode
+	 * @returns {{valid:boolean, msg:string}}
+	 */
+	tryShowAsUnpinned(shapeCode) {
+		const result = this.#tryGetPinnedShape(shapeCode);
+		if (result.valid) {
+			UpgradesDescriptor.showAsUnpinned(shapeCode);
+		}
+		return result;
+	}
+
 	closePanel() {
 		this.#shop.close();
 	}
@@ -108,5 +132,17 @@ export class UpgradesPanelController {
 			}
 		}
 		return "";
+	}
+
+	/**
+	 * @param {string} shapeCode
+	 * @returns {{valid:boolean, msg:string}}
+	 */
+	#tryGetPinnedShape(shapeCode) {
+		const result = {valid:false, msg:"shape is not on the upgrades list."};
+		if (UpgradesDescriptor.getPinForShape(shapeCode)) {
+			result.valid = true;
+		}
+		return result;
 	}
 }

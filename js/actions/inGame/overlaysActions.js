@@ -1,7 +1,7 @@
 import { InGameState } from "shapez/states/ingame";
 import { BaseActions } from "../baseActions";
 import { OverlaysActionList } from "../lists/inGame/overlaysActionList";
-import { TestShop } from "../descriptors/overlays/testShop";
+
 export class OverlaysActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {InGameState} */ #state;
@@ -29,7 +29,8 @@ export class OverlaysActions extends BaseActions {
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#openUpgradesMenu() {
-		return TestShop.test(this.#root);
+		this.#root.hud.parts.shop.show();
+		return {valid:true, msg:"openned upgrades menu"};
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */

@@ -55,7 +55,11 @@ export class UpgradesActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryPinShape(params) {
-		return this.#pinner.pinShape(params[UpgradesActionList.shapeToPin]);
+		const result = this.#panel.tryShowAsPinned(params[UpgradesActionList.shapeToPin]);
+		if (result.valid) {
+			return this.#pinner.pinShape(params[UpgradesActionList.shapeToPin]);
+		}
+		return result;
 	}
 
 	/**
@@ -64,7 +68,11 @@ export class UpgradesActions extends BaseActions {
 	*/
 
 	#tryUnpinShape(params) {
-		return this.#pinner.unpinShape(params[UpgradesActionList.shapeToUnpin]);
+		const result = this.#panel.tryShowAsUnpinned(params[UpgradesActionList.shapeToUnpin]);
+		if (result.valid) {
+			return this.#pinner.unpinShape(params[UpgradesActionList.shapeToUnpin]);
+		}
+		return result;
 	}
 
 	/**

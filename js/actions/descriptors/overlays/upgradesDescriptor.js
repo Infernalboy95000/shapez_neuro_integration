@@ -3,6 +3,49 @@ import { HUDShop } from "shapez/game/hud/parts/shop";
 import { T } from "shapez/translations";
 
 export class UpgradesDescriptor {
+	/** @type {Map<string, HTMLButtonElement>} */
+	static #pinButtons = new Map();
+
+	static clearPins() {
+		this.#pinButtons.clear();
+	}
+
+	/**
+	 * @param {string} shapeCode
+	 * @returns {HTMLButtonElement}
+	 * */
+	static getPinForShape(shapeCode) {
+		return this.#pinButtons.get(shapeCode);
+	}
+
+	/**
+	 * @param {string} shapeCode
+	 * @returns {boolean}
+	 * */
+	static showAsPinned(shapeCode) {
+		const button = this.getPinForShape(shapeCode);
+		if (button) {
+			button.classList.add("pinned");
+			button.classList.remove("unpinned");
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @param {string} shapeCode
+	 * @returns {boolean}
+	 * */
+	static showAsUnpinned(shapeCode) {
+		const button = this.getPinForShape(shapeCode);
+		if (button) {
+			button.classList.add("unpinned");
+			button.classList.remove("pinned", "alreadyPinned");
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {string} filter
@@ -11,6 +54,9 @@ export class UpgradesDescriptor {
 	static getInfo(root, filter = "") {
 		/** @type {HUDShop} */
 		const shop = root.hud.parts.shop;
+		const pins = this.#collectPins();
+		let currentPin = 0;
+
 		let msg = "";
 		const upgrades = root.gameMode.getUpgrades();
 		for (const id in shop.upgradeToElements) {
@@ -33,12 +79,28 @@ export class UpgradesDescriptor {
 				`\r\nShapes required to upgrade to x${newMultStr} boost:`;
 
 			tierHandle.required.forEach(({ shape, amount }) => {
-				//const shapeDef = root.shapeDefinitionMgr.getShapeFromShortKey(shape);
+				if (pins.length > currentPin) {
+					this.#pinButtons.set(shape, pins[currentPin]);
+					currentPin += 1;
+				}
+
 				const have = root.hubGoals.getShapesStoredByKey(shape);
 				msg += `\r\nYou have ${have} out of ${amount} required shapes with code: ${shape}`;
 			});
 		}
 
 		return msg;
+	}
+
+	/** @returns {Array<HTMLButtonElement>} */
+	static #collectPins() {
+		let buttons = [];
+		const shop = document.getElementById("ingame_HUD_Shop");
+		if (shop) {
+			shop.querySelectorAll('button.pin').forEach((value) => {
+				buttons.push(value);
+			});
+		}
+		return buttons;
 	}
 }
