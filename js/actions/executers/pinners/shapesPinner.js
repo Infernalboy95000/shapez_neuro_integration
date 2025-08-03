@@ -14,7 +14,7 @@ export class ShapesPinner {
 	 * @param {string} shapeCode
 	 * @returns {{valid:boolean, msg:string}}
 	 */
-	pinShape(shapeCode) {
+	tryPinShape(shapeCode) {
 		const shape = this.#root.shapeDefinitionMgr.getShapeFromShortKey(shapeCode);
 		const result = this.#isShapeValid(shape);
 		if (!result.valid) { return result; }
@@ -43,7 +43,7 @@ export class ShapesPinner {
 	 * @param {string} shapeCode
 	 * @returns {{valid:boolean, msg:string}}
 	 */
-	unpinShape(shapeCode) {
+	tryUnpinShape(shapeCode) {
 		const shape = this.#root.shapeDefinitionMgr.getShapeFromShortKey(shapeCode);
 		const result = this.#isShapeValid(shape);
 		if (!result.valid) { return result; }

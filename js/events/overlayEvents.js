@@ -1,62 +1,99 @@
 import { HUDShop } from "shapez/game/hud/parts/shop";
 import { ActionsCollection } from "../actions/base/actionsCollection";
+import { HUDShapeViewer } from "shapez/game/hud/parts/shape_viewer";
+import { ShapeDefinition } from "shapez/game/shape_definition";
 
 export class OverlayEvents {
-		/** @param {import("../main").NeuroIntegration} mod */
-		constructor(mod) {
-			const thisClass = this;
-			//this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
+	/** @type {ShapeDefinition} */ static lastShapeDescribed;
+	/** @type {string} */ #lastOverlay = "none";
 
-			mod.modInterface.runAfterMethod( HUDShop, "show",
-				function() { thisClass.#upgradesOpenned(); }
-			);
+	/** @param {import("../main").NeuroIntegration} mod */
+	constructor(mod) {
+		const thisClass = this;
+		//this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
 
-			mod.modInterface.runAfterMethod( HUDShop, "close",
-				function() { thisClass.#upgradesClosed(); }
-			);
+		mod.modInterface.runAfterMethod( HUDShop, "show",
+			function() { thisClass.#upgradesOpenned(); }
+		);
 
-			//this.#root.hud.signals.unlockNotificationFinished.add(() => {this.#testCrazy()});
-			//this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
-		}
+		mod.modInterface.runAfterMethod( HUDShop, "close",
+			function() { thisClass.#upgradesClosed(); }
+		);
 
-		#upgradesOpenned() {
-			ActionsCollection.deactivateActions([
-				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-			])
+		mod.modInterface.runAfterMethod( HUDShapeViewer, "renderForShape",
+			function(shape) {
+				OverlayEvents.lastShapeDescribed = shape;
+				thisClass.#fullShapeView();
+			}
+		);
+
+		mod.modInterface.runAfterMethod( HUDShapeViewer, "close",
+			function() { thisClass.#fullShapeClose(); }
+		);
+
+		//this.#root.hud.signals.unlockNotificationFinished.add(() => {this.#testCrazy()});
+		//this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
+	}
+
+	#upgradesOpenned() {
+		this.#lastOverlay = "shop";
+		ActionsCollection.deactivateActions([
+			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+		])
+		ActionsCollection.activateActions(["shop"]);
+	}
+
+	#upgradesClosed() {
+		this.#lastOverlay = "none";
+		ActionsCollection.deactivateActions(["shop"]);
+		ActionsCollection.activateActions([
+			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+		])
+	}
+
+	#fullShapeView() {
+		ActionsCollection.deactivateActions([
+			"build", "delete", "scan", "camera", "pin", "tools", "overlay", "shop"
+		])
+		ActionsCollection.activateActions(["shape"]);
+	}
+
+	#fullShapeClose() {
+		ActionsCollection.deactivateActions(["shape"]);
+		if (this.#lastOverlay == "shop") {
 			ActionsCollection.activateActions(["shop"]);
 		}
-
-		#upgradesClosed() {
-			ActionsCollection.deactivateActions(["shop"]);
+		else {
 			ActionsCollection.activateActions([
 				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
 			])
 		}
+	}
 
-		/**
-		 * @param {number} level
-		 * @param {enumHubGoalRewards} reward
-		 */
-		/*
-		#onStoryGoalCompleted(level, reward) {
-			const levels = this.#root.gameMode.getLevelDefinitions();
-	
-			if (level <= levels.length) {
-				//this.#actions.removeAllActions();
-				const desc = T.storyRewards[reward].desc;
-				const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");
-	
-				SdkClient.sendMessage(
-					`Level ${level} completed! \r\n` +
-					`${descText}`
-				)
-				//this.#notificationActions.activateActions();
-			}
-			else {
-				SdkClient.sendMessage(
-					`Level ${level} completed! Good luck on your next piece.`
-				)
-			}
+	/**
+	 * @param {number} level
+	 * @param {enumHubGoalRewards} reward
+	 */
+	/*
+	#onStoryGoalCompleted(level, reward) {
+		const levels = this.#root.gameMode.getLevelDefinitions();
+
+		if (level <= levels.length) {
+			//this.#actions.removeAllActions();
+			const desc = T.storyRewards[reward].desc;
+			const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");
+
+			SdkClient.sendMessage(
+				`Level ${level} completed! \r\n` +
+				`${descText}`
+			)
+			//this.#notificationActions.activateActions();
 		}
-		*/
+		else {
+			SdkClient.sendMessage(
+				`Level ${level} completed! Good luck on your next piece.`
+			)
+		}
+	}
+	*/
 }

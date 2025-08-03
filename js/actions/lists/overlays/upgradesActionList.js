@@ -3,12 +3,12 @@ import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
 import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class UpgradesActionList {
-	static getInfo = "get_info";
+	static getInfo = "get_upgrades_info";
 	static upgrade = "upgrade";
 	static pinShape = "pin_shape";
 	static unpinShape = "unpin_shape";
 	static shapeInfo = "get_shape_details";
-	static close = "close_menu";
+	static close = "close_upgrades_menu";
 	static actions = [
 		new SdkAction(this.getInfo,
 			"Get all the upgrade(s) information, like their required shapes."

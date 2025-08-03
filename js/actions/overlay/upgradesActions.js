@@ -57,7 +57,7 @@ export class UpgradesActions extends BaseActions {
 	#tryPinShape(params) {
 		const result = this.#panel.tryShowAsPinned(params[UpgradesActionList.shapeToPin]);
 		if (result.valid) {
-			return this.#pinner.pinShape(params[UpgradesActionList.shapeToPin]);
+			return this.#pinner.tryPinShape(params[UpgradesActionList.shapeToPin]);
 		}
 		return result;
 	}
@@ -70,7 +70,7 @@ export class UpgradesActions extends BaseActions {
 	#tryUnpinShape(params) {
 		const result = this.#panel.tryShowAsUnpinned(params[UpgradesActionList.shapeToUnpin]);
 		if (result.valid) {
-			return this.#pinner.unpinShape(params[UpgradesActionList.shapeToUnpin]);
+			return this.#pinner.tryUnpinShape(params[UpgradesActionList.shapeToUnpin]);
 		}
 		return result;
 	}

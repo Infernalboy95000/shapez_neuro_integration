@@ -10,6 +10,7 @@ import { OverlaysActions } from "../actions/inGame/overlaysActions";
 import { InGameState } from "shapez/states/ingame";
 import { UpgradesActions } from "../actions/overlay/upgradesActions";
 import { ActionsCollection } from "../actions/base/actionsCollection";
+import { ShapeInfoActions } from "../actions/overlay/shapeInfoActions";
 
 export class InGameMode {
 	/** @type {import("../main").NeuroIntegration} */ #mod;
@@ -56,6 +57,7 @@ export class InGameMode {
 		actions.set("tools", new ToolbeltActions(this.#root));
 		actions.set("overlay", new OverlaysActions(this.#root, state));
 		actions.set("shop", new UpgradesActions(this.#root));
+		actions.set("shape", new ShapeInfoActions(this.#root));
 		ActionsCollection.addActions(actions);
 	}
 
