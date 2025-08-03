@@ -21,10 +21,10 @@ export class UpgradesActionList {
 		),
 		new SdkAction(this.unpinShape,
 			"Unpin a shape from a certain upgrade"
-		),/*
+		),
 		new SdkAction(this.shapeInfo,
 			"Get all the details of a shape from an upgrade"
-		),*/
+		),
 		new SdkAction(this.close,
 			"Close the upgrades menu"
 		)

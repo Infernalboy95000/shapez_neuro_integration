@@ -1,5 +1,6 @@
 import { HUDPinnedShapes } from "shapez/game/hud/parts/pinned_shapes";
 import { GoalsDescriptor } from "../../descriptors/pins/goalsDescriptor";
+import { ShapeDefinition } from "shapez/game/shape_definition";
 
 export class ShapesPinner {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -15,13 +16,8 @@ export class ShapesPinner {
 	 */
 	pinShape(shapeCode) {
 		const shape = this.#root.shapeDefinitionMgr.getShapeFromShortKey(shapeCode);
-		if (!shape) {
-			return {valid: false, msg: "The shape is invalid."};
-		}
-
-		if (shape.isEntirelyEmpty()) {
-			return {valid: false, msg: "You can't pin an empty shape."};
-		}
+		const result = this.#isShapeValid(shape);
+		if (!result.valid) { return result; }
 
 		const currentGoalShape = this.#root.hubGoals.currentGoal.definition.getHash();
 		if (shapeCode === currentGoalShape) {
@@ -48,7 +44,10 @@ export class ShapesPinner {
 	 * @returns {{valid:boolean, msg:string}}
 	 */
 	unpinShape(shapeCode) {
-		const result = {valid: false, msg: "Shape is not pinned."};
+		const shape = this.#root.shapeDefinitionMgr.getShapeFromShortKey(shapeCode);
+		const result = this.#isShapeValid(shape);
+		if (!result.valid) { return result; }
+
 		/** @type {HUDPinnedShapes} */
 		// @ts-ignore
 		const pinned = this.#root.hud.parts.pinnedShapes;
@@ -81,5 +80,35 @@ export class ShapesPinner {
 			result.msg = msg;
 		}
 		return result;
+	}
+
+	/**
+	 * @param {string} shapeCode
+	 * @returns {{valid:boolean, msg:string}}
+	 */
+	fullyDescribeShape(shapeCode) {
+		const shape = this.#root.shapeDefinitionMgr.getShapeFromShortKey(shapeCode);
+		const result = this.#isShapeValid(shape);
+		if (!result.valid) { return result; }
+		// @ts-ignore
+		this.#root.hud.parts.shapeViewer.renderForShape(shape);
+		result.msg = GoalsDescriptor.fullyDescribeShape(shape);
+		return result;
+	}
+
+	/**
+	 * @param {ShapeDefinition} shape
+	 * @returns {{valid:boolean, msg:string}}
+	 * */
+	#isShapeValid(shape) {
+		if (!shape) {
+			return {valid: false, msg: "The shape is invalid."};
+		}
+
+		if (shape.isEntirelyEmpty()) {
+			return {valid: false, msg: "You can't pin an empty shape."};
+		}
+
+		return {valid: true, msg: ""};
 	}
 }

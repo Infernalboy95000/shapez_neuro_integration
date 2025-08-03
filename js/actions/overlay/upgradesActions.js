@@ -80,7 +80,7 @@ export class UpgradesActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryGetShapeInfo(params) {
-		return {valid: false, msg: "ERROR! FUNCTION NOT IMPLEMENTED!"};;
+		return this.#pinner.fullyDescribeShape(params[UpgradesActionList.shape]);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
