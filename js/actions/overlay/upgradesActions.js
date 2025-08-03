@@ -1,4 +1,4 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { UpgradesPanelController } from "../executers/overlays/upgradesPanelController";
 import { ShapesPinner } from "../executers/pinners/shapesPinner";
 import { UpgradesActionList } from "../lists/overlays/upgradesActionList";
@@ -80,6 +80,7 @@ export class UpgradesActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryGetShapeInfo(params) {
+		return {valid: false, msg: "ERROR! FUNCTION NOT IMPLEMENTED!"};;
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */

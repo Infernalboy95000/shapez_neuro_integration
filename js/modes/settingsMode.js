@@ -1,15 +1,13 @@
-import { SdkClient } from "../../sdkClient";
-import { SettingsMenu } from "../../settings/settingsMenu";
+import { SdkClient } from "../sdkClient";
+import { SettingsMenu } from "../settings/settingsMenu";
 
-export class SettingsActions {
-	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+export class SettingsMode {
 	/** @type {SettingsMenu} */ #settingsMenu;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
 	 */
 	constructor(mod) {
-		this.#mod = mod;
 		this.#settingsMenu = new SettingsMenu(mod);
 	}
 

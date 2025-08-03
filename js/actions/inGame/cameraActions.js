@@ -1,4 +1,4 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { CameraMover } from "../executers/camera/cameraMover";
 import { CamList } from "../lists/inGame/cameraActionList";
 

@@ -1,5 +1,5 @@
 import { InGameState } from "shapez/states/ingame";
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { OverlaysActionList } from "../lists/inGame/overlaysActionList";
 
 export class OverlaysActions extends BaseActions {
@@ -29,12 +29,14 @@ export class OverlaysActions extends BaseActions {
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#openUpgradesMenu() {
+		// @ts-ignore
 		this.#root.hud.parts.shop.show();
 		return {valid:true, msg:"openned upgrades menu"};
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#openStatsMenu() {
+		// @ts-ignore
 		this.#root.hud.parts.statistics.show();
 		return {valid:true, msg:"openned stats menu"};
 	}

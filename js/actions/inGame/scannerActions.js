@@ -1,8 +1,8 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { BuildingScanner } from "../executers/scanners/buildingScanner";
 import { PatchScanner } from "../executers/scanners/patchScanner";
 import { ScanList } from "../lists/inGame/scannerActionList";
-import { TutorialChecks } from "../tutorialChecks";
+import { TutorialChecks } from "../../helpers/tutorialChecks";
 
 export class ScannerActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;

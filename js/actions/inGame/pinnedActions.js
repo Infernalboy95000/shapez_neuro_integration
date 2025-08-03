@@ -1,4 +1,4 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { ShapesPinner } from "../executers/pinners/shapesPinner";
 import { PinList } from "../lists/inGame/pinnedActionsList";
 

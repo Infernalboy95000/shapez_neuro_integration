@@ -32,6 +32,7 @@ export class ShapesPinner {
 			return {valid: false, msg: "The blueprint shape is always pinned It can't be pinned it manually."};
 		}
 		/** @type {HUDPinnedShapes} */
+		// @ts-ignore
 		const pinned = this.#root.hud.parts.pinnedShapes;
 
 		if (pinned.isShapePinned(shapeCode)) {
@@ -49,6 +50,7 @@ export class ShapesPinner {
 	unpinShape(shapeCode) {
 		const result = {valid: false, msg: "Shape is not pinned."};
 		/** @type {HUDPinnedShapes} */
+		// @ts-ignore
 		const pinned = this.#root.hud.parts.pinnedShapes;
 
 		if (pinned.isShapePinned(shapeCode)) {

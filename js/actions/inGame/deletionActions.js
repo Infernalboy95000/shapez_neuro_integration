@@ -1,4 +1,4 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { MassDeleter } from "../executers/deleters/massDeleter";
 import { SingleDeleter } from "../executers/deleters/singleDeleter";
 import { DelList } from "../lists/inGame/deletionActionsList";

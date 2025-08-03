@@ -1,12 +1,11 @@
-import { SdkClient } from "../../sdkClient";
-import { StatusDisplay } from "../../visuals/statusDisplay";
-import { PlayGameActions } from "../mainMenu/playGameActions";
-import { BaseActions } from "../baseActions";
+import { SdkClient } from "../sdkClient";
+import { StatusDisplay } from "../visuals/statusDisplay";
+import { PlayGameActions } from "../actions/mainMenu/playGameActions";
+import { ActionsCollection } from "../actions/base/actionsCollection";
 
-export class MainMenuActions {
+export class MainMenuMode {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
-	/** @type {PlayGameActions} */ #playGameActions;
-	/** @type {Array<BaseActions>} */ #actioners;
+	/** @type {PlayGameActions} */ #playActions;
 	/** @type {StatusDisplay} */ #StatusDisplay;
 	/** @type {boolean} */ #open = false;
 	/** @type {number} */ #timeout;
@@ -21,10 +20,10 @@ export class MainMenuActions {
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	menuOpenned(state) {
 		this.#open = true;
-		this.#playGameActions = new PlayGameActions(this.#mod, state);
-		this.#actioners = [
-			this.#playGameActions
-		];
+		this.#playActions = new PlayGameActions(this.#mod, state);
+		ActionsCollection.addActions(new Map([
+			["play", this.#playActions]
+		]));
 
 		const statusDisplayBox = this.#createStatusBox();
 		this.#StatusDisplay.show(statusDisplayBox);
@@ -44,23 +43,10 @@ export class MainMenuActions {
 
 	menuClosed() {
 		this.#open = false;
-		this.#deactivateActions();
+		ActionsCollection.deactivateActions(["play"], true);
 		if (this.#timeout) {
 			clearTimeout(this.#timeout);
 		}
-	}
-
-	playerSentAction(action) {
-		let result = null;
-		for (let i = 0; i < this.#actioners.length && result == null; i++) {
-			result = this.#actioners[i].tryAction(action);
-		}
-
-		if (result == null) {
-			result = {valid:false, msg:"Unknown action."};
-		}
-
-		SdkClient.tellActionResult(action.id, result.valid, result.msg);
 	}
 
 	#onConnectedActions() {
@@ -74,16 +60,16 @@ export class MainMenuActions {
 			const seconds = this.#mod.settings.forcedMapTime;
 			if (seconds > 0) {
 				this.#timeout = setTimeout(() => {
-					this.#playGameActions.forcePlayMap();
+					this.#playActions.forcePlayMap();
 					this.#timeout = null;
 				}, seconds * 1000);
 			}
 			else {
-				this.#playGameActions.forcePlayMap();
+				this.#playActions.forcePlayMap();
 			}
 		}
 		else if (this.#mod.settings.playerChooseMap) {
-			this.#activateActions();
+			ActionsCollection.activateActions(["play"]);
 		}
 	}
 
@@ -103,17 +89,5 @@ export class MainMenuActions {
 		header.appendChild(title);
 
 		return statusDisplay;
-	}
-
-	#activateActions() {
-		for (let i = 0; i < this.#actioners.length; i++) {
-			this.#actioners[i].activate();
-		}
-	}
-
-	#deactivateActions() {
-		for (let i = 0; i < this.#actioners.length; i++) {
-			this.#actioners[i].deactivate();
-		}
 	}
 }

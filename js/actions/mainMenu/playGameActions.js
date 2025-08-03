@@ -1,5 +1,5 @@
 import { SettingsMenu } from "../../settings/settingsMenu";
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { MapLoader } from "../executers/menus/main/mapLoader";
 import { PlayGameActionList } from "../lists/PlayGameActionList";
 

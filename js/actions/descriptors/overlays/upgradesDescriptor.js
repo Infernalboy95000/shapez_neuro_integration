@@ -53,6 +53,7 @@ export class UpgradesDescriptor {
 	 * */
 	static getInfo(root, filter = "") {
 		/** @type {HUDShop} */
+		// @ts-ignore
 		const shop = root.hud.parts.shop;
 		const pins = this.#collectPins();
 		let currentPin = 0;

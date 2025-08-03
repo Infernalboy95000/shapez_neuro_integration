@@ -1,4 +1,4 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { BeltPlannerBuilder } from "../executers/builders/beltPlannerBuilder";
 import { MassBuilder } from "../executers/builders/massBuilder";
 import { SingleBuilder } from "../executers/builders/singleBuilder";

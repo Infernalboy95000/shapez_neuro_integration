@@ -1,6 +1,6 @@
-import { SchemaBase } from "../sdkActions/schema/schemaBase";
-import { SdkAction } from "../sdkActions/sdkAction";
-import { SdkClient } from "../sdkClient";
+import { SchemaBase } from "../../sdkActions/schema/schemaBase";
+import { SdkAction } from "../../sdkActions/sdkAction";
+import { SdkClient } from "../../sdkClient";
 
 export class BaseActions {
 	/** @type {Map<string, {action:SdkAction, active:boolean, function:CallableFunction}>} */

@@ -4,7 +4,7 @@ import { MinerComponent } from "shapez/game/components/miner";
 import { WireComponent } from "shapez/game/components/wire";
 import { ShapeItem } from "shapez/game/items/shape_item";
 import { GameRoot } from "shapez/game/root";
-import { TutorialChecks } from "../actions/tutorialChecks";
+import { TutorialChecks } from "./tutorialChecks";
 
 export class TutorialList {
 	static tutorialsByLevel = [

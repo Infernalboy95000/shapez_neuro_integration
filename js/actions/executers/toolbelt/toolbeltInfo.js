@@ -1,4 +1,3 @@
-import { BuildingDescriptor } from "../../descriptors/buildings/buildingDescriptor";
 import { BuildingStats } from "../../descriptors/buildings/buildingStats";
 import { ToolbeltSelector } from "../selectors/toolbeltSelector";
 

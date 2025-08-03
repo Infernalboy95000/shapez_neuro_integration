@@ -11,6 +11,7 @@ export class UpgradesPanelController {
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
 		this.#root = root;
+		// @ts-ignore
 		this.#shop = root.hud.parts.shop;
 	}
 	
@@ -51,6 +52,7 @@ export class UpgradesPanelController {
 			tierHandle.required.forEach(({ shape, amount }) => {
 				const have = this.#root.hubGoals.getShapesStoredByKey(shape);
 				if (currentGoalShape != shape) {
+					// @ts-ignore
 					if (this.#root.hud.parts.pinnedShapes.isShapePinned(shape)) {
 						compile.unpin.push(shape);
 					}

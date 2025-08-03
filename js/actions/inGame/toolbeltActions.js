@@ -1,4 +1,4 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { ToolbeltSelector } from "../executers/selectors/toolbeltSelector";
 import { ToolbeltInfo } from "../executers/toolbelt/toolbeltInfo";
 import { ToolsList } from "../lists/inGame/toolbeltActionList";
