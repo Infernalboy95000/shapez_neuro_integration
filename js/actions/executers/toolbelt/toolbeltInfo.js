@@ -1,4 +1,4 @@
-import { BuildingDescriptor } from "../../descriptors/buildings/buildingDescriptor";
+import { BuildingStats } from "../../descriptors/buildings/buildingStats";
 import { ToolbeltSelector } from "../selectors/toolbeltSelector";
 
 export class ToolbeltInfo {
@@ -22,7 +22,7 @@ export class ToolbeltInfo {
 		}
 
 		const building = this.#selector.getBuildingByName(buildingName);
-		const msg = BuildingDescriptor.getInfo(this.#root, building);
+		const msg = BuildingStats.describe(this.#root, building);
 		if (msg == "") {
 			result.valid = false;
 			result.msg = "Building has no stats.";

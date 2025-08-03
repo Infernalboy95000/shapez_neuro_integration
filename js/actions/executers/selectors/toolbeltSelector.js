@@ -1,6 +1,7 @@
 import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { MetaBuilding } from "shapez/game/meta_building";
 import { RotationCodes } from "../../descriptors/shapes/rotationCodes";
+import { T } from "shapez/translations";
 
 /** Helps manage the current toolbelt */
 export class ToolbeltSelector {
@@ -46,6 +47,19 @@ export class ToolbeltSelector {
 
 		this.#rotateBuilding(RotationCodes.getAngle(rotKey));
 		return {valid:true, msg:""};
+	}
+
+	/** @returns {Map<string, string>} */
+	getTranslatedBuildings() {
+		const translations = new Map();
+		const names = this.getAvailableBuildings();
+		for (let i = 0; i < names.length; i++) {
+			//TODO: Add variants to this
+			const buildName = T.buildings[names[i]].default.name;
+			translations.set(buildName, names[i]);
+		}
+
+		return translations;
 	}
 
 	/** @returns {Array<String>} */

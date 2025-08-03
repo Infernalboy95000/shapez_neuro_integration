@@ -1,7 +1,8 @@
 import { Mod } from "shapez/mods/mod";
-import { CoordsGrid } from "./descriptors/coordsGrid";
-import { ActionsController } from "./actions/actionsController";
-import { TutorialMessager } from "./descriptors/tutorialMessager";
+import { CoordsGrid } from "./helpers/coordsGrid";
+import { ActionsController } from "./actions/base/actionsController";
+import { TutorialMessager } from "./helpers/tutorialMessager";
+import { EventsController } from "./events/eventsController";
 const DEFAULT_URL = "localhost:8000";
 
 export class NeuroIntegration extends Mod {
@@ -9,6 +10,7 @@ export class NeuroIntegration extends Mod {
 	/** @type {CoordsGrid} */ #coordsGrid;
 	/** @type {TutorialMessager} */ #tutorialMessager;
 	/** @type {ActionsController} */ #actionsController;
+	/** @type {EventsController} */ #eventsController;
 
 	init() {
 		// I wish I didn't need to do this check
@@ -20,11 +22,13 @@ export class NeuroIntegration extends Mod {
 			this.#coordsGrid = new CoordsGrid(this);
 			this.#tutorialMessager = new TutorialMessager(this);
 			this.#actionsController = new ActionsController(this);
+			this.#eventsController = new EventsController(this);
 			this.#booted = true;
 		});
 
 		this.signals.gameStarted.add(root => {
 			this.#actionsController.newGameOpenned(root);
+			this.#eventsController.updateRoot(root);
 		});
 
 		this.signals.stateEntered.add(state	=> {
@@ -45,6 +49,7 @@ export class NeuroIntegration extends Mod {
 
 	#SaveDefaultSettings() {
 		this.settings.socketURL = DEFAULT_URL;
+		this.settings.forcedMapTime = 5;
 		this.saveSettings();
 	}
 }

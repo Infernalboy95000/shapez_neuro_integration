@@ -1,4 +1,31 @@
-#state_SettingsState input.input-text {
+input[type=password] {
+    padding: calc(11px*var(--ui-scale)) calc(12px*var(--ui-scale));
+    margin: calc(10px*var(--ui-scale)) calc(0px*var(--ui-scale));
+    border: 0;
+    cursor: text;
+    display: block;
+    box-sizing: border-box;
+    background: #f7f8fa;
+    color: #eee;
+    text-align: left;
+    -webkit-user-select: text!important;
+    -moz-user-select: text!important;
+    -ms-user-select: text!important;
+    user-select: text!important;
+    pointer-events: all!important;
+    font-size: calc(16px*var(--ui-scale));
+    line-height: calc(21px*var(--ui-scale));
+    font-weight: 400;
+    font-family: GameFont,sans-serif;
+    letter-spacing: .01em;
+    border-radius: calc(6px*var(--ui-scale));
+    transition: background-color .1s ease-in-out!important;
+    color: #fff;
+    background-color: #fff;
+}
+
+#state_SettingsState input.input-text,
+#state_SettingsState input.input-password {
 	background-color: #eee;
 	color: #333438;
 	padding-top: calc(2px*var(--ui-scale));

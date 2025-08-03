@@ -27,12 +27,18 @@ export class HubDescriptor {
 		}
 
 		log.msg = `Found hub at x: ${origin.x}, y: ${origin.y}.`;
+		const size = hub.StaticMapEntity.getTileSize();
+		if (size != new Vector(1, 1)) {
+			log.msg += `\r\nIt's ${size.x} tiles long in x positive, `+
+			`${size.y} tiles tall in y positive`;
+		}
+
 		if (slots.length > 0) {
-			log.msg += ` Accepts items:`
+			log.msg += `\r\nAccepts items:`
 		}
 
 		slotsByDir.forEach((slots, direction) => {
-			log.msg += `\nfrom ${direction}:`
+			log.msg += `\r\nfrom ${direction}:`
 
 			for (let i = 0; i < slots.length; i++) {
 				log.msg += ` x: ${slots[i].x}, y: ${slots[i].y}.`;

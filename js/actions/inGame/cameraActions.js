@@ -1,6 +1,6 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { CameraMover } from "../executers/camera/cameraMover";
-import { CamList } from "../lists/cameraActionList";
+import { CamList } from "../lists/inGame/cameraActionList";
 
 export class CameraActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;

@@ -1,7 +1,8 @@
-import { BaseActions } from "../baseActions";
+import { BaseActions } from "../base/baseActions";
 import { BuildingScanner } from "../executers/scanners/buildingScanner";
 import { PatchScanner } from "../executers/scanners/patchScanner";
-import { ScanList } from "../lists/scannerActionList";
+import { ScanList } from "../lists/inGame/scannerActionList";
+import { TutorialChecks } from "../../helpers/tutorialChecks";
 
 export class ScannerActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -33,6 +34,7 @@ export class ScannerActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#scanTerrain(params) {
+		TutorialChecks.scanned = true;
 		return this.#patchScanner.scanInView();
 	}
 
@@ -41,6 +43,7 @@ export class ScannerActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryScanPatch(params) {
+		TutorialChecks.deepScanned = true;
 		return this.#patchScanner.scanAt(
 			params[ScanList.xPos], params[ScanList.yPos]
 		)
@@ -51,6 +54,7 @@ export class ScannerActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#scanBuildings(params) {
+		TutorialChecks.buildingScanned = true;
 		return this.#buildsScanner.scanInView();
 	}
 }

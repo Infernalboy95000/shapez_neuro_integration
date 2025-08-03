@@ -1,4 +1,3 @@
-import { GameRoot } from "shapez/game/root";
 import { Mod } from "shapez/mods/mod";
 
 export class MapLoader {

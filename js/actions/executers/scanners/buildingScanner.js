@@ -20,7 +20,7 @@ export class BuildingScanner {
 			for (let i = 0; i < entities.length; i++) {
 				result.valid = true;
 				if (!inspections.has(entities[i].uid)) {
-					const description = BuildingDescriptor.describe(entities[i]);
+					const description = BuildingDescriptor.describe(this.#root, entities[i]);
 					inspections.add(entities[i].uid);
 					result.msg += description.msg;
 					
@@ -33,7 +33,6 @@ export class BuildingScanner {
 					result.msg += "\r\n";
 				}
 			};
-			result.msg += "\r\n";
 		});
 
 		if (!result.valid) {

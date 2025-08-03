@@ -1,3 +1,4 @@
+import { NumberSetting } from "./inputs/numberSetting";
 import { OptionListSetting } from "./inputs/optionListSetting";
 import { ToggleSetting } from "./inputs/toggleSetting";
 
@@ -10,6 +11,7 @@ export class StartupSettings {
 	/** @type {ToggleSetting} */ #autoConnectToggle;
 	/** @type {ToggleSetting} */ #playerChooseMapToggle;
 	/** @type {ToggleSetting} */ #forceOpenMapToggle;
+	/** @type {NumberSetting} */ #forceOpenTimer;
 	/** @type {OptionListSetting} */ #mapAwailableOptions;
 
 	/**
@@ -51,6 +53,12 @@ export class StartupSettings {
 		}
 	}
 
+	/** @param {NumberSetting} numberSetting */
+	addForceMapTimer(numberSetting) {
+		this.#forceOpenTimer = numberSetting;
+		this.#setForceTimerEvents();
+	}
+
 	/** @param {OptionListSetting} optionListSetting */
 	addMapAvailableOptions(optionListSetting, options) {
 		this.#mapAwailableOptions = optionListSetting;
@@ -75,6 +83,12 @@ export class StartupSettings {
 		};
 	}
 
+	#setForceTimerEvents() {
+		this.#forceOpenTimer.onDragEnded = (e) => {
+			this.#onForceTimerDragEnded(e)
+		};
+	}
+
 	#setMapAvailableEvents() {
 		this.#mapAwailableOptions.onOptionChoosed = (optionID) => {
 			this.#onMapAvailableOptionChosed(optionID)
@@ -93,6 +107,11 @@ export class StartupSettings {
 
 	#saveForceOpenMapSetting(value) {
 		this.#mod.settings.forceOpenMap = value;
+		this.#mod.saveSettings();
+	}
+
+	#saveForceOpenTimerSetting(value) {
+		this.#mod.settings.forcedMapTime = value;
 		this.#mod.saveSettings();
 	}
 
@@ -129,6 +148,10 @@ export class StartupSettings {
 			this.#playerChooseMapToggle.set(false);
 			this.#savePlayerChooseMapSetting(false);
 		}
+	}
+
+	#onForceTimerDragEnded(value) {
+		this.#saveForceOpenTimerSetting(value);
 	}
 
 	#onMapAvailableOptionChosed(optionID) {

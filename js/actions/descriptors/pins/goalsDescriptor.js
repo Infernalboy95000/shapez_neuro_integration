@@ -1,9 +1,11 @@
-import { GameRoot } from "shapez/game/root";
+import { ShapeDefinition } from "shapez/game/shape_definition";
 import { ShapeCode } from "../shapes/shapeCode";
 
 export class GoalsDescriptor {
+	static quadNames = ["Top right", "Bottom right", "Bottom left", "Top left"];
+
 	/**
-	 * @param {GameRoot} root
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @returns {string}
 	 * */
 	static describeCurrentGoal(root) {
@@ -20,7 +22,7 @@ export class GoalsDescriptor {
 	}
 
 	/**
-	 * @param {GameRoot} root
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @returns {string}
 	 * */
 	static describePinnedShapes(root) {
@@ -37,6 +39,27 @@ export class GoalsDescriptor {
 				if (i + 1 < pinned.pinnedShapes.length) {
 					msg += `\r\n`;
 				}
+			}
+		}
+
+		return msg;
+	}
+
+	/**
+	 * @param {ShapeDefinition} shape
+	 * @returns {string}
+	 * */
+	static fullyDescribeShape(shape) {
+		let msg = `The shape with code ${shape.cachedHash} is composed of:\r\n`
+		const layers = shape.layers;
+		for (let i = layers.length - 1; i >= 0; --i) {
+			msg += `Layer ${i + 1}:\r\n`;
+
+			for (let quad = 0; quad < 4; ++quad) {
+				const contents = layers[i][quad];
+				msg += `${this.quadNames[quad]} corner: ` +
+				`${contents.color} ${contents.subShape}`;
+				if (quad + 1 < 4) { msg += "\r\n"; }
 			}
 		}
 

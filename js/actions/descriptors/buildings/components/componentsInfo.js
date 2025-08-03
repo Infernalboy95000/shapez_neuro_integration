@@ -1,0 +1,33 @@
+import { Entity } from "shapez/game/entity";
+import { ItemAcceptorInfo } from "./ItemAcceptorInfo";
+import { ItemEjectorInfo } from "./ItemEjectorInfo";
+import { BeltInfo } from "./beltInfo";
+
+export class ComponentsInfo {
+	static components = {
+		"ItemAcceptor": (e) => {return ItemAcceptorInfo.describe(e)},
+		"ItemEjector": (e) => {return ItemEjectorInfo.describe(e)},
+		"Belt": (e) => {return BeltInfo.describe(e)}
+	}
+
+	/**
+	 * @param {Entity} entity
+	 * @returns {{msg:string, describedIDs:Array<number>}}
+	 */
+	static describe(entity) {
+		const result = {msg:"", describedIDs:[]};
+		for (const [key, _] of Object.entries(entity.components)) {
+			if (this.components[key]) {
+				const response = this.components[key](entity.components);
+				if (response.msg != "\n" && response.msg != "\r\n" && response.msg != "") {
+					result.msg += `${response.msg}`;
+				}
+				for (let i = 0; i < response.describedIDs.length; i++) {
+					result.describedIDs.push(response.describedIDs[i]);
+				}
+			}
+		}
+
+		return result;
+	}
+}

@@ -15,7 +15,7 @@ export class BeltPlannerBuilder {
 	constructor(root, singleBuilder) {
 		this.#root = root;
 		this.#singleBuilder = singleBuilder;
-		this.toolbelt = new ToolbeltSelector(root);
+		this.#toolbelt = new ToolbeltSelector(root);
 	}
 
 	/**
@@ -28,7 +28,6 @@ export class BeltPlannerBuilder {
 		let placedAll = true;
 		let placedSome = false;
 
-		// @ts-ignore
 		const result = this.#toolbelt.trySelectBuilding("belt");
 		if (!result.valid) {
 			return result;

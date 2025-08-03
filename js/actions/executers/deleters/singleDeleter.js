@@ -1,5 +1,6 @@
 import { Vector } from "shapez/core/vector";
 import { SOUNDS } from "shapez/platform/sound";
+import { T } from "shapez/translations";
 
 /** Allows removing a single building.*/
 export class SingleDeleter {
@@ -19,7 +20,8 @@ export class SingleDeleter {
 		const contents = this.#root.map.getTileContent(pos, this.#root.currentLayer);
 
 		if (contents) {
-			const buildName = contents.components.StaticMapEntity.getMetaBuilding().getId();
+			const buildID = contents.components.StaticMapEntity.getMetaBuilding().getId();
+			const buildName = T.buildings[buildID].default.name;
 			if (this.#root.logic.tryDeleteBuilding(contents)) {
 				this.#root.soundProxy.playUi(SOUNDS.destroyBuilding);
 				return {

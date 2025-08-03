@@ -66,7 +66,13 @@ export class StatusDisplay {
 	}
 
 	#onReattempting() {
-		this.#display.textContent = `Connecting... (${SdkClient.getRetriesFormatted()})`;
+		const reattempts = SdkClient.getRetriesFormatted();
+		if (reattempts.includes("0")) {
+			this.#display.textContent = `Connecting...`;
+		}
+		else {
+			this.#display.textContent = `Connecting... (${reattempts})`;
+		}
 		this.#display.className = "attempting";
 	}
 

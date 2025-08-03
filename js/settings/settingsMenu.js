@@ -7,6 +7,7 @@ import { ContextSettings } from "./contextSettings";
 import { StartupSettings } from "./startupSettings";
 import { ButtonSetting } from "./inputs/buttonSetting";
 import { OptionListSetting } from "./inputs/optionListSetting";
+import { NumberSetting } from "./inputs/numberSetting";
 
 export class SettingsMenu {
 	static ANY_MAP = "any_map";
@@ -114,6 +115,13 @@ export class SettingsMenu {
 			this.#mod.settings.socketURL,
 			256
 		));
+		
+		connSettings.addHideURL(new ToggleSetting (
+			this.#mod, this.#menu,
+			"Hide URL",
+			"Hides the connection URL everywhere, even on it's input field.",
+			"sdkHideURL"
+		));
 	}
 
 	#contextSettings() {
@@ -152,6 +160,14 @@ export class SettingsMenu {
 			"Force open map",
 			"Opens a map when entering the main menu. This can be limited to certain maps.",
 			"sdkForceOpenMap"
+		));
+
+		startupSettngs.addForceMapTimer(new NumberSetting (
+			this.#mod, this.#menu,
+			"Force map delay",
+			"Delays opening a map by force for a set ammount of seconds.",
+			this.#mod.settings.forcedMapTime, 0, 10, 0.1, 's',
+			"sdkForcedMapTimer"
 		));
 
 		const mapOptions = this.#getMapOptions();
