@@ -29,6 +29,6 @@ export class ShapeInfoActions extends BaseActions {
 	#closeMenu() {
 		// @ts-ignore
 		this.#root.hud.parts.shapeViewer.close();
-		return {valid: true, msg: "Upgrade panel closed"};
+		return {valid: true, msg: "Shape info menu closed"};
 	}
 }

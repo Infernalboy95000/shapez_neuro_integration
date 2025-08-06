@@ -2,6 +2,7 @@ import { HUDShop } from "shapez/game/hud/parts/shop";
 import { ActionsCollection } from "../actions/base/actionsCollection";
 import { HUDShapeViewer } from "shapez/game/hud/parts/shape_viewer";
 import { ShapeDefinition } from "shapez/game/shape_definition";
+import { HUDStatistics } from "shapez/game/hud/parts/statistics";
 
 export class OverlayEvents {
 	/** @type {ShapeDefinition} */ static lastShapeDescribed;
@@ -31,6 +32,14 @@ export class OverlayEvents {
 			function() { thisClass.#fullShapeClose(); }
 		);
 
+		mod.modInterface.runAfterMethod( HUDStatistics, "show",
+			function() { thisClass.#statsOpenned(); }
+		);
+
+		mod.modInterface.runAfterMethod( HUDStatistics, "close",
+			function() { thisClass.#statsClosed(); }
+		);
+
 		//this.#root.hud.signals.unlockNotificationFinished.add(() => {this.#testCrazy()});
 		//this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
 	}
@@ -39,7 +48,7 @@ export class OverlayEvents {
 		this.#lastOverlay = "shop";
 		ActionsCollection.deactivateActions([
 			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-		])
+		]);
 		ActionsCollection.activateActions(["shop"]);
 	}
 
@@ -48,13 +57,13 @@ export class OverlayEvents {
 		ActionsCollection.deactivateActions(["shop"]);
 		ActionsCollection.activateActions([
 			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-		])
+		]);
 	}
 
 	#fullShapeView() {
 		ActionsCollection.deactivateActions([
 			"build", "delete", "scan", "camera", "pin", "tools", "overlay", "shop"
-		])
+		]);
 		ActionsCollection.activateActions(["shape"]);
 	}
 
@@ -66,8 +75,25 @@ export class OverlayEvents {
 		else {
 			ActionsCollection.activateActions([
 				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-			])
+			]);
 		}
+	}
+
+	#statsOpenned() {
+		console.log("opening stats");
+		this.#lastOverlay = "stats";
+		ActionsCollection.deactivateActions([
+			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+		]);
+		ActionsCollection.activateActions(["stats"]);
+	}
+
+	#statsClosed() {
+		this.#lastOverlay = "none";
+		ActionsCollection.deactivateActions(["stats"]);
+		ActionsCollection.activateActions([
+			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+		]);
 	}
 
 	/**
