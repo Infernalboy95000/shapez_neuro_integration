@@ -8,7 +8,7 @@ export class ShapeInfoActionList {
 			"Get the full composition of one or all layers of the shape on screen."
 		),
 		new SdkAction(this.close,
-			"Close the shape info menu"
+			"Close the shape info menu."
 		)
 	];
 }
