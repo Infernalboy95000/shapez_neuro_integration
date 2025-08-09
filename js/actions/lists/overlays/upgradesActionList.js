@@ -17,16 +17,16 @@ export class UpgradesActionList {
 			"Upgrade a certain upgrade."
 		),
 		new SdkAction(this.pinShape,
-			"Pin a shape from a certain upgrade"
+			"Pin a shape from a certain upgrade."
 		),
 		new SdkAction(this.unpinShape,
-			"Unpin a shape from a certain upgrade"
+			"Unpin a shape from a certain upgrade."
 		),
 		new SdkAction(this.shapeInfo,
-			"Get all the details of a shape from an upgrade"
+			"Get all the details of a shape from an upgrade."
 		),
 		new SdkAction(this.close,
-			"Close the upgrades menu"
+			"Close the upgrades menu."
 		)
 	];
 

@@ -86,6 +86,6 @@ export class UpgradesActions extends BaseActions {
 	/** @returns {{valid:boolean, msg:string}} */
 	#closeMenu() {
 		this.#panel.closePanel();
-		return {valid: true, msg: "Upgrade panel closed"};
+		return {valid: true, msg: "Upgrade menu closed"};
 	}
 }

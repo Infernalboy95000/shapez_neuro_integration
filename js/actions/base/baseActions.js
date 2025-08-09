@@ -45,11 +45,18 @@ export class BaseActions {
 
 	/** @param {Array<string>} actionNames */
 	activate(actionNames = []) {
-		SdkClient.registerActions(this.#getActionsToActivate(actionNames));
+		const actions = this.#getActionsToActivate(actionNames);
+		if (actions.length > 0) {
+			SdkClient.registerActions(actions);
+		}
 	}
 
-	deactivate() {
-		SdkClient.removeActions(this.#getKeysToDeactivate());
+	/** @param {Array<string>} actionNames */
+	deactivate(actionNames = []) {
+		const actions = this.#getKeysToDeactivate(actionNames);
+		if (actions.length > 0) {
+			SdkClient.removeActions(actions);
+		}
 	}
 
 	/**
@@ -93,13 +100,18 @@ export class BaseActions {
 		return actions;
 	}
 
-	/** @returns {Array<string>} */
-	#getKeysToDeactivate() {
+	/**
+	 * @param {Array<string>} filter
+	 * @returns {Array<string>}
+	 * */
+	#getKeysToDeactivate(filter = []) {
 		const keys = [];
 		this.#actions.forEach((value, key) => {
-			keys.push(key);
-			value.active = false;
-			this.#actions.set(key, value);
+			if (value.active && (filter.length <= 0 || filter.includes(key))) {
+				keys.push(key);
+				value.active = false;
+				this.#actions.set(key, value);
+			}
 		});
 		return keys;
 	}

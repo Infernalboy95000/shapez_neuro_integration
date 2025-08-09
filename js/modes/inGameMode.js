@@ -11,6 +11,7 @@ import { InGameState } from "shapez/states/ingame";
 import { UpgradesActions } from "../actions/overlay/upgradesActions";
 import { ActionsCollection } from "../actions/base/actionsCollection";
 import { ShapeInfoActions } from "../actions/overlay/shapeInfoActions";
+import { StatisticsActions } from "../actions/overlay/statisticsActions";
 
 export class InGameMode {
 	/** @type {import("../main").NeuroIntegration} */ #mod;
@@ -42,7 +43,7 @@ export class InGameMode {
 		TutorialChecks.buildingScanned = false;
 		ActionsCollection.deactivateActions([
 			"build", "delete", "scan", "camera", "pin", "tools", "overlay",
-			"shop"
+			"shop", "shape", "stats"
 		], true)
 	}
 
@@ -58,6 +59,7 @@ export class InGameMode {
 		actions.set("overlay", new OverlaysActions(this.#root, state));
 		actions.set("shop", new UpgradesActions(this.#root));
 		actions.set("shape", new ShapeInfoActions(this.#root));
+		actions.set("stats", new StatisticsActions(this.#root));
 		ActionsCollection.addActions(actions);
 	}
 
