@@ -55,6 +55,15 @@ export class StatsDescriptor {
 		return result;
 	}
 
+	/** @returns {Array<string>} */
+	describeUnits() {
+		const keys = [];
+		for (const [key] of Object.entries(statisticsUnitsSeconds)) {
+			keys.push(key);
+		}
+		return keys;
+	}
+
 	/**
 	 * @param {[string, any][]} entries
 	 * @param {enumAnalyticsDataSource} dataType

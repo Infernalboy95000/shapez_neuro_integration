@@ -1,3 +1,5 @@
+import { EnumSchema } from "../../../sdkActions/schema/enumSchema";
+import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
 import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class StatisticsActionList {
@@ -7,6 +9,7 @@ export class StatisticsActionList {
 	static showStored = "show_stored_shapes";
 	static showAscendant = "show_shapes_in_ascendant_order";
 	static showUnsorted = "show_shapes_unsorted";
+	static changeUnits = "change_stats_units";
 	static close = "close_statistics_menu";
 	static actions = [
 		new SdkAction(this.showProduced,
@@ -24,8 +27,38 @@ export class StatisticsActionList {
 		new SdkAction(this.showUnsorted,
 			"Show current shape list unsorted."
 		),
+		new SdkAction(this.changeUnits,
+			"Change the current time scope shown in the stats."
+		),
 		new SdkAction(this.close,
 			"Close the statistics menu."
 		)
 	];
+
+	static unit = "unit";
+
+	/**
+	 * @param {Array<string>} units
+	 * @returns {Map<string, Array<SchemaBase>>}
+	 * */
+	static getOptions(units) {
+		const options = {
+			[this.unit]: new EnumSchema(this.unit, units),
+		};
+		return this.#mapOptions(options);
+	}
+
+	/**
+	 * @param {Object} options
+	 * @returns {Map<string, Array<SchemaBase>>}
+	 */
+	static #mapOptions(options) {
+		return new Map([
+			[
+				this.changeUnits, [
+					options[this.unit]
+				]
+			],
+		]);
+	}
 }

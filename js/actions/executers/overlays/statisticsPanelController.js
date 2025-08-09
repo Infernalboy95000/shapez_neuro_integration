@@ -18,15 +18,20 @@ export class StatisticsPanelController {
 	 * @returns {string}
 	 * */
 	show(data) {
+		let msg = this.#getSortMessage();
 		this.#stats.setDataSource(data);
 		switch (data) {
 			case enumAnalyticsDataSource.produced:
-				return this.#statsInfo.describeProduced();
+				msg += this.#statsInfo.describeProduced();
+				break;
 			case enumAnalyticsDataSource.delivered:
-				return this.#statsInfo.describeDelivered();
+				msg += this.#statsInfo.describeDelivered();
+				break;
 			case enumAnalyticsDataSource.stored:
-				return this.#statsInfo.describeStored();
+				msg += this.#statsInfo.describeStored();
+				break;
 		}
+		return msg;
 	}
 
 	/**
@@ -34,15 +39,8 @@ export class StatisticsPanelController {
 	 * @returns {string}
 	 * */
 	sort(sorted) {
-		let msg = "Showing shapes ";
-		if (sorted) {
-			msg += "in ascending order:\r\n";
-		}
-		else {
-			msg += "unsorted:\r\n";
-		}
-
 		this.#stats.setSorted(sorted);
+		let msg = this.#getSortMessage();
 		msg += this.show(this.#stats.dataSource);
 		return msg;
 	}
@@ -50,6 +48,40 @@ export class StatisticsPanelController {
 	/** @returns {boolean} */
 	isSorted() {
 		return this.#stats.sorted;
+	}
+
+	/** @returns {Array<string>} */
+	getUnits() {
+		return this.#statsInfo.describeUnits();
+	}
+
+	/**
+	 * @param {string} unit
+	 * @returns {{valid:boolean, msg:string}} */
+	changeUnits(unit) {
+		const result = {valid:false, msg:"Invalid unit"};
+		const units = this.getUnits();
+		for (let i = 0; i < units.length && !result.valid; i++) {
+			if (units[i] == unit) {
+				this.#stats.currentUnit = unit;
+				this.#stats.rerenderPartial();
+				result.valid = true;
+				result.msg = this.show(this.#stats.dataSource);
+			}
+		}
+		return result;
+	}
+
+	/** @returns {string} */
+	#getSortMessage() {
+		let msg = "Showing shapes ";
+		if (this.#stats.sorted) {
+			msg += "in ascending order:\r\n";
+		}
+		else {
+			msg += "unsorted:\r\n";
+		}
+		return msg;
 	}
 
 	close() {

@@ -16,6 +16,7 @@ export class StatisticsActions extends BaseActions {
 			[StatisticsActionList.showStored, () => { return this.#showStored()}],
 			[StatisticsActionList.showAscendant, () => { return this.#showAscendant()}],
 			[StatisticsActionList.showUnsorted, () => { return this.#showUnsorted()}],
+			[StatisticsActionList.changeUnits, (e) => { return this.#tryChangeUnits(e)}],
 			[StatisticsActionList.close, () => { return this.#closeMenu()}],
 		]));
 
@@ -24,19 +25,10 @@ export class StatisticsActions extends BaseActions {
 	};
 
 	activate() {
-		const actionList = [
-			StatisticsActionList.showProduced,
-			StatisticsActionList.showDelivered,
-			StatisticsActionList.showStored,
-			StatisticsActionList.close
-		]
-		if (this.#statsPanel.isSorted()) {
-			actionList.push(StatisticsActionList.showUnsorted);
-		}
-		else {
-			actionList.push(StatisticsActionList.showAscendant);
-		}
-		super.activate(actionList);
+		const units = this.#statsPanel.getUnits();
+		const options = StatisticsActionList.getOptions(units);
+		super.setOptions(options);
+		super.activate();
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
@@ -81,6 +73,11 @@ export class StatisticsActions extends BaseActions {
 			valid: true,
 			msg: this.#statsPanel.sort(false)
 		};
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#tryChangeUnits(params) {
+		return this.#statsPanel.changeUnits(params[StatisticsActionList.unit]);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
