@@ -14,12 +14,30 @@ export class StatisticsActions extends BaseActions {
 			[StatisticsActionList.showProduced, () => { return this.#showProduced()}],
 			[StatisticsActionList.showDelivered, () => { return this.#showDelivered()}],
 			[StatisticsActionList.showStored, () => { return this.#showStored()}],
+			[StatisticsActionList.showAscendant, () => { return this.#showAscendant()}],
+			[StatisticsActionList.showUnsorted, () => { return this.#showUnsorted()}],
 			[StatisticsActionList.close, () => { return this.#closeMenu()}],
 		]));
 
 		this.#root = root;
 		this.#statsPanel = new StatisticsPanelController(root);
 	};
+
+	activate() {
+		const actionList = [
+			StatisticsActionList.showProduced,
+			StatisticsActionList.showDelivered,
+			StatisticsActionList.showStored,
+			StatisticsActionList.close
+		]
+		if (this.#statsPanel.isSorted()) {
+			actionList.push(StatisticsActionList.showUnsorted);
+		}
+		else {
+			actionList.push(StatisticsActionList.showAscendant);
+		}
+		super.activate(actionList);
+	}
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#showProduced() {
@@ -42,6 +60,26 @@ export class StatisticsActions extends BaseActions {
 		return {
 			valid: true,
 			msg: this.#statsPanel.show(enumAnalyticsDataSource.stored)
+		};
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#showAscendant() {
+		super.deactivate([StatisticsActionList.showAscendant]);
+		super.activate([StatisticsActionList.showUnsorted]);
+		return {
+			valid: true,
+			msg: this.#statsPanel.sort(true)
+		};
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#showUnsorted() {
+		super.deactivate([StatisticsActionList.showUnsorted]);
+		super.activate([StatisticsActionList.showAscendant]);
+		return {
+			valid: true,
+			msg: this.#statsPanel.sort(false)
 		};
 	}
 

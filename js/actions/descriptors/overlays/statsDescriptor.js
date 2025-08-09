@@ -1,7 +1,7 @@
 import { globalConfig } from "shapez/core/config";
 import { formatBigNumber } from "shapez/core/utils";
 import { HUDStatistics } from "shapez/game/hud/parts/statistics";
-import { HUDShapeStatisticsHandle, statisticsUnitsSeconds } from "shapez/game/hud/parts/statistics_handle";
+import { statisticsUnitsSeconds } from "shapez/game/hud/parts/statistics_handle";
 import { enumAnalyticsDataSource } from "shapez/game/production_analytics";
 import { T } from "shapez/translations";
 

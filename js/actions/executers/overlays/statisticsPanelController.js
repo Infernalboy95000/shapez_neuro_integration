@@ -29,6 +29,29 @@ export class StatisticsPanelController {
 		}
 	}
 
+	/**
+	 * @param {boolean} sorted
+	 * @returns {string}
+	 * */
+	sort(sorted) {
+		let msg = "Showing shapes ";
+		if (sorted) {
+			msg += "in ascending order:\r\n";
+		}
+		else {
+			msg += "unsorted:\r\n";
+		}
+
+		this.#stats.setSorted(sorted);
+		msg += this.show(this.#stats.dataSource);
+		return msg;
+	}
+
+	/** @returns {boolean} */
+	isSorted() {
+		return this.#stats.sorted;
+	}
+
 	close() {
 		this.#stats.close();
 	}
