@@ -18,17 +18,20 @@ export class MassBuilder {
 
 	/**
 	 * @param {string} buildName
+	 * @param {string} variant
 	 * @param {string} rotName
 	 * @param {number} posX
 	 * @param {number} posY
 	 * @param {("UP"|"DOWN"|"LEFT"|"RIGHT")} dir
 	 * @param {number} lineLength
 	 * @returns {{valid:boolean, msg:string}} */
-	tryPlaceBuildingLine(buildName, rotName, posX, posY, dir, lineLength) {
+	tryPlaceBuildingLine(buildName, variant, rotName, posX, posY, dir, lineLength) {
 		let placedAll = true;
 		let placedSome = false;
 		let currentPos = new Vector(posX, posY);
-		const result = this.#singleBuilder.trySelectAndRotate(buildName, rotName);
+		const result = this.#singleBuilder.trySelectAndRotate(
+			buildName, variant, rotName
+		);
 		if (!result.valid) {
 			return result;
 		}

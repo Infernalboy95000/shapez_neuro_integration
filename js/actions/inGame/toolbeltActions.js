@@ -33,8 +33,9 @@ export class ToolbeltActions extends BaseActions {
 	*/
 	#tryGetBuildingStats(params) {
 		const buildings = this.#toolbeltSelector.getTranslatedBuildings();
+		const building = buildings.get(params[ToolsList.build]);
 		return this.#toolbeltInfo.buildingInfo(
-			buildings.get(params[ToolsList.build])
+			building.id, building.variant
 		);
 	}
 }

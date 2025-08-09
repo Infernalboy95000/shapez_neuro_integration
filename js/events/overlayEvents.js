@@ -80,7 +80,6 @@ export class OverlayEvents {
 	}
 
 	#statsOpenned() {
-		console.log("opening stats");
 		this.#lastOverlay = "stats";
 		ActionsCollection.deactivateActions([
 			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
