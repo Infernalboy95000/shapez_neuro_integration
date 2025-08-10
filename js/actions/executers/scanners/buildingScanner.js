@@ -22,15 +22,14 @@ export class BuildingScanner {
 				if (!inspections.has(entities[i].uid)) {
 					const description = BuildingDescriptor.describe(this.#root, entities[i]);
 					inspections.add(entities[i].uid);
-					result.msg += description.msg;
-					
+
+					if (description.msg != "") {
+						result.msg += `${description.msg}\n`;
+					}
+
 					for (let j = 0; j < description.describedIDs.length; j++) {
 						inspections.add(description.describedIDs[j]);
 					}
-				}
-
-				if (i + 1 < entities.length) {
-					result.msg += "\r\n";
 				}
 			};
 		});

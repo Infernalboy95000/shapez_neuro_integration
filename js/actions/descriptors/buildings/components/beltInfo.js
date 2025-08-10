@@ -18,7 +18,6 @@ export class BeltInfo {
 			const rotName = RotationCodes.getRotationName(entity.originalRotation);
 			log.msg = `It's facing ${rotName}`;
 		}
-		log.msg += "\r\n";
 
 		return log;
 	}

@@ -14,12 +14,11 @@ export class ItemEjectorInfo {
 
 		log.msg += `Outputs:`
 		info.forEach((slots, direction) => {
-			log.msg += `\r\nto ${direction}:`
+			log.msg += `\nto ${direction}:`
 			for (let i = 0; i < slots.length; i++) {
 				log.msg += ` x: ${slots[i].x}, y: ${slots[i].y}.`;
 			}
 		});
-		log.msg += "\r\n";
 
 		return log;
 	}

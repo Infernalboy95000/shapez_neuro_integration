@@ -10,7 +10,8 @@ export class BuildingDescriptor {
 	 * */
 	static describe(root, entity) {
 		const response = {msg:"", describedIDs:[entity.uid]};
-		response.msg += `${StaticEntityInfo.describe(root, entity.components).msg}\r\n`;
+		response.msg += `${StaticEntityInfo.describe(root, entity.components).msg}`;
+		if (response.msg != "") { response.msg += "\n"; }
 		const description = ComponentsInfo.describe(entity);
 		response.msg += description.msg;
 		for(let i = 0; i < description.describedIDs.length; i++) {

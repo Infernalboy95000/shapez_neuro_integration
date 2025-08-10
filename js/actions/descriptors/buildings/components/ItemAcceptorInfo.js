@@ -11,17 +11,21 @@ export class ItemAcceptorInfo {
 	static describe(components) {
 		const log = {msg:"", describedIDs:new Array()};
 		const info = this.#info(components);
+		let count = 0;
 
 		info.forEach((input, filter) => {
 			log.msg += `Accepts ${filter} on inputs:`
 			input.forEach((slots, direction) => {
-				log.msg += `\r\nfrom ${direction}:`
+				log.msg += `\nfrom ${direction}:`
 
 				for (let i = 0; i < slots.length; i++) {
 					log.msg += ` x: ${slots[i].x}, y: ${slots[i].y}.`;
 				}
 			});
-			log.msg += "\r\n";
+			count += 1;
+			if (count < info.size) {
+				log.msg += "\n";
+			}
 		});
 
 		return log;
@@ -50,6 +54,10 @@ export class ItemAcceptorInfo {
 			const pos = rotPos.add(origin);
 			let filter = slots[i].filter;
 			let inputs;
+			if (filter == "shape") {
+				filter = "shapes";
+			}
+
 			if (filteredInputs.has(filter)) {
 				inputs = filteredInputs.get(filter);
 			}
