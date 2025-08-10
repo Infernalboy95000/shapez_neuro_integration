@@ -21,11 +21,10 @@ export class StaticEntityInfo {
 		const staticEntity = components.StaticMapEntity;
 		const origin = staticEntity.origin;
 		const entitiyName = staticEntity.getMetaBuilding().getId();
-		const buildName = T.buildings[entitiyName].default.name;
 		const variant = staticEntity.getVariant();
+		const buildName = T.buildings[entitiyName][variant].name;
 
-		log.msg = `Found${variant == "default" ? " " : ` ${variant} `}${buildName} ` +
-			`at x: ${origin.x}, y: ${origin.y}.`;
+		log.msg = `Found ${buildName} at x: ${origin.x}, y: ${origin.y}.`;
 
 		const direction = staticEntity.rotation;
 		const size = RandomUtils.directionalSize(staticEntity.getTileSize(), direction);

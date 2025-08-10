@@ -2,6 +2,7 @@ import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { MetaBuilding } from "shapez/game/meta_building";
 import { RotationCodes } from "../../descriptors/shapes/rotationCodes";
 import { T } from "shapez/translations";
+import { HUDBaseToolbar } from "shapez/game/hud/parts/base_toolbar";
 
 /** Helps manage the current toolbelt */
 export class ToolbeltSelector {
@@ -102,12 +103,11 @@ export class ToolbeltSelector {
 	 * @param {string} variant
 	 * */
 	#selectBuilding(building, variant) {
-		const handle = this.#root.hud.parts.buildingsToolbar.
-			buildingHandles[building.getId()];
+		const toolbar = this.#getToolbar();
+		const handle = toolbar.buildingHandles[building.getId()];
 
 		if (!handle.selected) {
-			this.#root.hud.parts.buildingsToolbar
-				.selectBuildingForPlacement(building);
+			toolbar.selectBuildingForPlacement(building);
 		}
 
 		this.#root.hud.parts.buildingPlacer.setVariant(variant);
@@ -144,7 +144,7 @@ export class ToolbeltSelector {
 
 	/** @returns {Array<MetaBuilding>} */
 	#getToolbelt() {
-		const buildings = this.#root.hud.parts.buildingsToolbar.allBuildings;
+		const buildings = this.#getToolbar().allBuildings;
 		const metaBuilds = [];
 
 		for (let i = 0; i < buildings.length; i++) {
@@ -154,5 +154,16 @@ export class ToolbeltSelector {
 		}
 
 		return metaBuilds;
+	}
+
+	/** @returns {HUDBaseToolbar} */
+	#getToolbar() {
+		if (this.#root.currentLayer == "regular") {
+			return this.#root.hud.parts.buildingsToolbar;
+		}
+		else {
+			// @ts-ignore
+			return this.#root.hud.parts.wiresToolbar;
+		}
 	}
 }
