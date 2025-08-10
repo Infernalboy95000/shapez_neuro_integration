@@ -5,17 +5,17 @@ export class BuildingStats {
 	/**
 	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {MetaBuilding} building
+	 * @param {string} variant
 	 * @returns {string}
 	 * */
-	static describe(root, building) {
-		const stats = building.getAdditionalStatistics(root, "default");
+	static describe(root, building, variant) {
+		const stats = building.getAdditionalStatistics(root, variant);
 		let msg = "";
-		//TODO: Add variants to this
-		const displayName = T.buildings[building.getId()].default.name;
+		const displayName = T.buildings[building.getId()][variant].name;
 		let info = "";
 
 		if (!root.app.settings.getAllSettings().compactBuildingInfo) {
-			info = T.buildings[building.getId()].default.description;
+			info = T.buildings[building.getId()][variant].description;
 		}
 
 		if (info != "") {

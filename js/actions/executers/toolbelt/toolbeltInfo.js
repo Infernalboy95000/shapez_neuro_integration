@@ -12,17 +12,18 @@ export class ToolbeltInfo {
 	}
 
 	/**
-	 * @param {string} buildingName
+	 * @param {string} buildingID
+	 * @param {string} variant
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	buildingInfo(buildingName) {
-		const result = this.#selector.trySelectBuilding(buildingName);
+	buildingInfo(buildingID, variant) {
+		const result = this.#selector.trySelectBuilding(buildingID, variant);
 		if (!result.valid) {
 			return result;
 		}
 
-		const building = this.#selector.getBuildingByName(buildingName);
-		const msg = BuildingStats.describe(this.#root, building);
+		const building = this.#selector.getBuildingByID(buildingID);
+		const msg = BuildingStats.describe(this.#root, building, variant);
 		if (msg == "") {
 			result.valid = false;
 			result.msg = "Building has no stats.";

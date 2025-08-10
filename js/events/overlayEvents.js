@@ -3,117 +3,126 @@ import { ActionsCollection } from "../actions/base/actionsCollection";
 import { HUDShapeViewer } from "shapez/game/hud/parts/shape_viewer";
 import { ShapeDefinition } from "shapez/game/shape_definition";
 import { HUDStatistics } from "shapez/game/hud/parts/statistics";
+import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
+import { Stack } from "../custom/types/stack";
+import { SdkClient } from "../sdkClient";
+import { T } from "shapez/translations";
 
 export class OverlayEvents {
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {ShapeDefinition} */ static lastShapeDescribed;
-	/** @type {string} */ #lastOverlay = "none";
+	/** @type {Stack} */ #overlays = new Stack();
 
 	/** @param {import("../main").NeuroIntegration} mod */
 	constructor(mod) {
 		const thisClass = this;
-		//this.#notificationActions.addAction(NotificationsActionList.CLOSE_NOTIFICATION);
-
 		mod.modInterface.runAfterMethod( HUDShop, "show",
-			function() { thisClass.#upgradesOpenned(); }
+			function() { thisClass.#overlayOpened("shop"); }
 		);
 
 		mod.modInterface.runAfterMethod( HUDShop, "close",
-			function() { thisClass.#upgradesClosed(); }
+			function() { thisClass.#overlayClosed(); }
 		);
 
 		mod.modInterface.runAfterMethod( HUDShapeViewer, "renderForShape",
 			function(shape) {
 				OverlayEvents.lastShapeDescribed = shape;
-				thisClass.#fullShapeView();
+				thisClass.#overlayOpened("shape");
 			}
 		);
 
 		mod.modInterface.runAfterMethod( HUDShapeViewer, "close",
-			function() { thisClass.#fullShapeClose(); }
+			function() { thisClass.#overlayClosed(); }
 		);
 
 		mod.modInterface.runAfterMethod( HUDStatistics, "show",
-			function() { thisClass.#statsOpenned(); }
+			function() { thisClass.#overlayOpened("stats"); }
 		);
 
 		mod.modInterface.runAfterMethod( HUDStatistics, "close",
-			function() { thisClass.#statsClosed(); }
+			function() { thisClass.#overlayClosed(); }
 		);
-
-		//this.#root.hud.signals.unlockNotificationFinished.add(() => {this.#testCrazy()});
-		//this.#root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
 	}
 
-	#upgradesOpenned() {
-		this.#lastOverlay = "shop";
-		ActionsCollection.deactivateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-		]);
-		ActionsCollection.activateActions(["shop"]);
+	/** @param {import("shapez/game/root").GameRoot} root */
+	updateRoot(root) {
+		this.#root = root;
+		root.hud.signals.unlockNotificationFinished.add(() => {this.#overlayClosed()});
+		root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
 	}
 
-	#upgradesClosed() {
-		this.#lastOverlay = "none";
-		ActionsCollection.deactivateActions(["shop"]);
-		ActionsCollection.activateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-		]);
-	}
-
-	#fullShapeView() {
-		ActionsCollection.deactivateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay", "shop"
-		]);
-		ActionsCollection.activateActions(["shape"]);
-	}
-
-	#fullShapeClose() {
-		ActionsCollection.deactivateActions(["shape"]);
-		if (this.#lastOverlay == "shop") {
-			ActionsCollection.activateActions(["shop"]);
-		}
-		else {
-			ActionsCollection.activateActions([
+	#activateOverlay() {
+		const overlay = this.#overlays.peek();
+		switch (overlay) {
+			case "shop":
+				ActionsCollection.activateActions(["shop"]);
+				break;
+			case "shape":
+				ActionsCollection.activateActions(["shape"]);
+				break;
+			case "stats":
+				ActionsCollection.activateActions(["stats"]);
+				break;
+			case "reward":
+				ActionsCollection.activateActions(["reward"]);
+				break;
+			default:
+				ActionsCollection.activateActions([
 				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
 			]);
 		}
 	}
 
-	#statsOpenned() {
-		console.log("opening stats");
-		this.#lastOverlay = "stats";
-		ActionsCollection.deactivateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-		]);
-		ActionsCollection.activateActions(["stats"]);
+	#deactivateOverlay() {
+		const overlay = this.#overlays.peek();
+		switch (overlay) {
+			case "shop":
+				ActionsCollection.deactivateActions(["shop"]);
+				break;
+			case "shape":
+				ActionsCollection.deactivateActions(["shape"]);
+				break;
+			case "stats":
+				ActionsCollection.deactivateActions(["stats"]);
+				break;
+			case "reward":
+				ActionsCollection.deactivateActions(["reward"]);
+				break;
+			default:
+				ActionsCollection.deactivateActions([
+				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+			]);
+		}
 	}
 
-	#statsClosed() {
-		this.#lastOverlay = "none";
-		ActionsCollection.deactivateActions(["stats"]);
-		ActionsCollection.activateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-		]);
+	/** @param {string} overlay */
+	#overlayOpened(overlay) {
+		this.#deactivateOverlay();
+		this.#overlays.push(overlay);
+		this.#activateOverlay();
+	}
+
+	#overlayClosed() {
+		this.#deactivateOverlay();
+		this.#overlays.pop();
+		this.#activateOverlay();
 	}
 
 	/**
 	 * @param {number} level
 	 * @param {enumHubGoalRewards} reward
 	 */
-	/*
 	#onStoryGoalCompleted(level, reward) {
 		const levels = this.#root.gameMode.getLevelDefinitions();
 
 		if (level <= levels.length) {
-			//this.#actions.removeAllActions();
 			const desc = T.storyRewards[reward].desc;
 			const descText = desc.replace(/<\s*br[^>]?>/,'\n').replace(/<[^>]*>/g,"");
-
+			this.#overlayOpened("reward");
 			SdkClient.sendMessage(
 				`Level ${level} completed! \r\n` +
 				`${descText}`
 			)
-			//this.#notificationActions.activateActions();
 		}
 		else {
 			SdkClient.sendMessage(
@@ -121,5 +130,4 @@ export class OverlayEvents {
 			)
 		}
 	}
-	*/
 }

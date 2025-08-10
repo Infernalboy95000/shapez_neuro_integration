@@ -28,7 +28,7 @@ export class BeltPlannerBuilder {
 		let placedAll = true;
 		let placedSome = false;
 
-		const result = this.#toolbelt.trySelectBuilding("belt");
+		const result = this.#toolbelt.trySelectBuilding("belt", "default");
 		if (!result.valid) {
 			return result;
 		}

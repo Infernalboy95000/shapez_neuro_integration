@@ -14,5 +14,6 @@ export class EventsController {
 	/** @param {import("shapez/game/root").GameRoot} root */
 	updateRoot(root) {
 		this.#inGameEvents.updateRoot(root);
+		this.#overlayEvents.updateRoot(root);
 	}
 }

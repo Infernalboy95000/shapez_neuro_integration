@@ -40,9 +40,9 @@ export class PlacementActions extends BaseActions {
 
 	/**
 	 * @param {string} buildName
-	 * @returns {string}
+	 * @returns {{id:string, variant:string}}
 	 * */
-	#buildKey(buildName) {
+	#getBuilding(buildName) {
 		const buildings = this.#toolbelt.getTranslatedBuildings();
 		return buildings.get(buildName);
 	}
@@ -52,8 +52,9 @@ export class PlacementActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryPlaceBuilding(params) {
+		const building = this.#getBuilding(params[PlaceList.build]);
 		return this.#singleBuilder.tryPlaceBuilding(
-			this.#buildKey(params[PlaceList.build]), params[PlaceList.rot],
+			building.id, building.variant, params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
 		);
 	}
@@ -63,8 +64,9 @@ export class PlacementActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryPlaceBuildingsLine(params) {
+		const building = this.#getBuilding(params[PlaceList.build]);
 		return this.#massBuilder.tryPlaceBuildingLine(
-			this.#buildKey(params[PlaceList.build]), params[PlaceList.rot],
+			building.id, building.variant, params[PlaceList.rot],
 			params[PlaceList.xPos], params[PlaceList.yPos],
 			params[PlaceList.dir], params[PlaceList.lineLength]
 		);

@@ -12,6 +12,7 @@ import { UpgradesActions } from "../actions/overlay/upgradesActions";
 import { ActionsCollection } from "../actions/base/actionsCollection";
 import { ShapeInfoActions } from "../actions/overlay/shapeInfoActions";
 import { StatisticsActions } from "../actions/overlay/statisticsActions";
+import { LevelRewardActions } from "../actions/overlay/levelRewardActions";
 
 export class InGameMode {
 	/** @type {import("../main").NeuroIntegration} */ #mod;
@@ -43,7 +44,7 @@ export class InGameMode {
 		TutorialChecks.buildingScanned = false;
 		ActionsCollection.deactivateActions([
 			"build", "delete", "scan", "camera", "pin", "tools", "overlay",
-			"shop", "shape", "stats"
+			"shop", "shape", "stats", "reward"
 		], true)
 	}
 
@@ -60,6 +61,7 @@ export class InGameMode {
 		actions.set("shop", new UpgradesActions(this.#root));
 		actions.set("shape", new ShapeInfoActions(this.#root));
 		actions.set("stats", new StatisticsActions(this.#root));
+		actions.set("reward", new LevelRewardActions(this.#root));
 		ActionsCollection.addActions(actions);
 	}
 

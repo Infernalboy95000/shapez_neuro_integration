@@ -2,6 +2,7 @@ import { gMetaBuildingRegistry } from "shapez/core/global_registries";
 import { MetaBuilding } from "shapez/game/meta_building";
 import { RotationCodes } from "../../descriptors/shapes/rotationCodes";
 import { T } from "shapez/translations";
+import { HUDBaseToolbar } from "shapez/game/hud/parts/base_toolbar";
 
 /** Helps manage the current toolbelt */
 export class ToolbeltSelector {
@@ -13,30 +14,32 @@ export class ToolbeltSelector {
 	}
 
 	/**
-	 * @param {string} buildingName
+	 * @param {string} buildingID
+	 * @param {string} variant
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	trySelectBuilding(buildingName) {
-		if (!this.#doesBuildingExist(buildingName)) {
-			return {valid:false, msg: `Building ${buildingName} does not exist`};
+	trySelectBuilding(buildingID, variant) {
+		if (!this.#doesBuildingExist(buildingID, variant)) {
+			return {valid:false, msg: `The building does not exist`};
 		}
 
-		const building = this.getBuildingByName(buildingName);
+		const building = this.getBuildingByID(buildingID);
 		if (!this.#isUnlocked(building)) {
-			return {valid:false, msg:`Building ${buildingName} is not unlocked`};
+			return {valid:false, msg:`the building is not unlocked`};
 		}
 
-		this.#selectBuilding(building);
+		this.#selectBuilding(building, variant);
 		return {valid:true, msg:""};
 	}
 
 	/**
-	 * @param {string} buildingName
+	 * @param {string} buildingID
+	 * @param {string} variant
 	 * @param {string} rotKey
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	trySelectAndRotate(buildingName, rotKey) {
-		const result = this.trySelectBuilding(buildingName);
+	trySelectAndRotate(buildingID, variant, rotKey) {
+		const result = this.trySelectBuilding(buildingID, variant);
 		if (!result.valid) {
 			return result;
 		}
@@ -49,55 +52,65 @@ export class ToolbeltSelector {
 		return {valid:true, msg:""};
 	}
 
-	/** @returns {Map<string, string>} */
+	/** @returns {Map<string, {id:string, variant:string}>} */
 	getTranslatedBuildings() {
 		const translations = new Map();
-		const names = this.getAvailableBuildings();
-		for (let i = 0; i < names.length; i++) {
-			//TODO: Add variants to this
-			const buildName = T.buildings[names[i]].default.name;
-			translations.set(buildName, names[i]);
+		const buildings = this.#getAvailableBuildings();
+		for (let i = 0; i < buildings.length; i++) {
+			const fullName = T.buildings[buildings[i].id][buildings[i].variant].name;
+			translations.set(fullName, buildings[i]);
 		}
 
 		return translations;
 	}
 
-	/** @returns {Array<String>} */
-	getAvailableBuildings() {
+	/** @returns {Array<{id:string, variant:string}>} */
+	#getAvailableBuildings() {
+		/** @type {Array<{id:string, variant:string}>} */
 		const buildingNames = [];
 		const buildings = this.#getToolbelt();
 		for (let i = 0; i < buildings.length; i++) {
 			if (this.#isUnlocked(buildings[i])) {
-				buildingNames.push(buildings[i].getId());
+				const variants = buildings[i].getAvailableVariants(this.#root);
+				for (let j = 0; j < variants.length; j++) {
+					buildingNames.push({
+						id:buildings[i].getId(),
+						variant:variants[j]
+					});
+				}
 			}
 		}
 		return buildingNames;
 	}
 
 	/**
-	 * @param {string} buildingName
+	 * @param {string} buildingID
 	 * @returns {MetaBuilding}
 	 */
-	getBuildingByName(buildingName) {
+	getBuildingByID(buildingID) {
 		const buildings = this.#getToolbelt();
 
 		for (let i = 0; i < buildings.length; i++)  {
-			if (buildings[i].getId() == buildingName) {
+			if (buildings[i].getId() == buildingID) {
 				return buildings[i];
 			}
 		}
 		return buildings[0];
 	}
 
-	/** @param {MetaBuilding} building */
-	#selectBuilding(building) {
-		const handle = this.#root.hud.parts.buildingsToolbar.
-			buildingHandles[building.getId()];
+	/**
+	 * @param {MetaBuilding} building
+	 * @param {string} variant
+	 * */
+	#selectBuilding(building, variant) {
+		const toolbar = this.#getToolbar();
+		const handle = toolbar.buildingHandles[building.getId()];
 
 		if (!handle.selected) {
-			this.#root.hud.parts.buildingsToolbar
-				.selectBuildingForPlacement(building);
+			toolbar.selectBuildingForPlacement(building);
 		}
+
+		this.#root.hud.parts.buildingPlacer.setVariant(variant);
 	}
 
 	/** @param {number} rotation */
@@ -107,12 +120,14 @@ export class ToolbeltSelector {
 
 	/**
 	 * @param {string} buildingName
+	 * @param {string} variant
 	 * @returns {boolean}
 	 * */
-	#doesBuildingExist(buildingName) {
-		const buildings = this.#getToolbelt();
+	#doesBuildingExist(buildingName, variant) {
+		const buildings = this.#getAvailableBuildings();
 		for (let i = 0; i < buildings.length; i++) {
-			if (buildings[i].getId() == buildingName) {
+			if (buildings[i].id == buildingName &&
+				buildings[i].variant == variant) {
 				return true;
 			}
 		}
@@ -129,7 +144,7 @@ export class ToolbeltSelector {
 
 	/** @returns {Array<MetaBuilding>} */
 	#getToolbelt() {
-		const buildings = this.#root.hud.parts.buildingsToolbar.allBuildings;
+		const buildings = this.#getToolbar().allBuildings;
 		const metaBuilds = [];
 
 		for (let i = 0; i < buildings.length; i++) {
@@ -139,5 +154,16 @@ export class ToolbeltSelector {
 		}
 
 		return metaBuilds;
+	}
+
+	/** @returns {HUDBaseToolbar} */
+	#getToolbar() {
+		if (this.#root.currentLayer == "regular") {
+			return this.#root.hud.parts.buildingsToolbar;
+		}
+		else {
+			// @ts-ignore
+			return this.#root.hud.parts.wiresToolbar;
+		}
 	}
 }

@@ -14,13 +14,14 @@ export class SingleBuilder {
 	}
 
 	/**
-	 * @param {string} buildName
+	 * @param {string} buildID
+	 * @param {string} variant
 	 * @param {string} rotName
 	 * @param {number} posX
 	 * @param {number} posY
 	 * @returns {{valid:boolean, msg:string}} */
-	tryPlaceBuilding(buildName, rotName, posX, posY) {
-		const result = this.trySelectAndRotate(buildName, rotName);
+	tryPlaceBuilding(buildID, variant, rotName, posX, posY) {
+		const result = this.trySelectAndRotate(buildID, variant, rotName);
 		if (!result.valid) {
 			return result;
 		}
@@ -28,9 +29,9 @@ export class SingleBuilder {
 		const pos = new Vector(posX, posY);
 		if (!this.tryPlaceCurrentAt(posX, posY)) {
 			result.valid = false;
-			result.msg = `Cannot place ${buildName} at x: ${posX}, y: ${posY}.`
+			result.msg = `Cannot place ${buildID} at x: ${posX}, y: ${posY}.`
 
-			const overlap = this.#checkOverlap(buildName, pos);
+			const overlap = this.#checkOverlap(buildID, variant, pos);
 			if (overlap != null) {
 				result.msg += ` It's overlapping a ${overlap.buildName} ` +
 				`at x: ${overlap.position.x}, y: ${overlap.position.y}.`
@@ -42,19 +43,20 @@ export class SingleBuilder {
 		}
 
 		if (result.valid) {
-			this.playPlacementSound(buildName);
-			result.msg = `Placed ${buildName} at x: ${posX}, y: ${posY}.`;
+			this.playPlacementSound(buildID);
+			result.msg = `Placed ${buildID} at x: ${posX}, y: ${posY}.`;
 		}
 
 		return result;
 	}
 
 	/**
-	 * @param {string} buildName
+	 * @param {string} buildID
+	 * @param {string} variant
 	 * @param {string} rotName
 	 * @returns {{valid:boolean, msg:string}} */
-	trySelectAndRotate(buildName, rotName) {
-		return this.#toolbelt.trySelectAndRotate(buildName, rotName);
+	trySelectAndRotate(buildID, variant, rotName) {
+		return this.#toolbelt.trySelectAndRotate(buildID, variant, rotName);
 	}
 
 	/**
@@ -66,26 +68,27 @@ export class SingleBuilder {
 		return this.#root.hud.parts.buildingPlacer.tryPlaceCurrentBuildingAt(pos);
 	}
 
-	/** @param {string} buildName */
-	playPlacementSound(buildName) {
-		const building = this.#toolbelt.getBuildingByName(buildName);
+	/** @param {string} buildID */
+	playPlacementSound(buildID) {
+		const building = this.#toolbelt.getBuildingByID(buildID);
 		this.#root.soundProxy.playUi(building.getPlacementSound());
 	}
 
 	/**
-	 * @param {string} buildName
+	 * @param {string} buildID
+	 * @param {string} variant
 	 * @param {Vector} tile
 	 * @return {{buildName:string,position:Vector,removable:boolean}}
 	 */
-	#checkOverlap(buildName, tile) {
+	#checkOverlap(buildID, variant, tile) {
 		// I feel that this is too complex for what is doing.
-		const building = this.#toolbelt.getBuildingByName(buildName);
+		const building = this.#toolbelt.getBuildingByID(buildID);
 		
 		const { rotation, rotationVariant } = building.computeOptimalDirectionAndRotationVariantAtTile({
 			root: this.#root,
 			tile,
 			rotation: this.#root.hud.parts.buildingPlacer.currentBaseRotation,
-			variant: this.#root.hud.parts.buildingPlacer.currentVariant.lastSeenValue,
+			variant: variant,
 			layer: building.getLayer(),
 		});
 
@@ -96,7 +99,7 @@ export class SingleBuilder {
 			originalRotation: this.#root.hud.parts.buildingPlacer.currentBaseRotation,
 			// @ts-ignore
 			building: building,
-			variant: this.#root.hud.parts.buildingPlacer.currentVariant.lastSeenValue,
+			variant: variant,
 		});
 
 		const rect = entity.components.StaticMapEntity.getTileSpaceBounds();
