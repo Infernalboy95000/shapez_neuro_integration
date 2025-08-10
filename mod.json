@@ -1,7 +1,7 @@
 {
     "entry": "main.js",
     "id": "neuro_integration",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "name": "Shapez Neuro Integration",
     "author": "Infernal_Ekoro",
     "description": "Let's Neuro and Evil play Shapez on their own",
