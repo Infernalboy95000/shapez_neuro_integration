@@ -17,7 +17,7 @@ export class OverlaysActionList {
 			this.saveGame, "Manually save the game."
 		),
 		new SdkAction(
-			this.pauseGame, "Pause the game."
+			this.pauseGame, "Pause the game and open the pause menu."
 		)
 	];
 }

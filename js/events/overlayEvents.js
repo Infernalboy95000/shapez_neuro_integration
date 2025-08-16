@@ -7,6 +7,7 @@ import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 import { Stack } from "../custom/types/stack";
 import { SdkClient } from "../sdkClient";
 import { T } from "shapez/translations";
+import { HUDSettingsMenu } from "shapez/game/hud/parts/settings_menu";
 
 export class OverlayEvents {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -42,6 +43,14 @@ export class OverlayEvents {
 		mod.modInterface.runAfterMethod( HUDStatistics, "close",
 			function() { thisClass.#overlayClosed(); }
 		);
+
+		mod.modInterface.runAfterMethod ( HUDSettingsMenu, "show",
+			function() { thisClass.#overlayOpened("pause"); }
+		);
+
+		mod.modInterface.runAfterMethod ( HUDSettingsMenu, "close",
+			function() { thisClass.#overlayClosed(); }
+		);
 	}
 
 	/** @param {import("shapez/game/root").GameRoot} root */
@@ -66,6 +75,9 @@ export class OverlayEvents {
 			case "reward":
 				ActionsCollection.activateActions(["reward"]);
 				break;
+			case "pause":
+				ActionsCollection.activateActions(["pause"]);
+				break;
 			default:
 				ActionsCollection.activateActions([
 				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
@@ -87,6 +99,9 @@ export class OverlayEvents {
 				break;
 			case "reward":
 				ActionsCollection.deactivateActions(["reward"]);
+				break;
+			case "pause":
+				ActionsCollection.deactivateActions(["pause"]);
 				break;
 			default:
 				ActionsCollection.deactivateActions([
