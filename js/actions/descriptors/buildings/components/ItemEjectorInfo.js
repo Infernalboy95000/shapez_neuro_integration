@@ -12,7 +12,9 @@ export class ItemEjectorInfo {
 		const log = {msg:"", describedIDs:new Array()};
 		const info = this.#info(components);
 
-		log.msg += `Outputs:`
+		if (info.size > 0)
+			log.msg += `Outputs:`
+
 		info.forEach((slots, direction) => {
 			log.msg += `\nto ${direction}:`
 			for (let i = 0; i < slots.length; i++) {

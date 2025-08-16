@@ -8,14 +8,20 @@ export class BuildingDescriptor {
 	 * @param {Entity} entity
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
-	static describe(root, entity) {
-		const response = {msg:"", describedIDs:[entity.uid]};
+	static describe(root, entity, force = false) {
+		//console.log(entity);
+		const response = {msg:"", describedIDs:[entity.uid], skipped:[]};
 		response.msg += `${StaticEntityInfo.describe(root, entity.components).msg}`;
 		if (response.msg != "") { response.msg += "\n"; }
-		const description = ComponentsInfo.describe(entity);
-		response.msg += description.msg;
-		for(let i = 0; i < description.describedIDs.length; i++) {
-			response.describedIDs.push(description.describedIDs[i]);
+		const description = ComponentsInfo.describe(entity, force);
+		if (description.msg == "SKIP") {
+			response.msg = "SKIP";
+		}
+		else {
+			response.msg += description.msg;
+			for(let i = 0; i < description.describedIDs.length; i++) {
+				response.describedIDs.push(description.describedIDs[i]);
+			}
 		}
 
 		return response;

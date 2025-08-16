@@ -29,7 +29,7 @@ export class StaticEntityInfo {
 		const direction = staticEntity.rotation;
 		const size = RandomUtils.directionalSize(staticEntity.getTileSize(), direction);
 		const sizeAbs = size.abs();
-		if (size.equals(new Vector(1, 1))) {
+		if (!size.equals(new Vector(1, 1))) {
 			log.msg +=`\nIt's ` +
 			`${sizeAbs.x} tile${sizeAbs.x > 1 ? "s" : ""} long in x ${size.x > 0 ? "positive" : "negative"}, `+
 			`${sizeAbs.y} tile${sizeAbs.y > 1 ? "s" : ""} tall in y ${size.y > 0 ? "positive" : "negative"}.`;
