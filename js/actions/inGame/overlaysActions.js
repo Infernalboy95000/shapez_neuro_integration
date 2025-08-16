@@ -27,6 +27,20 @@ export class OverlaysActions extends BaseActions {
 		this.#state = state;
 	};
 
+	activate() {
+		const actions = [];
+		if (!this.#root.app.settings.getAllSettings().offerHints ||
+			this.#root.hubGoals.level >= 3 )
+		{
+			actions.push(OverlaysActionList.openUpgrades);
+			actions.push(OverlaysActionList.openStats);
+		}
+		actions.push(OverlaysActionList.saveGame);
+		actions.push(OverlaysActionList.pauseGame);
+
+		super.activate(actions);
+	}
+
 	/** @returns {{valid:boolean, msg:string}} */
 	#openUpgradesMenu() {
 		// @ts-ignore
