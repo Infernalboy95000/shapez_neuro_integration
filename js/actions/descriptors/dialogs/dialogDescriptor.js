@@ -8,10 +8,20 @@ export class DialogDescriptor {
 	 * @returns {string}
 	 * */
 	describe(dialog) {
-		const htmlString = dialog.dialogElem.querySelector(".content").textContent;
+		const htmlString = dialog.dialogElem.querySelector(".content").innerHTML;
 		const msg = `${dialog.title}\n` +
-		`${htmlString}`;
+		`${this.#scrapeWallOfText(htmlString)}`;
 
 		return msg;
+	}
+
+	/**
+	 * @param {string} HTML
+	 * @returns {string}
+	 */
+	#scrapeWallOfText(HTML) {
+		return HTML.replace(/<button class="website[^<]*<\/button>/gm,'')
+			.replace(/<[^\/]*[>]/g,'\n')
+			.replace(/<[^>]*>/g,'');
 	}
 }
