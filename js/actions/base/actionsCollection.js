@@ -32,6 +32,19 @@ export class ActionsCollection {
 		}
 	}
 
+	static deactivateAllActive() {
+		this.#actions.forEach((action) => {
+			action.deactivate();
+		});
+	}
+
+	static clearAllActions() {
+		this.#actions.forEach((action) => {
+			action.deactivate();
+		});
+		this.#actions.clear();
+	}
+
 	/** @returns {{valid:boolean, msg:string}} */
 	static tryPlayerAction(action) {
 		let result = null;

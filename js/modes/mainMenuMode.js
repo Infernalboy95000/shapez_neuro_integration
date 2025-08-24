@@ -2,23 +2,25 @@ import { SdkClient } from "../sdkClient";
 import { StatusDisplay } from "../visuals/statusDisplay";
 import { PlayGameActions } from "../actions/mainMenu/playGameActions";
 import { ActionsCollection } from "../actions/base/actionsCollection";
+import { DialogEvents } from "../events/dialogEvents";
 
 export class MainMenuMode {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {PlayGameActions} */ #playActions;
 	/** @type {StatusDisplay} */ #StatusDisplay;
 	/** @type {boolean} */ #open = false;
-	/** @type {number} */ #timeout;
+	/** @type {NodeJS.Timeout} */ #timeout;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#StatusDisplay = new StatusDisplay();
-		SdkClient.connected.add(() => this.#onConnectedActions());
+		SdkClient.connected.add("mainConn", () => this.#onConnectedActions());
 	}
 
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	menuOpenned(state) {
+		DialogEvents.DIALOG_CLOSED.add("mainDialog", () => this.#onDialogClosed);
 		this.#open = true;
 		this.#playActions = new PlayGameActions(this.#mod, state);
 		ActionsCollection.addActions(new Map([
@@ -47,6 +49,7 @@ export class MainMenuMode {
 		if (this.#timeout) {
 			clearTimeout(this.#timeout);
 		}
+		DialogEvents.DIALOG_CLOSED.remove("mainDialog");
 	}
 
 	#onConnectedActions() {
@@ -89,5 +92,12 @@ export class MainMenuMode {
 		header.appendChild(title);
 
 		return statusDisplay;
+	}
+
+	#onDialogClosed()
+	{
+		if (this.#mod.settings.playerChooseMap) {
+			ActionsCollection.activateActions(["play"]);
+		}
 	}
 }

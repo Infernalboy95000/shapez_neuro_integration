@@ -19,8 +19,8 @@ export class ActionsController {
 		this.#mod = mod;
 		this.#MainMenuMode = new MainMenuMode(mod);
 		this.#SettingsMode = new SettingsMode(mod);
-		SdkClient.connected.add(() => { this.#onPlayerConnected()});
-		SdkClient.action.add((e) => { this.#onPlayerAction(e)});
+		SdkClient.connected.add("actCtrCon", () => { this.#onPlayerConnected()});
+		SdkClient.action.add("actCtrAct", (e) => { this.#onPlayerAction(e)});
 	}
 
 	notifyStateChange(state) {

@@ -8,6 +8,7 @@ import { Stack } from "../custom/types/stack";
 import { SdkClient } from "../sdkClient";
 import { T } from "shapez/translations";
 import { HUDSettingsMenu } from "shapez/game/hud/parts/settings_menu";
+import { DialogEvents } from "./dialogEvents";
 
 export class OverlayEvents {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -58,6 +59,7 @@ export class OverlayEvents {
 		this.#root = root;
 		root.hud.signals.unlockNotificationFinished.add(() => {this.#overlayClosed()});
 		root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
+		//DialogEvents.DIALOG_CLOSED.add("overlayDialog", () => this.#activateOverlay);
 	}
 
 	#activateOverlay() {
@@ -80,8 +82,9 @@ export class OverlayEvents {
 				break;
 			default:
 				ActionsCollection.activateActions([
-				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-			]);
+					"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+				]);
+				break;
 		}
 	}
 
@@ -105,8 +108,9 @@ export class OverlayEvents {
 				break;
 			default:
 				ActionsCollection.deactivateActions([
-				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-			]);
+					"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+				]);
+				break;
 		}
 	}
 

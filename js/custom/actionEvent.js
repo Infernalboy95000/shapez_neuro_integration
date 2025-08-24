@@ -1,14 +1,21 @@
 export class ActionEvent {
-	/** @type {Array<CallableFunction>} */ #callbacks = new Array();
+	/** @type {Map<string, CallableFunction>} */ #callbacks = new Map();
 
-	/** @param {CallableFunction} callable */
-	add(callable) {
-		this.#callbacks.push(callable);
+	/**
+	 * @param {string} key
+	 * @param {CallableFunction} callable */
+	add(key, callable) {
+		this.#callbacks.set(key, callable);
+	}
+
+	/** @param {string} key */
+	remove(key) {
+		this.#callbacks.delete(key);
 	}
 
 	invoke(attribute) {
-		for (let i = 0; i < this.#callbacks.length; i++) {
-			this.#callbacks[i](attribute);
-		}
+		this.#callbacks.forEach((callback) => {
+			callback(attribute);
+		})
 	}
 }

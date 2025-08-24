@@ -63,12 +63,12 @@ export class ConnectionSettings {
 	}
 
 	#setSdkClientEvents() {
-		SdkClient.connected.add(() => { this.#onConnected() });
-		SdkClient.disconnected.add(() => { this.#onDisconnected() });
-		SdkClient.reattempting.add(() => { this.#onReattempting() });
-		SdkClient.closed.add(() => { this.#onClosed() });
-		SdkClient.failed.add(() => { this.#onFailed() });
-		SdkClient.initCrash.add(() => { this.#onInitCrash() });
+		SdkClient.connected.add("settingsCon", () => { this.#onConnected() });
+		SdkClient.disconnected.add("settingsDis", () => { this.#onDisconnected() });
+		SdkClient.reattempting.add("settingsReat", () => { this.#onReattempting() });
+		SdkClient.closed.add("settingsClo", () => { this.#onClosed() });
+		SdkClient.failed.add("settingsFail", () => { this.#onFailed() });
+		SdkClient.initCrash.add("settingsKo", () => { this.#onInitCrash() });
 	}
 
 	#onSdkButtonClicked() {
