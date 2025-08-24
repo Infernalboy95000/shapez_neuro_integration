@@ -6,6 +6,10 @@ import { ClickDetector } from "shapez/core/click_detector";
 import { T } from "shapez/translations";
 
 export class DialogActions extends BaseActions {
+	#bannedDialogs = [
+		"dialog-Language"
+	]
+
 	/** @type {import("../../main").NeuroIntegration} */ #mod
 	/** @type {DialogDescriptor} */ #descriptor;
 	/** @type {Dialog} */ #dialog;
@@ -25,6 +29,8 @@ export class DialogActions extends BaseActions {
 	/** @param {Dialog} dialog */
 	activateByDialog(dialog)
 	{
+		console.log(dialog);
+		if (this.#isBannedDialog(dialog)) { return; }
 		this.#dialog = dialog;
 		this.#buttons = this.#mapOptions(dialog);
 		super.setOptions(DialogActionList.getOptions(
@@ -71,16 +77,33 @@ export class DialogActions extends BaseActions {
 	#mapOptions(dialog)
 	{
 		const buttonsMap = new Map();
+
 		/** @type {Array<ClickDetector>} */
 		const clicks = dialog.clickDetectors;
-		/** @type {Array<string>} */
-		const buttonIds = dialog.buttonIds;
 		for (let i = 0; i < clicks.length; i++)
 		{
-			const buttonID = buttonIds[i].replace(/[:][^:]+/g,'');
-			const btName = T.dialogs.buttons[buttonID];
-			buttonsMap.set(btName, clicks[i]);
+			if (i == 0 && dialog.closeButton)
+				buttonsMap.set("close", clicks[0]);
+			else {
+				const btName = clicks[i].element.innerText;
+				buttonsMap.set(btName, clicks[i]);
+			}
 		}
 		return buttonsMap;
+	}
+
+	/**
+	 * @param {Dialog} dialog
+	 * @returns {boolean}
+	 * */
+	#isBannedDialog(dialog)
+	{
+		const context = dialog.inputReciever.context;
+		for (let i = 0; i < this.#bannedDialogs.length; i++)
+		{
+			if (this.#bannedDialogs[i] == context)
+				return true;
+		}
+		return false;
 	}
 }
