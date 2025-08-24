@@ -1,106 +1,73 @@
 import { BaseActions } from "../base/baseActions";
 import { Dialog } from "shapez/core/modal_dialog_elements";
 import { DialogActionList } from "../lists/dialogs/dialogActionList";
-import { DialogDescriptor } from "../descriptors/dialogs/dialogDescriptor";
-import { ClickDetector } from "shapez/core/click_detector";
-import { T } from "shapez/translations";
+import { DialogController } from "../executers/dialogs/dialogController";
 
 export class DialogActions extends BaseActions {
-	#bannedDialogs = [
-		"dialog-Language"
-	]
+	#bannedDialogs = ["dialog-Language"]
 
 	/** @type {import("../../main").NeuroIntegration} */ #mod
-	/** @type {DialogDescriptor} */ #descriptor;
-	/** @type {Dialog} */ #dialog;
-	/** @type {Map<string, ClickDetector>} */ #buttons;
+	/** @type {DialogController} */ #controller;
 
 	/** @param {import("../../main").NeuroIntegration} mod */
 	constructor(mod) {
 		super(DialogActionList.actions);
 		super.addCallables(new Map([
 			[DialogActionList.read, () => { return this.#read()}],
-			[DialogActionList.chooseOption, (e) => { return this.#chooseOption(e)}],
+			[DialogActionList.chooseOption, (e) => { return this.#tryChooseOption(e)}],
+			[DialogActionList.writeText, (e) => { return this.#tryWriteText(e)}],
 		]));
 		this.#mod = mod;
-		this.#descriptor = new DialogDescriptor();
+		this.#controller = new DialogController();
 	};
 
 	/** @param {Dialog} dialog */
-	activateByDialog(dialog)
-	{
+	activateByDialog(dialog) {
 		console.log(dialog);
 		if (this.#isBannedDialog(dialog)) { return; }
-		this.#dialog = dialog;
-		this.#buttons = this.#mapOptions(dialog);
+		this.#controller.inspect(dialog);
 		super.setOptions(DialogActionList.getOptions(
-			Array.from(this.#buttons.keys())
+			this.#controller.getActionKeys()
 		));
-		this.activate();
+		const actions = [DialogActionList.read, DialogActionList.chooseOption]
+		if (this.#controller.hasInput())
+			actions.push(DialogActionList.writeText);
+		this.activate(actions);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
-	#read()
-	{
-		const result = {valid:false, msg:"There's no dialog to read."}
-		if (this.#dialog) {
-			result.valid = true;
-			result.msg = this.#descriptor.describe(this.#dialog);
+	#read() {
+		return {
+			valid:true,
+			msg:this.#controller.readInfo()
 		}
-		return result;
 	}
 
 	/**
 	 * @param {Object} params
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	#chooseOption(params)
-	{
+	#tryChooseOption(params) {
 		const requested = params[DialogActionList.option];
-		const result = {valid:false, msg:"There's no dialog to close."}
-		if (this.#dialog) {
-			if (this.#buttons.has(requested)) {
-				const button = this.#buttons.get(requested);
-				button.handlerTouchStart(new MouseEvent("mousedown", {button:1}));
-				button.handlerTouchEnd(new MouseEvent("mouseup", {button:1}));
-				result.valid = true;
-				result.msg = "Option executed";
-			}
-		}
-		return result;
+		return this.#controller.tryExecuteAction(requested);
 	}
 
 	/**
-	 * @param {Dialog} dialog
-	 * @returns {Map<string, ClickDetector>}
+	 * @param {Object} params
+	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	#mapOptions(dialog)
-	{
-		const buttonsMap = new Map();
-
-		/** @type {Array<ClickDetector>} */
-		const clicks = dialog.clickDetectors;
-		for (let i = 0; i < clicks.length; i++)
-		{
-			if (i == 0 && dialog.closeButton)
-				buttonsMap.set("close", clicks[0]);
-			else {
-				const btName = clicks[i].element.innerText;
-				buttonsMap.set(btName, clicks[i]);
-			}
-		}
-		return buttonsMap;
+	#tryWriteText(params) {
+		const text = params[DialogActionList.text];
+		return this.#controller.tryInputText(text);
 	}
 
 	/**
 	 * @param {Dialog} dialog
 	 * @returns {boolean}
 	 * */
-	#isBannedDialog(dialog)
-	{
+	#isBannedDialog(dialog) {
 		const context = dialog.inputReciever.context;
-		for (let i = 0; i < this.#bannedDialogs.length; i++)
-		{
+		for (let i = 0; i < this.#bannedDialogs.length; i++) {
 			if (this.#bannedDialogs[i] == context)
 				return true;
 		}
