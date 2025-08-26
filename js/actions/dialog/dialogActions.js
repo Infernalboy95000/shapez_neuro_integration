@@ -14,8 +14,10 @@ export class DialogActions extends BaseActions {
 		super(DialogActionList.actions);
 		super.addCallables(new Map([
 			[DialogActionList.read, () => { return this.#read()}],
-			[DialogActionList.chooseOption, (e) => { return this.#tryChooseOption(e)}],
+			[DialogActionList.pressButton, (e) => { return this.#tryPressButton(e)}],
+			[DialogActionList.setSignal, (e) => { return this.#trySetSignal(e)}],
 			[DialogActionList.writeText, (e) => { return this.#tryWriteText(e)}],
+			[DialogActionList.closeWindow, () => { return this.#tryCloseWindow()}],
 		]));
 		this.#mod = mod;
 		this.#controller = new DialogController();
@@ -25,13 +27,24 @@ export class DialogActions extends BaseActions {
 	activateByDialog(dialog) {
 		console.log(dialog);
 		if (this.#isBannedDialog(dialog)) { return; }
-		this.#controller.inspect(dialog);
+		const inputs = this.#controller.inspect(dialog);
 		super.setOptions(DialogActionList.getOptions(
-			this.#controller.getActionKeys()
+			inputs.buttons, inputs.signals
 		));
-		const actions = [DialogActionList.read, DialogActionList.chooseOption]
-		if (this.#controller.hasInput())
+
+		const actions = [DialogActionList.read];
+		if (inputs.buttons.length > 0)
+			actions.push(DialogActionList.pressButton);
+
+		if (inputs.signals.length > 0)
+			actions.push(DialogActionList.setSignal);
+
+		if (inputs.text)
 			actions.push(DialogActionList.writeText);
+
+		if (inputs.close)
+			actions.push(DialogActionList.closeWindow);
+
 		this.activate(actions);
 	}
 
@@ -47,9 +60,18 @@ export class DialogActions extends BaseActions {
 	 * @param {Object} params
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	#tryChooseOption(params) {
-		const requested = params[DialogActionList.option];
-		return this.#controller.tryExecuteAction(requested);
+	#tryPressButton(params) {
+		const requested = params[DialogActionList.button];
+		return this.#controller.tryPressButton(requested);
+	}
+
+	/**
+	 * @param {Object} params
+	 * @returns {{valid:boolean, msg:string}}
+	 * */
+	#trySetSignal(params) {
+		const requested = params[DialogActionList.signal];
+		return this.#controller.trySetSignal(requested);
 	}
 
 	/**
@@ -59,6 +81,11 @@ export class DialogActions extends BaseActions {
 	#tryWriteText(params) {
 		const text = params[DialogActionList.text];
 		return this.#controller.tryInputText(text);
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#tryCloseWindow() {
+		return this.#controller.tryClose();
 	}
 
 	/**

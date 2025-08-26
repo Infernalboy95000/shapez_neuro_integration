@@ -3,6 +3,7 @@ import { RandomUtils } from "../../../custom/randomUtils";
 import { ShapeCode } from "../shapes/shapeCode";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
+import { SignalDescriptor } from "../signals/signalDescriptor";
 
 export class SimplePatchDescriptor {
 	/**
@@ -16,18 +17,15 @@ export class SimplePatchDescriptor {
 		patchPos.x = Math.floor(patchPos.x + patch.pos.x);
 		patchPos.y = Math.floor(patchPos.y + patch.pos.y);
 		const patchType = patch.item.getItemType();
+		const description = SignalDescriptor.Describe(patch.item);
 
 		switch (patchType) {
 			case "shape":
-				const shapeKey = patch.item.getAsCopyableKey();
-				const desc = ShapeCode.describe(shapeKey);
-				msg = `${desc} shape patch ` +
+				msg = `${description} shape patch ` +
 				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
 				break;
 			case "color":
-				const colorKey = patch.item.getAsCopyableKey();
-				const colorName = RandomUtils.capitalizeFirst(colorKey);
-				msg = `${colorName} color patch ` +
+				msg = `${description} color patch ` +
 				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
 				break;
 			default:

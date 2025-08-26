@@ -4,55 +4,83 @@ import { DialogDescriptor } from "../../descriptors/dialogs/dialogDescriptor";
 
 export class DialogController {
 	/** @type {Dialog} */ #dialog;
-	/** @type {HTMLInputElement} */ #input
-	/** @type {Map<string, ClickDetector>} */ #buttons;
+	/** @type {{buttons:Map<string, ClickDetector>, signals:Map<string, ClickDetector>, text:HTMLInputElement, close:ClickDetector}} */ #inputs;
 	/** @type {DialogDescriptor} */ #descriptor;
 
 	constructor() {
 		this.#descriptor = new DialogDescriptor();
 	}
 
-	/** @param {Dialog} dialog */
+	/**
+	 * @param {Dialog} dialog
+	 * @returns {{
+	 * 		buttons:Array<string>,
+	 * 		signals:Array<string>,
+	 * 		text:{has:boolean, min:number, max:number},
+	 * 		close:boolean
+	 * }}
+	 * */
 	inspect(dialog) {
+		const result = {buttons:[], signals:[], text:{has:false, min:1, max:9}, close:false};
 		this.#dialog = dialog;
-		this.#buttons = this.#mapOptions(dialog);
-		this.#input = dialog.dialogElem.querySelector("input");
-	}
+		this.#inputs = this.#descriptor.mapInputs(dialog);
 
-	/** @returns {{has:boolean, min:number, max:number}} */
-	hasInput() {
-		const result = {has:false, min:0, max:0}
-		if (this.#input)
-		{
-			result.has = true;
-			result.min = this.#input.minLength;
-			result.max = this.#input.maxLength;
+		if (this.#inputs.buttons.size > 0)
+			result.buttons = Array.from(this.#inputs.buttons.keys());
+		
+		if (this.#inputs.signals.size > 0)
+			result.signals = Array.from(this.#inputs.signals.keys());
+		
+		if (this.#inputs.text) {
+			result.text.has = true;
+			result.text.min = this.#inputs.text.minLength;
+			result.text.max = this.#inputs.text.maxLength;
 		}
-		return result;
-	}
 
-	/** @returns {Array<string>} */
-	getActionKeys() {
-		return Array.from(this.#buttons.keys());
+		if (this.#inputs.close)
+			result.close = true;
+
+		return result;
 	}
 
 	/** @returns {string} */
 	readInfo() {
-		return this.#descriptor.describe(this.#dialog);
+		let message = this.#descriptor.describe(this.#dialog);
+		if (this.#inputs.text)
+		{
+			if (this.#inputs.text.value == "")
+				message += ` It's input field is empty`;
+			else
+				message += ` It's input field has '${this.#inputs.text.value}' written on it.`;
+		}
+
+		return message;
 	}
 
 	/**
-	 * @param {string} request
+	 * @param {string} buttonName
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
-	tryExecuteAction(request) {
-		const result = {valid:false, msg:"The option doesn't exist in the current dialog."}
-		if (this.#buttons.has(request)) {
-			const button = this.#buttons.get(request);
-			button.handlerTouchStart(new MouseEvent("mousedown", {button:1}));
-			button.handlerTouchEnd(new MouseEvent("mouseup", {button:1}));
+	tryPressButton(buttonName) {
+		const result = {valid:false, msg:"The button doesn't exist in the current window."}
+		if (this.#inputs.buttons.has(buttonName)) {
+			this.#pressButton(this.#inputs.buttons.get(buttonName));
 			result.valid = true;
-			result.msg = "Option executed.";
+			result.msg = "Button pressed.";
+		}
+		return result;
+	}
+
+	/**
+	 * @param {string} signalName
+	 * @returns {{valid:boolean, msg:string}}
+	 * */
+	trySetSignal(signalName) {
+		const result = {valid:false, msg:"The signal is not predefined in the current window."}
+		if (this.#inputs.signals.has(signalName)) {
+			this.#pressButton(this.#inputs.signals.get(signalName));
+			result.valid = true;
+			result.msg = "Signal set.";
 		}
 		return result;
 	}
@@ -62,46 +90,34 @@ export class DialogController {
 	 * @returns {{valid:boolean, msg:string}}
 	 * */
 	tryInputText(inputText) {
-		const result = {valid:false, msg:"This dialog has no text input."}
-		if (this.hasInput()) {
+		const result = {valid:false, msg:"This window has no text input."}
+		if (this.#inputs.text) {
 			result.valid = true;
-			this.#input.value = inputText;
-			if (this.#input.value == inputText) {
+			this.#inputs.text.value = inputText;
+			if (this.#inputs.text.value == inputText) {
 				result.msg = "Text written correctly.";
 			}
 			else {
-				result.msg = `Not all text could be written. Current text: ${this.#input.value}`;
+				result.msg = `Not all text could be written. Current text: ${this.#inputs.text.value}`;
 			}
 		}
 		return result;
 	}
 
-	/**
-	 * @param {Dialog} dialog
-	 * @returns {Map<string, ClickDetector>}
-	 * */
-	#mapOptions(dialog) {
-		const buttonsMap = new Map();
-
-		/** @type {Array<ClickDetector>} */
-		const clicks = dialog.clickDetectors;
-		for (let i = 0; i < clicks.length; i++)
-		{
-			if (i == 0 && dialog.closeButton)
-				buttonsMap.set("close", clicks[0]);
-			else {
-				const btName = clicks[i].element.innerText;
-				buttonsMap.set(btName, clicks[i]);
-			}
+	/** @returns {{valid:boolean, msg:string}} */
+	tryClose() {
+		const result = {valid:false, msg:"This window has no proper close button."}
+		if (this.#inputs.close) {
+			this.#pressButton(this.#inputs.close);
+			result.valid = true;
+			result.msg = "Window closed.";
 		}
-		return buttonsMap;
+		return result;
 	}
 
-	/**
-	 * @param {Dialog} dialog
-	 * @returns {HTMLInputElement}
-	 * */
-	#searchInputField(dialog) {
-		return 
+	/** @param {ClickDetector} button */
+	#pressButton(button) {
+		button.handlerTouchStart(new MouseEvent("mousedown", {button:1}));
+		button.handlerTouchEnd(new MouseEvent("mouseup", {button:1}));
 	}
 }
