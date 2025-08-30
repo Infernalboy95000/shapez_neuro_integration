@@ -14,6 +14,7 @@ export class BuildingScanner {
 		const result = {valid: false, msg: ""};
 		const chunks = ViewScanner.getVisibleChunks(this.#root);
 		const inspections = new Set();
+		const skipped = [];
 
 		chunks.forEach((chunk) => {
 			const entities = chunk.containedEntitiesByLayer.regular;
@@ -21,19 +22,31 @@ export class BuildingScanner {
 				result.valid = true;
 				if (!inspections.has(entities[i].uid)) {
 					const description = BuildingDescriptor.describe(this.#root, entities[i]);
-					inspections.add(entities[i].uid);
-					result.msg += description.msg;
-					
-					for (let j = 0; j < description.describedIDs.length; j++) {
-						inspections.add(description.describedIDs[j]);
+					if (description.msg == "SKIP") {
+						skipped.push(entities[i]);
 					}
-				}
-
-				if (i + 1 < entities.length) {
-					result.msg += "\r\n";
+					else {
+						if (description.msg != "") {
+							result.msg += `${description.msg}\n`;
+						}
+						inspections.add(entities[i].uid);
+						for (let j = 0; j < description.describedIDs.length; j++) {
+							inspections.add(description.describedIDs[j]);
+						}
+					}
 				}
 			};
 		});
+
+		for (let i = 0; i < skipped.length; i++) {
+			console.log(skipped);
+			if (!inspections.has(skipped[i].uid)) {
+				const description = BuildingDescriptor.describe(this.#root, skipped[i], true);
+				if (description.msg != "") {
+					result.msg += `${description.msg}\n`;
+				}
+			}
+		}
 
 		if (!result.valid) {
 			result.msg = "No buildings in view.";

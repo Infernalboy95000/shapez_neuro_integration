@@ -35,12 +35,12 @@ export class StatusDisplay {
 	}
 
 	#connectEvents() {
-		SdkClient.connected.add(() => { this.#onConnected() });
-		SdkClient.disconnected.add(() => { this.#onDisconnected() });
-		SdkClient.reattempting.add(() => { this.#onReattempting() });
-		SdkClient.closed.add(() => { this.#onClosed() });
-		SdkClient.failed.add(() => { this.#onFailed() });
-		SdkClient.initCrash.add(() => { this.#onInitCrash() });
+		SdkClient.connected.add("statusCon", () => { this.#onConnected() });
+		SdkClient.disconnected.add("statusDis",() => { this.#onDisconnected() });
+		SdkClient.reattempting.add("statusReat",() => { this.#onReattempting() });
+		SdkClient.closed.add("statusClo",() => { this.#onClosed() });
+		SdkClient.failed.add("statusFail",() => { this.#onFailed() });
+		SdkClient.initCrash.add("statusKo",() => { this.#onInitCrash() });
 	}
 
 	#refreshStatus() {

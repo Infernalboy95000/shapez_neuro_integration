@@ -12,7 +12,7 @@ export class StaticEntityInfo {
 	 */
 	static describe(root, components) {
 		const log = {msg:"", describedIDs:[]};
-		// We skip belts due to them having diferent introductions
+		// We skip belts with paths due to them having diferent introductions
 		const belt = components.Belt;
 		if (belt && belt.assignedPath.entityPath.length > 1) {
 			return log;
@@ -30,13 +30,13 @@ export class StaticEntityInfo {
 		const size = RandomUtils.directionalSize(staticEntity.getTileSize(), direction);
 		const sizeAbs = size.abs();
 		if (!size.equals(new Vector(1, 1))) {
-			log.msg +=`\r\nIt's ` +
+			log.msg +=`\nIt's ` +
 			`${sizeAbs.x} tile${sizeAbs.x > 1 ? "s" : ""} long in x ${size.x > 0 ? "positive" : "negative"}, `+
 			`${sizeAbs.y} tile${sizeAbs.y > 1 ? "s" : ""} tall in y ${size.y > 0 ? "positive" : "negative"}.`;
 		}
 
 		if (!staticEntity.getMetaBuilding().getIsRemovable(root)) {
-			log.msg += "\r\nWarning: It cannot be removed!"
+			log.msg += "\nWarning: It cannot be removed!"
 		}
 		return log;
 	}
