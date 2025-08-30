@@ -12,7 +12,7 @@ export class GoalsDescriptor {
 		const goal = root.hubGoals.currentGoal;
 		let msg = "";
 		if (goal) {
-			const shape = ShapeCode.describe(goal.definition.cachedHash);
+			const shape = ShapeCode.describe(goal.definition);
 			msg = `Your goal shape is: ${shape}. ` +
 				`You delivered ${root.hubGoals.getCurrentGoalDelivered()} ` +
 				`out of ${goal.required} required`;
@@ -29,6 +29,7 @@ export class GoalsDescriptor {
 		// @ts-ignore A little SMH that typed.ts has not generated this
 		const pinned = root.hud.parts.pinnedShapes;
 		let msg = "";
+		console.log(pinned.pinnedShapes);
 		if (pinned.pinnedShapes.length > 0) {
 			msg = `Pinned shapes:\r\n`;
 			for (let i = 0; i < pinned.pinnedShapes.length; i++) {
@@ -55,10 +56,15 @@ export class GoalsDescriptor {
 		for (let i = layers.length - 1; i >= 0; --i) {
 			msg += `Layer ${i + 1}:\r\n`;
 
-			for (let quad = 0; quad < 4; ++quad) {
+			console.log(layers);
+			for (let quad = 0; quad < layers[i].length; ++quad) {
 				const contents = layers[i][quad];
-				msg += `${this.quadNames[quad]} corner: ` +
-				`${contents.color} ${contents.subShape}`;
+				if (contents) {
+					msg += `${this.quadNames[quad]} corner: ` +
+					`${contents.color} ${contents.subShape}`;
+				}
+				else
+					msg += `${this.quadNames[quad]} corner: empty.`
 				if (quad + 1 < 4) { msg += "\r\n"; }
 			}
 		}

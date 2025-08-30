@@ -12,7 +12,7 @@ export class SignalDescriptor
 		const key = item.getAsCopyableKey();
 		switch (item.getItemType()) {
 			case "shape":
-				desc = ShapeCode.describe(key);
+				desc = ShapeCode.describe(item.definition);
 				break;
 			case "color":
 				desc = RandomUtils.capitalizeFirst(key);

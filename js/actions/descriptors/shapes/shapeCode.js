@@ -1,78 +1,114 @@
-import { RandomUtils } from "../../../custom/randomUtils";
+import { ShapeDefinition } from "shapez/game/shape_definition";
 
 export class ShapeCode {
+	static #corners = ["top right", "bottom right", "bottom left", "top left"];
+	static #halfs = ["right", "bottom", "left", "top"];
+	static #quarters = ["top left", "top right", "bottom right", "bottom left"];
+
 	/**
-	 * @param {string} code
+	 * @param {ShapeDefinition} shape
 	 * @returns {string}
 	 * */
-	static describe(code) {
-		const color = this.#decodeColor(code);
-		const shape = this.#decodeShape(code);
+	static describe(shape) {
+		console.log(shape);
 
-		if (shape == "") {
-			return `[${code}]`;
+		if (this.#isShapeTooComplex(shape))
+			return `[${shape.getHash()}]`;
+
+		let msg = "";
+		for (let i = 0; i < shape.layers.length; i++) {
+			msg += `${this.#describeLayer(shape.layers[i])}`;
+			if (i + 1 < shape.layers.length)
+				msg += " stacked with:\n";
 		}
-		else if (color == "") {
-			return `${RandomUtils.capitalizeFirst(shape)} [${code}]`;
-		}
-		else {
-			return `${RandomUtils.capitalizeFirst(color)} ${shape} [${code}]`;
-		}
+		return msg;
 	}
 
 	/**
-	 * @param {string} code
+	 * @param {any} layer
 	 * @returns {string}
 	 * */
-	static #decodeShape(code) {
-		if (/^[C].[C].[C].[C].$/.test(code)) {
-			return "circle";
+	static #describeLayer(layer) {
+		/** @type {Map<string, Array<Number>>} */
+		const sameShapes = new Map();
+		let msg = "";
+		for (let i = 0; i < layer.length; i++) {
+			if (layer[i] != null) {
+				const shapeKey = `${layer[i].subShape}/${layer[i].color}`;
+				let shapeColor = [];
+				if (sameShapes.has(shapeKey)) {
+					shapeColor = sameShapes.get(shapeKey);
+				}
+				shapeColor.push(i);
+				sameShapes.set(shapeKey, shapeColor);
+			}
 		}
-		else if (/^[R].[R].[R].[R].$/.test(code)) {
-			return "square";
-		}
-		else if (/^[W].[W].[W].[W].$/.test(code)) {
-			return "windmill";
-		}
-		else if (/^[R].[R].[R].[R].$/.test(code)) {
-			return "star";
-		}
-		else {
-			return "";
-		}
+		
+		let current = 0;
+		sameShapes.forEach((positions) => {
+			const pos = positions[0];
+			if (positions.length == 1) {
+				msg += `${this.#corners[pos]} quarter ${layer[pos].color} ${layer[pos].subShape}`;
+			}
+			else if (positions.length == 2) {
+				if (positions[0] % 2 == positions[1] % 2)
+					msg += `mirrored quarters ${this.#corners[positions[0]]} and ${this.#corners[positions[1]]} ${layer[pos].color} ${layer[pos].subShape}`;
+				else
+					msg += `${this.#halfs[pos]} half ${layer[pos].color} ${layer[pos].subShape}`;
+			}
+			else if (positions.length == 3) {
+				msg += `three quarters ${layer[pos].color} ${layer[pos].subShape} missing ${this.#quarters[pos]}`;
+			}
+			else {
+				msg += `${layer[0].color} ${layer[0].subShape}`;
+			}
+			current += 1;
+			if (current < sameShapes.size)
+				msg += " ";
+		});
+		return msg;
 	}
 
 	/**
-	 * @param {string} code
-	 * @returns {string}
+	 * @param {ShapeDefinition} shape
+	 * @returns {boolean}
 	 * */
-	static #decodeColor(code) {
-		if (/^.[u].[u].[u].[u]$/.test(code)) {
-			return "uncolored";
+	static #isShapeTooComplex(shape) {
+		if (shape.layers.length > 2 ||
+			this.#countColors(shape) > 2 ||
+			this.#countShapes(shape) > 2)
+			return true;
+	}
+
+	/**
+	 * @param {ShapeDefinition} shape
+	 * @returns {Number}
+	 * */
+	static #countColors(shape) {
+		let colors = [];
+		for (let i = 0; i < shape.layers.length; i++) {
+			for (let j = 0; j < shape.layers[i].length; j++) {
+				if (shape.layers[i][j] && !colors.includes(shape.layers[i][j].color)) {
+					colors.push(shape.layers[i][j].color);
+				}
+			}
 		}
-		else if (/^.[r].[r].[r].[r]$/.test(code)) {
-			return "red";
+		return colors.length;
+	}
+
+	/**
+	 * @param {ShapeDefinition} shape
+	 * @returns {Number}
+	 * */
+	static #countShapes(shape) {
+		let shapes = [];
+		for (let i = 0; i < shape.layers.length; i++) {
+			for (let j = 0; j < shape.layers[i].length; j++) {
+				if (shape.layers[i][j] && !shapes.includes(shape.layers[i][j].shape)) {
+					shapes.push(shape.layers[i][j].shape);
+				}
+			}
 		}
-		else if (/^.[g].[g].[g].[g]$/.test(code)) {
-			return "green";
-		}
-		else if (/^.[b].[b].[b].[b]$/.test(code)) {
-			return "blue";
-		}
-		else if (/^.[y].[y].[y].[y]$/.test(code)) {
-			return "yellow";
-		}
-		else if (/^.[p].[p].[p].[p]$/.test(code)) {
-			return "purple";
-		}
-		else if (/^.[c].[c].[c].[c]$/.test(code)) {
-			return "cyan";
-		}
-		else if (/^.[w].[w].[w].[w]$/.test(code)) {
-			return "white";
-		}
-		else {
-			return "";
-		}
+		return shapes.length;
 	}
 }

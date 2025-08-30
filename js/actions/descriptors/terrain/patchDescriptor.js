@@ -3,6 +3,7 @@ import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { ShapeCode } from "../shapes/shapeCode";
 import { RandomUtils } from "../../../custom/randomUtils";
+import { ShapeDefinition } from "shapez/game/shape_definition";
 
 export class PatchDescriptor {
 	/** @type {MapChunkView} */ #chunk
@@ -119,7 +120,7 @@ export class PatchDescriptor {
 			describedKey = RandomUtils.capitalizeFirst(patchKey);
 		}
 		else if (tiles.type == "shape") {
-			describedKey = ShapeCode.describe(patchKey);
+			describedKey = ShapeCode.describe(ShapeDefinition.fromShortKey(patchKey));
 		}
 
 		let msg = `Patch of ${describedKey} ${tiles.type} found in these positions:`;
@@ -179,8 +180,8 @@ export class PatchDescriptor {
 
 		switch (patchType) {
 			case "shape":
-				const shapeKey = patch.item.getAsCopyableKey();
-				const desc = ShapeCode.describe(shapeKey);
+				// @ts-ignore
+				const desc = ShapeCode.describe(patch.item.definition);
 				msg = `${desc} shape patch ` +
 				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
 				break;
