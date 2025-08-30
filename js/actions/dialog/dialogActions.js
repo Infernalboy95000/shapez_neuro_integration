@@ -29,7 +29,7 @@ export class DialogActions extends BaseActions {
 		if (this.#isBannedDialog(dialog)) { return; }
 		const inputs = this.#controller.inspect(dialog);
 		super.setOptions(DialogActionList.getOptions(
-			inputs.buttons, inputs.signals
+			inputs.buttons, inputs.signals, inputs.text.min, inputs.text.max
 		));
 
 		const actions = [DialogActionList.read];
@@ -39,7 +39,7 @@ export class DialogActions extends BaseActions {
 		if (inputs.signals.length > 0)
 			actions.push(DialogActionList.setSignal);
 
-		if (inputs.text)
+		if (inputs.text.has)
 			actions.push(DialogActionList.writeText);
 
 		if (inputs.close)
