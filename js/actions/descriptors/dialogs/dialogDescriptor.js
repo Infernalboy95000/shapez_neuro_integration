@@ -13,8 +13,9 @@ export class DialogDescriptor {
 	 * */
 	describe(dialog) {
 		const htmlString = dialog.dialogElem.querySelector(".content").innerHTML;
+		console.log(htmlString);
 		const msg = `${dialog.title}\n` +
-		`${this.#scrapeWallOfText(htmlString)}.`;
+		`${this.#scrapeWallOfText(htmlString)}`;
 
 		return msg;
 	}
@@ -95,8 +96,17 @@ export class DialogDescriptor {
 	 * @returns {string}
 	 */
 	#scrapeWallOfText(HTML) {
-		return HTML.replace(/<button class="website[^<]*<\/button>/gm,'')
+		if (HTML.includes('<button class="website', 0)) {
+			return HTML.replace(/<button class="website[^<]*<\/button>/gm,'')
 			.replace(/<[^\/]*[>]/g,'\n')
-			.replace(/<[^>]*>/g,'');
+			.replace(/<[^>]*>/g,'')
+			.replace(/(\n){2,}/g,'\n');
+		}
+		else {
+			return HTML.replace(/<button class="website[^<]*<\/button>/gm,'')
+			.replace(/<[^>]*>/g,'')
+			.replace(/( ){2,}/g,'')
+			.replace(/(\n){2,}/g,'\n');
+		}
 	}
 }

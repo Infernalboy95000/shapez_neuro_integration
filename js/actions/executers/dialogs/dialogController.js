@@ -49,9 +49,9 @@ export class DialogController {
 		if (this.#inputs.text)
 		{
 			if (this.#inputs.text.value == "")
-				message += ` It's input field is empty`;
+				message += `It's input field is empty`;
 			else
-				message += ` It's input field has '${this.#inputs.text.value}' written on it.`;
+				message += `It's input field has '${this.#inputs.text.value}' written on it.`;
 		}
 
 		return message;
