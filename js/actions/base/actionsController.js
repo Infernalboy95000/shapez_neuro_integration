@@ -55,7 +55,8 @@ export class ActionsController {
 				this.#MainMenuMode.menuClosed();
 				break;
 			case "InGameState":
-				this.#InGameMode.gameClosed();
+				if (this.#InGameMode)
+					this.#InGameMode.gameClosed();
 				break;
 		}
 	}

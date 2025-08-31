@@ -3,6 +3,7 @@ import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { RandomUtils } from "../../../custom/randomUtils";
 import { ShapeCode } from "../shapes/shapeCode";
+import { ColorCodes } from "../shapes/colorCodes";
 
 export class AdvancedPatchDescriptor {
 	/**
@@ -63,7 +64,7 @@ export class AdvancedPatchDescriptor {
 	static #describeLayerInfo(item, tiles) {
 		let describedKey = "unknown";
 		if (tiles.type == "color") {
-			describedKey = RandomUtils.capitalizeFirst(item.getAsCopyableKey());
+			describedKey = ColorCodes.describe(item.getAsCopyableKey());
 		}
 		else if (tiles.type == "shape") {
 			// @ts-ignore

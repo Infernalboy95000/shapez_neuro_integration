@@ -13,7 +13,6 @@ export class DialogDescriptor {
 	 * */
 	describe(dialog) {
 		const htmlString = dialog.dialogElem.querySelector(".content").innerHTML;
-		console.log(htmlString);
 		const msg = `${dialog.title}\n` +
 		`${this.#scrapeWallOfText(htmlString)}`;
 

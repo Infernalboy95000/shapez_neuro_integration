@@ -25,7 +25,6 @@ export class DialogActions extends BaseActions {
 
 	/** @param {Dialog} dialog */
 	activateByDialog(dialog) {
-		console.log(dialog);
 		if (this.#isBannedDialog(dialog)) { return; }
 		const inputs = this.#controller.inspect(dialog);
 		super.setOptions(DialogActionList.getOptions(

@@ -1,4 +1,4 @@
-import { RandomUtils } from "../../../custom/randomUtils";
+import { ColorCodes } from "../shapes/colorCodes";
 import { ShapeCode } from "../shapes/shapeCode";
 
 export class SignalDescriptor
@@ -12,10 +12,11 @@ export class SignalDescriptor
 		const key = item.getAsCopyableKey();
 		switch (item.getItemType()) {
 			case "shape":
+				// @ts-ignore
 				desc = ShapeCode.describe(item.definition);
 				break;
 			case "color":
-				desc = RandomUtils.capitalizeFirst(key);
+				desc = ColorCodes.describe(key);
 				break;
 			case "boolean":
 				desc = key;

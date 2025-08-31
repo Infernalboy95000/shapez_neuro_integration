@@ -39,7 +39,6 @@ export class BuildingScanner {
 		});
 
 		for (let i = 0; i < skipped.length; i++) {
-			console.log(skipped);
 			if (!inspections.has(skipped[i].uid)) {
 				const description = BuildingDescriptor.describe(this.#root, skipped[i], true);
 				if (description.msg != "") {

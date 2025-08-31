@@ -22,18 +22,18 @@ export class SimplePatchDescriptor {
 		switch (patchType) {
 			case "shape":
 				msg = `${description} shape patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
+				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 			case "color":
 				msg = `${description} color patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
+				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 			default:
 				msg = `unknown patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
+				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 		}
 
-		return msg;
+		return RandomUtils.capitalizeFirst(msg);
 	}
 }

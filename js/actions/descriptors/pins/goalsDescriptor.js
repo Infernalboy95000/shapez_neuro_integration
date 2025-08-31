@@ -1,5 +1,6 @@
 import { ShapeDefinition } from "shapez/game/shape_definition";
 import { ShapeCode } from "../shapes/shapeCode";
+import { ColorCodes } from "../shapes/colorCodes";
 
 export class GoalsDescriptor {
 	static quadNames = ["Top right", "Bottom right", "Bottom left", "Top left"];
@@ -29,7 +30,6 @@ export class GoalsDescriptor {
 		// @ts-ignore A little SMH that typed.ts has not generated this
 		const pinned = root.hud.parts.pinnedShapes;
 		let msg = "";
-		console.log(pinned.pinnedShapes);
 		if (pinned.pinnedShapes.length > 0) {
 			msg = `Pinned shapes:\r\n`;
 			for (let i = 0; i < pinned.pinnedShapes.length; i++) {
@@ -55,13 +55,11 @@ export class GoalsDescriptor {
 		const layers = shape.layers;
 		for (let i = layers.length - 1; i >= 0; --i) {
 			msg += `Layer ${i + 1}:\r\n`;
-
-			console.log(layers);
 			for (let quad = 0; quad < layers[i].length; ++quad) {
 				const contents = layers[i][quad];
 				if (contents) {
 					msg += `${this.quadNames[quad]} corner: ` +
-					`${contents.color} ${contents.subShape}`;
+					`${ColorCodes.describe(contents.color)} ${contents.subShape}`;
 				}
 				else
 					msg += `${this.quadNames[quad]} corner: empty.`

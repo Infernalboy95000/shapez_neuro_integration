@@ -7,6 +7,7 @@ import { BaseItem } from "shapez/game/base_item";
 import { ColorItem } from "shapez/game/items/color_item";
 import { ShapeItem } from "shapez/game/items/shape_item";
 import { ShapeCode } from "../../shapes/shapeCode";
+import { ColorCodes } from "../../shapes/colorCodes";
 
 export class BeltInfo {
 	/**
@@ -14,7 +15,6 @@ export class BeltInfo {
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
 	static describe(belt) {
-		console.log(belt);
 		let log = {msg:"", describedIDs:new Array()};
 		const path = belt.Belt.assignedPath.entityPath;
 		if (path.length > 1) {
@@ -41,7 +41,7 @@ export class BeltInfo {
 			let count = 0;
 			info.items.forEach((itemMap) => {
 				if (itemMap.item instanceof ColorItem) {
-					log.msg += `${itemMap.count} ${itemMap.item.color}`
+					log.msg += `${itemMap.count} ${ColorCodes.describe(itemMap.item.color)}`
 				}
 				else if (itemMap.item instanceof ShapeItem) {
 					log.msg += `${itemMap.count} ${ShapeCode.describe(itemMap.item.definition)}`

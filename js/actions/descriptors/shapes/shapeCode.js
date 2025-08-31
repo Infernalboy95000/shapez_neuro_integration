@@ -1,4 +1,5 @@
 import { ShapeDefinition } from "shapez/game/shape_definition";
+import { ColorCodes } from "./colorCodes";
 
 export class ShapeCode {
 	static #corners = ["top right", "bottom right", "bottom left", "top left"];
@@ -10,8 +11,6 @@ export class ShapeCode {
 	 * @returns {string}
 	 * */
 	static describe(shape) {
-		console.log(shape);
-
 		if (this.#isShapeTooComplex(shape))
 			return `[${shape.getHash()}]`;
 
@@ -34,7 +33,7 @@ export class ShapeCode {
 		let msg = "";
 		for (let i = 0; i < layer.length; i++) {
 			if (layer[i] != null) {
-				const shapeKey = `${layer[i].subShape}/${layer[i].color}`;
+				const shapeKey = `${layer[i].subShape}/${ColorCodes.describe(layer[i].color)}`;
 				let shapeColor = [];
 				if (sameShapes.has(shapeKey)) {
 					shapeColor = sameShapes.get(shapeKey);
@@ -48,19 +47,19 @@ export class ShapeCode {
 		sameShapes.forEach((positions) => {
 			const pos = positions[0];
 			if (positions.length == 1) {
-				msg += `${this.#corners[pos]} quarter ${layer[pos].color} ${layer[pos].subShape}`;
+				msg += `${this.#corners[pos]} quarter ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape}`;
 			}
 			else if (positions.length == 2) {
 				if (positions[0] % 2 == positions[1] % 2)
-					msg += `mirrored quarters ${this.#corners[positions[0]]} and ${this.#corners[positions[1]]} ${layer[pos].color} ${layer[pos].subShape}`;
+					msg += `mirrored quarters ${this.#corners[positions[0]]} and ${this.#corners[positions[1]]} ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape}`;
 				else
-					msg += `${this.#halfs[pos]} half ${layer[pos].color} ${layer[pos].subShape}`;
+					msg += `${this.#halfs[pos]} half ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape}`;
 			}
 			else if (positions.length == 3) {
-				msg += `three quarters ${layer[pos].color} ${layer[pos].subShape} missing ${this.#quarters[pos]}`;
+				msg += `three quarters ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape} missing ${this.#quarters[pos]}`;
 			}
 			else {
-				msg += `${layer[0].color} ${layer[0].subShape}`;
+				msg += `${ColorCodes.describe(layer[0].color)} ${layer[0].subShape}`;
 			}
 			current += 1;
 			if (current < sameShapes.size)
