@@ -1,6 +1,12 @@
 import { EntityComponentStorage } from "shapez/game/entity_components";
 import { RotationCodes } from "../../shapes/rotationCodes";
 import { Entity } from "shapez/game/entity";
+import { StaticEntityInfo } from "../staticEntityInfo";
+import { BeltComponent } from "shapez/game/components/belt";
+import { BaseItem } from "shapez/game/base_item";
+import { ColorItem } from "shapez/game/items/color_item";
+import { ShapeItem } from "shapez/game/items/shape_item";
+import { ShapeCode } from "../../shapes/shapeCode";
 
 export class BeltInfo {
 	/**
@@ -8,6 +14,7 @@ export class BeltInfo {
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
 	static describe(belt) {
+		console.log(belt);
 		let log = {msg:"", describedIDs:new Array()};
 		const path = belt.Belt.assignedPath.entityPath;
 		if (path.length > 1) {
@@ -16,7 +23,48 @@ export class BeltInfo {
 		else {
 			const entity = belt.StaticMapEntity;
 			const rotName = RotationCodes.getRotationName(entity.originalRotation);
-			log.msg = `It's facing ${rotName}`;
+			log.msg = `It's facing ${rotName}.`;
+		}
+
+		let connected = belt.Belt.assignedPath.boundAcceptor;
+		if (connected) {
+			const acceptor = belt.Belt.assignedPath.computeAcceptingEntityAndSlot().entity;
+			log.msg += ` It's connected to ${StaticEntityInfo.simple(acceptor.components.StaticMapEntity)}.`
+		}
+		else {
+			log.msg += " It's not connected to any building.";
+		}
+
+		if (belt.Belt.assignedPath.items.length > 0) {
+			log.msg += " It contains "
+			const info = this.#countItems(belt.Belt);
+			let count = 0;
+			info.items.forEach((itemMap) => {
+				if (itemMap.item instanceof ColorItem) {
+					log.msg += `${itemMap.count} ${itemMap.item.color}`
+				}
+				else if (itemMap.item instanceof ShapeItem) {
+					log.msg += `${itemMap.count} ${ShapeCode.describe(itemMap.item.definition)}`
+					if (itemMap.count > 1)
+						log.msg += "s";
+				}
+				else {
+					log.msg += `${itemMap.count} unknown pieces`
+				}
+				count += 1;
+				if (count < info.items.size)
+					log.msg += ", ";
+			});
+			log.msg += "."
+
+			if (info.full) {
+				log.msg += " It's full of items."
+				if (connected)
+					log.msg += " Maybe the connected machine is too slow or it's stuck."
+			}
+		}
+		else {
+			log.msg += " It's empty."
 		}
 
 		return log;
@@ -64,5 +112,34 @@ export class BeltInfo {
 		}
 
 		return log;
+	}
+
+	/**
+	 * @param {BeltComponent} belt
+	 * @returns {{items:Map<String, {item:BaseItem, count:Number}>, full:boolean}}
+	 * */
+	static #countItems(belt) {
+		/** @type {Map<String, {item:BaseItem, count:Number}>} */
+		const itemsMap = new Map();
+		let spacing = 0;
+
+		for (let i = 0; i < belt.assignedPath.items.length; i++) {
+			const item = belt.assignedPath.items[i];
+			const key = item[1].getAsCopyableKey();
+			let itemMap;
+			if (itemsMap.has(key)) {
+				itemMap = itemsMap.get(key);
+				itemMap.count += 1;
+			}
+			else {
+				itemMap = {item:item[1], count:1}
+			}
+			itemsMap.set(key, itemMap);
+			spacing += item[0];
+		}
+
+		const itemsSpace = spacing + belt.assignedPath.numCompressedItemsAfterFirstItem;
+
+		return {items:itemsMap, full:(itemsSpace >= belt.assignedPath.totalLength)};
 	}
 }
