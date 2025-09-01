@@ -1,7 +1,6 @@
 import { Vector } from "shapez/core/vector";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
-import { RandomUtils } from "../../../custom/randomUtils";
 import { ShapeCode } from "../shapes/shapeCode";
 import { ColorCodes } from "../shapes/colorCodes";
 
