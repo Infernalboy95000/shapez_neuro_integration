@@ -1,9 +1,49 @@
 import { ShapeDefinition } from "shapez/game/shape_definition";
 import { ShapeCode } from "../shapes/shapeCode";
 import { ColorCodes } from "../shapes/colorCodes";
+import { T } from "shapez/translations";
 
 export class GoalsDescriptor {
 	static quadNames = ["Top right", "Bottom right", "Bottom left", "Top left"];
+
+	/**
+	 * @param {import("shapez/game/root").GameRoot} root
+	 * @returns {{boosts:Array<string>, full:Array<string>, pin:Array<string>, unpin:Array<string>, goal:string}}
+	 * */
+	static compileInfo(root) {
+		const compile = { boosts:["all"], full:[], pin:[], unpin: [], goal:""};
+		const upgrades = root.gameMode.getUpgrades();
+		const currentGoalShape = root.hubGoals.currentGoal.definition.getHash();
+		compile.goal = currentGoalShape;
+		for (const [id, _] of Object.entries(upgrades)) {
+			compile.boosts.push(T.shopUpgrades[id].name);
+			const tiers = upgrades[id];
+			const tier = root.hubGoals.getUpgradeLevel(id);
+			const tierHandle = tiers[tier];
+			let full = true;
+			tierHandle.required.forEach(({ shape, amount }) => {
+				const have = root.hubGoals.getShapesStoredByKey(shape);
+				if (currentGoalShape != shape) {
+					// @ts-ignore
+					if (root.hud.parts.pinnedShapes.isShapePinned(shape)) {
+						compile.unpin.push(shape);
+					}
+					else {
+						compile.pin.push(shape);
+					}
+				}
+
+				if (have < amount) {
+					full = false;
+				}
+			});
+
+			if (full) {
+				compile.full.push(T.shopUpgrades[id].name)
+			}
+		}
+		return compile;
+	}
 
 	/**
 	 * @param {import("shapez/game/root").GameRoot} root

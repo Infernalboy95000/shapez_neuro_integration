@@ -8,11 +8,12 @@ import { Stack } from "../custom/types/stack";
 import { SdkClient } from "../sdkClient";
 import { T } from "shapez/translations";
 import { HUDSettingsMenu } from "shapez/game/hud/parts/settings_menu";
-import { DialogEvents } from "./dialogEvents";
 
 export class OverlayEvents {
-	/** @type {import("shapez/game/root").GameRoot} */ #root;
+	/** @type {string} */ static currentOverlay;
 	/** @type {ShapeDefinition} */ static lastShapeDescribed;
+
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {Stack} */ #overlays = new Stack();
 
 	/** @param {import("../main").NeuroIntegration} mod */
@@ -119,12 +120,14 @@ export class OverlayEvents {
 		this.#deactivateOverlay();
 		this.#overlays.push(overlay);
 		this.#activateOverlay();
+		OverlayEvents.currentOverlay = overlay;
 	}
 
 	#overlayClosed() {
 		this.#deactivateOverlay();
 		this.#overlays.pop();
 		this.#activateOverlay();
+		OverlayEvents.currentOverlay = this.#overlays.peek();
 	}
 
 	/**

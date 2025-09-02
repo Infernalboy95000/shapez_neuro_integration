@@ -11,19 +11,23 @@ export class UpgradesDescriptor {
 	}
 
 	/**
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {string} shapeCode
 	 * @returns {HTMLButtonElement}
 	 * */
-	static getPinForShape(shapeCode) {
+	static getPinForShape(root, shapeCode) {
+		if (this.#pinButtons.size <= 0)
+			UpgradesDescriptor.getInfo(root);
 		return this.#pinButtons.get(shapeCode);
 	}
 
 	/**
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {string} shapeCode
 	 * @returns {boolean}
 	 * */
-	static showAsPinned(shapeCode) {
-		const button = this.getPinForShape(shapeCode);
+	static showAsPinned(root, shapeCode) {
+		const button = this.getPinForShape(root, shapeCode);
 		if (button) {
 			button.classList.add("pinned");
 			button.classList.remove("unpinned");
@@ -33,11 +37,12 @@ export class UpgradesDescriptor {
 	}
 
 	/**
+	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {string} shapeCode
 	 * @returns {boolean}
 	 * */
-	static showAsUnpinned(shapeCode) {
-		const button = this.getPinForShape(shapeCode);
+	static showAsUnpinned(root, shapeCode) {
+		const button = this.getPinForShape(root, shapeCode);
 		if (button) {
 			button.classList.add("unpinned");
 			button.classList.remove("pinned", "alreadyPinned");

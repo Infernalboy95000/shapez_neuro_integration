@@ -38,41 +38,6 @@ export class UpgradesPanelController {
 		return result;
 	}
 
-	/** @returns {{boosts:Array<string>, full:Array<string>, pin:Array<string>, unpin:Array<string>}} */
-	compileInfo() {
-		const compile = { boosts:["all"], full:[], pin:[], unpin: [] };
-		const upgrades = this.#root.gameMode.getUpgrades();
-		const currentGoalShape = this.#root.hubGoals.currentGoal.definition.getHash();
-		for (const [id, _] of Object.entries(upgrades)) {
-			compile.boosts.push(T.shopUpgrades[id].name);
-			const tiers = upgrades[id];
-			const tier = this.#root.hubGoals.getUpgradeLevel(id);
-			const tierHandle = tiers[tier];
-			let full = true;
-			tierHandle.required.forEach(({ shape, amount }) => {
-				const have = this.#root.hubGoals.getShapesStoredByKey(shape);
-				if (currentGoalShape != shape) {
-					// @ts-ignore
-					if (this.#root.hud.parts.pinnedShapes.isShapePinned(shape)) {
-						compile.unpin.push(shape);
-					}
-					else {
-						compile.pin.push(shape);
-					}
-				}
-
-				if (have < amount) {
-					full = false;
-				}
-			});
-
-			if (full) {
-				compile.full.push(T.shopUpgrades[id].name)
-			}
-		}
-		return compile;
-	}
-
 	/**
 	 * @param {string} upgrade
 	 * @returns {{valid:boolean, msg:string}}
@@ -100,7 +65,7 @@ export class UpgradesPanelController {
 	tryShowAsPinned(shapeCode) {
 		const result = this.#tryGetPinnedShape(shapeCode);
 		if (result.valid) {
-			UpgradesDescriptor.showAsPinned(shapeCode);
+			UpgradesDescriptor.showAsPinned(this.#root, shapeCode);
 		}
 		return result;
 	}
@@ -112,7 +77,7 @@ export class UpgradesPanelController {
 	tryShowAsUnpinned(shapeCode) {
 		const result = this.#tryGetPinnedShape(shapeCode);
 		if (result.valid) {
-			UpgradesDescriptor.showAsUnpinned(shapeCode);
+			UpgradesDescriptor.showAsUnpinned(this.#root, shapeCode);
 		}
 		return result;
 	}
@@ -142,8 +107,9 @@ export class UpgradesPanelController {
 	 */
 	#tryGetPinnedShape(shapeCode) {
 		const result = {valid:false, msg:"shape is not on the upgrades list."};
-		if (UpgradesDescriptor.getPinForShape(shapeCode)) {
+		if (UpgradesDescriptor.getPinForShape(this.#root, shapeCode)) {
 			result.valid = true;
+			result.msg = "Shape pinned correctly";
 		}
 		return result;
 	}

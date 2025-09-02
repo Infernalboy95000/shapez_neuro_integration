@@ -41,10 +41,12 @@ export class UpgradesActionList {
 	 * @param {Array<string>} upBoosts
 	 * @param {Array<string>} shapesToPin
 	 * @param {Array<string>} shapesToUnpin
+	 * @param {string} goal
 	 * @returns {Map<string, Array<SchemaBase>>}
 	 * */
-	static getOptions(boosts, upBoosts, shapesToPin, shapesToUnpin) {
+	static getOptions(boosts, upBoosts, shapesToPin, shapesToUnpin, goal) {
 		const shapes = shapesToPin.concat(shapesToUnpin);
+		shapes.push(goal);
 		const options = {
 			[this.boost]: new EnumSchema(this.boost, boosts),
 			[this.upBoost]: new EnumSchema(this.upBoost, upBoosts),
