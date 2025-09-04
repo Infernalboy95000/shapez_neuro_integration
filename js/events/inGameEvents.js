@@ -32,6 +32,20 @@ export class InGameEvents {
 		root.signals.editModeChanged.add(this.#layersSwitched, this);
 		root.signals.upgradePurchased.add(this.#refreshShop, this);
 		root.hud.signals.shapePinRequested.add(this.#refreshPins, this);
+		OverlayEvents.OVERLAYS_CLOSED.add("event_overs_closed", () => { this.#onDialogClosed(); });
+	}
+
+	#restoreGameActions() {
+		if (this.#root.camera.getIsMapOverlayActive()) {
+			ActionsCollection.activateActions([
+				"massDelete", "scan", "camera"
+			]);
+		}
+		else {
+			ActionsCollection.activateActions([
+				"build", "delete", "massDelete", "scan", "camera"
+			]);
+		}
 	}
 
 	//TODO This doesn't work when the player moves the camera slightly with mouse movement or keyboard
@@ -43,16 +57,14 @@ export class InGameEvents {
 		if (this.#moving) {
 			if (!this.#root.camera.viewportWillChange()) {
 				this.#moving = false;
-				ActionsCollection.activateActions([
-					"build", "delete", "scan", "camera"
-				]);
+				this.#restoreGameActions();
 			}
 		}
 		else {
 			if (this.#root.camera.viewportWillChange()) {
 				this.#moving = true;
 				ActionsCollection.deactivateActions([
-					"build", "delete", "scan", "camera"
+					"build", "delete", "massDelete", "scan", "camera"
 				]);
 			}
 		}
@@ -82,5 +94,10 @@ export class InGameEvents {
 			ActionsCollection.deactivateActions(["shop"]);
 			ActionsCollection.activateActions(["shop"]);
 		}
+	}
+
+	#onDialogClosed() {
+		ActionsCollection.activateActions(["pin", "tools", "overlay"]);
+		this.#restoreGameActions();
 	}
 }

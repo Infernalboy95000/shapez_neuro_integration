@@ -14,6 +14,9 @@ import { ShapeInfoActions } from "../actions/overlay/shapeInfoActions";
 import { StatisticsActions } from "../actions/overlay/statisticsActions";
 import { LevelRewardActions } from "../actions/overlay/levelRewardActions";
 import { PauseMenuActions } from "../actions/overlay/pauseMenuActions";
+import { MassDeleteActions } from "../actions/inGame/massDeleteActions";
+import { DialogEvents } from "../events/dialogEvents";
+import { OverlayEvents } from "../events/overlayEvents";
 
 export class InGameMode {
 	/** @type {import("../main").NeuroIntegration} */ #mod;
@@ -34,7 +37,7 @@ export class InGameMode {
 			this.#declareActions(state);
 			this.#announceOpening();
 			ActionsCollection.activateActions([
-				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+				"build", "delete", "massDelete", "scan", "camera", "pin", "tools", "overlay"
 			])
 		}
 	}
@@ -44,9 +47,11 @@ export class InGameMode {
 		TutorialChecks.deepScanned = false;
 		TutorialChecks.buildingScanned = false;
 		ActionsCollection.deactivateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay",
-			"shop", "shape", "stats", "reward", "pause"
-		], true)
+			"build", "delete", "massDelete", "scan", "camera", "pin", "tools",
+			"overlay", "shop", "shape", "stats", "reward", "pause"
+		], true);
+		DialogEvents.DIALOG_CLOSED.remove("overlayDialog");
+		OverlayEvents.OVERLAYS_CLOSED.remove("event_overs_closed");
 	}
 
 	/** @param {InGameState} state */
@@ -54,6 +59,7 @@ export class InGameMode {
 		const actions = new Map();
 		actions.set("build", new PlacementActions(this.#root));
 		actions.set("delete", new DeletionActions(this.#root));
+		actions.set("massDelete", new MassDeleteActions(this.#root));
 		actions.set("scan", new ScannerActions(this.#root));
 		actions.set("camera", new CameraActions(this.#root));
 		actions.set("pin", new PinnedActions(this.#root));

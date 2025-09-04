@@ -14,6 +14,11 @@ export class RotationCodes {
 		["left", this.#codes.get("left")],
 	])
 
+	/** @returns {Array<string>} */
+	static getCodes() {
+		return Array.from(this.#codes.keys());
+	}
+
 	/**
 	 * @param {string} direction
 	 * @returns {Number}

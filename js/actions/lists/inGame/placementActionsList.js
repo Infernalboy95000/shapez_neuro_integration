@@ -4,19 +4,20 @@ import { NumberSchema } from "../../../sdkActions/schema/numberSchema";
 import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
 import { SdkAction } from "../../../sdkActions/sdkAction";
 import { ViewScanner } from "../../descriptors/camera/viewScanner";
+import { RotationCodes } from "../../descriptors/shapes/rotationCodes";
 
-export class PlaceList {
+export class PlacementActionList {
 	static placeBuild = "place_building";
 	static placeBuildLine = "place_line_of_buildings";
 	static beltPlanner = "use_belt_planner";
 	static actions = [
-		new SdkAction(PlaceList.placeBuild,
+		new SdkAction(this.placeBuild,
 			"Select and place a building from your toolbelt."
 		),
-		new SdkAction(PlaceList.placeBuildLine,
+		new SdkAction(this.placeBuildLine,
 			"Place an entire straight line of buildings at once."
 		),
-		new SdkAction(PlaceList.beltPlanner,
+		new SdkAction(this.beltPlanner,
 			"Place belts from one point to the other, in an 'L' shaped path."
 		)
 	];
@@ -40,28 +41,28 @@ export class PlaceList {
 	 * */
 	static getOptions(root, buildNames) {
 		const limits = ViewScanner.getVisibleLimits(root);
-		const rotNames = ["UP", "DOWN", "LEFT", "RIGHT"];
+		const rotNames = RotationCodes.getCodes();
 		const options = {
-			[PlaceList.build]: new EnumSchema(PlaceList.build, buildNames),
-			[PlaceList.endHorizontal]: new BoolSchema(PlaceList.endHorizontal),
-			[PlaceList.rot]: new EnumSchema(PlaceList.rot, rotNames),
-			[PlaceList.dir]: new EnumSchema(PlaceList.dir, rotNames),
-			[PlaceList.lineLength]: new NumberSchema(PlaceList.lineLength, 1, 2, limits.w),
+			[this.build]: new EnumSchema(this.build, buildNames),
+			[this.endHorizontal]: new BoolSchema(this.endHorizontal),
+			[this.rot]: new EnumSchema(this.rot, rotNames),
+			[this.dir]: new EnumSchema(this.dir, rotNames),
+			[this.lineLength]: new NumberSchema(this.lineLength, 1, 2, limits.w),
 
-			[PlaceList.xPos]:
-			new NumberSchema(PlaceList.xPos, 1, limits.x, limits.x + limits.w - 1),
-			[PlaceList.yPos]:
-			new NumberSchema(PlaceList.yPos, 1, limits.y, limits.y + limits.h - 1),
+			[this.xPos]:
+			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),
+			[this.yPos]:
+			new NumberSchema(this.yPos, 1, limits.y, limits.y + limits.h - 1),
 
-			[PlaceList.xPos1]:
-			new NumberSchema(PlaceList.xPos1, 1, limits.x, limits.x + limits.w - 1),
-			[PlaceList.yPos1]:
-			new NumberSchema(PlaceList.yPos1, 1, limits.y, limits.y + limits.h - 1),
+			[this.xPos1]:
+			new NumberSchema(this.xPos1, 1, limits.x, limits.x + limits.w - 1),
+			[this.yPos1]:
+			new NumberSchema(this.yPos1, 1, limits.y, limits.y + limits.h - 1),
 
-			[PlaceList.xPos2]:
-			new NumberSchema(PlaceList.xPos2, 1, limits.x, limits.x + limits.w - 1),
-			[PlaceList.yPos2]:
-			new NumberSchema(PlaceList.yPos2, 1, limits.y, limits.y + limits.h - 1),
+			[this.xPos2]:
+			new NumberSchema(this.xPos2, 1, limits.x, limits.x + limits.w - 1),
+			[this.yPos2]:
+			new NumberSchema(this.yPos2, 1, limits.y, limits.y + limits.h - 1),
 		};
 		return this.#mapOptions(options);
 	}
@@ -73,25 +74,25 @@ export class PlaceList {
 	static #mapOptions(options) {
 		return new Map([
 			[
-				PlaceList.placeBuild, [
-					options[PlaceList.build],
-					options[PlaceList.xPos], options[PlaceList.yPos],
-					options[PlaceList.rot]
+				this.placeBuild, [
+					options[this.build],
+					options[this.xPos], options[this.yPos],
+					options[this.rot]
 				]
 			],
 			[
-				PlaceList.placeBuildLine, [
-					options[PlaceList.build],
-					options[PlaceList.xPos], options[PlaceList.yPos],
-					options[PlaceList.rot], options[PlaceList.dir],
-					options[PlaceList.lineLength]
+				this.placeBuildLine, [
+					options[this.build],
+					options[this.xPos], options[this.yPos],
+					options[this.rot], options[this.dir],
+					options[this.lineLength]
 				]
 			],
 			[
-				PlaceList.beltPlanner, [
-					options[PlaceList.xPos1], options[PlaceList.yPos1],
-					options[PlaceList.xPos2], options[PlaceList.yPos2],
-					options[PlaceList.endHorizontal],
+				this.beltPlanner, [
+					options[this.xPos1], options[this.yPos1],
+					options[this.xPos2], options[this.yPos2],
+					options[this.endHorizontal],
 				]
 			],
 		]);

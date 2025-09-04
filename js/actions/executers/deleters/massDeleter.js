@@ -1,6 +1,5 @@
-import { Entity } from "shapez/game/entity";
 import { AreaSelector } from "../selectors/areaSelector";
-import { ACHIEVEMENTS } from "shapez/platform/achievement_provider";
+import { HUDMassSelector } from "shapez/game/hud/parts/mass_selector";
 
 /** Allows removing an entire area full of buildings.*/
 export class MassDeleter {
@@ -28,70 +27,24 @@ export class MassDeleter {
 			};
 		}
 
-		this.#executeDelete(selection);
-		return {
-			valid: true,
-			msg: `Successfully deleted ${selSize} building${selSize > 1 ? "s": ""}`
-		};
-		/*
-		!TEMPORAL. NEED TO SHOW THE CONFIRMATION IF IT'S ACTIVE IN SETTINGS!
-		else if (this.#confirmDelete()) {
-			this.#doDelete();
-			msg = `Successfully deleted ${selSize} building${selSize > 1 ? "s": ""}`;
-		}
-		else {
-			msg = `You're about to delete ${selSize} buildings. Are you sure?`;
-		}
-		*/
-	}
-
-	/** @param {Set} selection */
-	#executeDelete(selection) {
-		const entityUids = Array.from(selection);
-
-		// Build mapping from uid to entity
-		/**
-		 * @type {Map<number, Entity>}
-		 */
-		const mapUidToEntity = this.#root.entityMgr.getFrozenUidSearchMap();
-
-		let count = 0;
-		this.#root.logic.performBulkOperation(() => {
-			for (let i = 0; i < entityUids.length; ++i) {
-				const uid = entityUids[i];
-				const entity = mapUidToEntity.get(uid);
-				if (!entity) {
-					continue;
-				}
-
-				if (this.#root.logic.tryDeleteBuilding(entity)) {
-					count++;
-				}
-			}
-
-			this.#root.signals.achievementCheck.dispatch(ACHIEVEMENTS.destroy1000, count);
-		});
-	}
-
-	/*
-	? Storing for later
-	#confirmDelete() {
+		/** @type {HUDMassSelector} */ //@ts-ignore
+		const selector = this.#root.hud.parts.massSelector;
+		selector.selectedUids = new Set(selection);
+		selector.confirmDelete();
 		if (
 			!this.#root.app.settings.getAllSettings().disableCutDeleteWarnings &&
-			this.#selection.size > 100
+			selector.selectedUids.size > 100
 		) {
-			const { ok } = this.#root.hud.parts.dialogs.showWarning(
-				T.dialogs.massDeleteConfirm.title,
-				T.dialogs.massDeleteConfirm.desc.replace(
-					"<count>",
-					"" + formatBigNumberFull(this.#selection.size)
-				),
-				["cancel:good:escape", "ok:bad:enter"]
-			);
-			ok.add(() => this.#doDelete());
-			return false;
+			return {
+				valid: true,
+				msg: "The command was sent, but, as the current dialog says, you need to confirm it."
+			}
 		}
-		return true;
+		else {
+			return {
+				valid: true,
+				msg: `Successfully deleted ${selSize} building${selSize > 1 ? "s": ""}`
+			};
+		}
 	}
-	*/
 }

@@ -3,7 +3,7 @@ import { BeltPlannerBuilder } from "../executers/builders/beltPlannerBuilder";
 import { MassBuilder } from "../executers/builders/massBuilder";
 import { SingleBuilder } from "../executers/builders/singleBuilder";
 import { ToolbeltSelector } from "../executers/selectors/toolbeltSelector";
-import { PlaceList } from "../lists/inGame/placementActionsList";
+import { PlacementActionList } from "../lists/inGame/placementActionsList";
 
 /** Manages all actions related to placement. */
 export class PlacementActions extends BaseActions {
@@ -15,11 +15,11 @@ export class PlacementActions extends BaseActions {
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(PlaceList.actions);
+		super(PlacementActionList.actions);
 		super.addCallables(new Map([
-			[PlaceList.placeBuild, (e) => { return this.#tryPlaceBuilding(e)}],
-			[PlaceList.placeBuildLine, (e) => { return this.#tryPlaceBuildingsLine(e)}],
-			[PlaceList.beltPlanner, (e) => { return this.#tryBeltPlanner(e)}],
+			[PlacementActionList.placeBuild, (e) => { return this.#tryPlaceBuilding(e)}],
+			[PlacementActionList.placeBuildLine, (e) => { return this.#tryPlaceBuildingsLine(e)}],
+			[PlacementActionList.beltPlanner, (e) => { return this.#tryBeltPlanner(e)}],
 		]));
 
 		this.#root = root;
@@ -31,7 +31,7 @@ export class PlacementActions extends BaseActions {
 
 	activate() {
 		const buildings = this.#toolbelt.getTranslatedBuildings();
-		const options = PlaceList.getOptions(
+		const options = PlacementActionList.getOptions(
 			this.#root, Array.from(buildings.keys())
 		);
 		super.setOptions(options);
@@ -52,10 +52,10 @@ export class PlacementActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryPlaceBuilding(params) {
-		const building = this.#getBuilding(params[PlaceList.build]);
+		const building = this.#getBuilding(params[PlacementActionList.build]);
 		return this.#singleBuilder.tryPlaceBuilding(
-			building.id, building.variant, params[PlaceList.rot],
-			params[PlaceList.xPos], params[PlaceList.yPos],
+			building.id, building.variant, params[PlacementActionList.rot],
+			params[PlacementActionList.xPos], params[PlacementActionList.yPos],
 		);
 	}
 
@@ -64,11 +64,11 @@ export class PlacementActions extends BaseActions {
 	 * @returns {{valid:boolean, msg:string}}
 	*/
 	#tryPlaceBuildingsLine(params) {
-		const building = this.#getBuilding(params[PlaceList.build]);
+		const building = this.#getBuilding(params[PlacementActionList.build]);
 		return this.#massBuilder.tryPlaceBuildingLine(
-			building.id, building.variant, params[PlaceList.rot],
-			params[PlaceList.xPos], params[PlaceList.yPos],
-			params[PlaceList.dir], params[PlaceList.lineLength]
+			building.id, building.variant, params[PlacementActionList.rot],
+			params[PlacementActionList.xPos], params[PlacementActionList.yPos],
+			params[PlacementActionList.dir], params[PlacementActionList.lineLength]
 		);
 	}
 
@@ -78,9 +78,9 @@ export class PlacementActions extends BaseActions {
 	*/
 	#tryBeltPlanner(params) {
 		return this.#beltPlanner.buildPlan(
-			params[PlaceList.xPos1], params[PlaceList.yPos1],
-			params[PlaceList.xPos2], params[PlaceList.yPos2],
-			params[PlaceList.endHorizontal]
+			params[PlacementActionList.xPos1], params[PlacementActionList.yPos1],
+			params[PlacementActionList.xPos2], params[PlacementActionList.yPos2],
+			params[PlacementActionList.endHorizontal]
 		);
 	}
 }
