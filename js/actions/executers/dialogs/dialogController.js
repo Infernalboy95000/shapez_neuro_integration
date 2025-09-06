@@ -1,10 +1,12 @@
 import { ClickDetector } from "shapez/core/click_detector";
-import { Dialog } from "shapez/core/modal_dialog_elements";
+import { Dialog, DialogWithForm } from "shapez/core/modal_dialog_elements";
 import { DialogDescriptor } from "../../descriptors/dialogs/dialogDescriptor";
+import { T } from "shapez/translations";
+import { FormElementInput } from "shapez/core/modal_dialog_forms";
 
 export class DialogController {
 	/** @type {Dialog} */ #dialog;
-	/** @type {{buttons:Map<string, ClickDetector>, signals:Map<string, ClickDetector>, text:HTMLInputElement, close:ClickDetector}} */ #inputs;
+	/** @type {{buttons:Map<string, ClickDetector>, signals:Map<string, ClickDetector>, text:FormElementInput, close:ClickDetector}} */ #inputs;
 	/** @type {DialogDescriptor} */ #descriptor;
 
 	constructor() {
@@ -33,8 +35,8 @@ export class DialogController {
 		
 		if (this.#inputs.text) {
 			result.text.has = true;
-			result.text.min = this.#inputs.text.minLength;
-			result.text.max = this.#inputs.text.maxLength;
+			result.text.min = this.#inputs.text.element.minLength;
+			result.text.max = this.#inputs.text.element.maxLength;
 		}
 
 		if (this.#inputs.close)
@@ -48,10 +50,10 @@ export class DialogController {
 		let message = this.#descriptor.describe(this.#dialog);
 		if (this.#inputs.text)
 		{
-			if (this.#inputs.text.value == "")
+			if (this.#inputs.text.getValue() == "")
 				message += `It's input field is empty`;
 			else
-				message += `It's input field has '${this.#inputs.text.value}' written on it.`;
+				message += `It's input field has '${this.#inputs.text.getValue()}' written on it.`;
 		}
 
 		return message;
@@ -65,8 +67,19 @@ export class DialogController {
 		const result = {valid:false, msg:"The button doesn't exist in the current window."}
 		if (this.#inputs.buttons.has(buttonName)) {
 			this.#pressButton(this.#inputs.buttons.get(buttonName));
-			result.valid = true;
-			result.msg = "Button pressed.";
+			if (this.#dialog instanceof DialogWithForm) {
+				if (buttonName == T.dialogs.buttons.ok && this.#dialog.hasAnyInvalid()) {
+					result.msg = `The button was pressed, but some input fields have invalid values.`;
+				}
+				else {
+					result.valid = true;
+					result.msg = "Button pressed.";
+				}
+			}
+			else {
+				result.valid = true;
+				result.msg = "Button pressed.";
+			}
 		}
 		return result;
 	}
@@ -92,13 +105,13 @@ export class DialogController {
 	tryInputText(inputText) {
 		const result = {valid:false, msg:"This window has no text input."}
 		if (this.#inputs.text) {
-			result.valid = true;
-			this.#inputs.text.value = inputText;
-			if (this.#inputs.text.value == inputText) {
-				result.msg = "Text written correctly.";
+			this.#inputs.text.setValue(inputText);
+			if (this.#inputs.text.isValid()) {
+				result.valid = true;
+				result.msg = "Text written and fully valid.";
 			}
 			else {
-				result.msg = `Not all text could be written. Current text: ${this.#inputs.text.value}`;
+				result.msg = "The written text is invalid for some reason. Try writting another one."
 			}
 		}
 		return result;
