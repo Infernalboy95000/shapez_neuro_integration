@@ -25,7 +25,7 @@ export class CameraMover {
 		focus.x += globalConfig.halfTileSize;
 		focus.y += globalConfig.halfTileSize;
 
-		if (focus == center) {
+		if (this.#isTooClose(center, focus)) {
 			return {valid:false, msg:`You're already at that position.`};
 		}
 		else {
@@ -48,5 +48,17 @@ export class CameraMover {
 			this.#root.camera.setDesiredZoom(zoom);
 			return {valid:true, msg:`Adjusting zoom to ${zoomPercent}%.`};
 		}
+	}
+
+	/**
+	 * @param {Vector} from
+	 * @param {Vector} to
+	 * @returns {boolean}
+	*/
+	#isTooClose(from, to) {
+		if (from.distance(to) >= globalConfig.halfTileSize) {
+			return false;
+		}
+		return true;
 	}
 }

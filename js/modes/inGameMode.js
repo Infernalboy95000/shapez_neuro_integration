@@ -17,6 +17,7 @@ import { PauseMenuActions } from "../actions/overlay/pauseMenuActions";
 import { MassDeleteActions } from "../actions/inGame/massDeleteActions";
 import { DialogEvents } from "../events/dialogEvents";
 import { OverlayEvents } from "../events/overlayEvents";
+import { MarkerActions } from "../actions/inGame/markerActions";
 
 export class InGameMode {
 	/** @type {import("../main").NeuroIntegration} */ #mod;
@@ -37,7 +38,8 @@ export class InGameMode {
 			this.#declareActions(state);
 			this.#announceOpening();
 			ActionsCollection.activateActions([
-				"build", "delete", "massDelete", "scan", "camera", "pin", "tools", "overlay"
+				"build", "delete", "massDelete", "scan", "camera", "pin",
+				"marker", "tools", "overlay"
 			])
 		}
 	}
@@ -47,8 +49,8 @@ export class InGameMode {
 		TutorialChecks.deepScanned = false;
 		TutorialChecks.buildingScanned = false;
 		ActionsCollection.deactivateActions([
-			"build", "delete", "massDelete", "scan", "camera", "pin", "tools",
-			"overlay", "shop", "shape", "stats", "reward", "pause"
+			"build", "delete", "massDelete", "scan", "camera", "pin", "marker",
+			"tools", "overlay", "shop", "shape", "stats", "reward", "pause"
 		], true);
 		DialogEvents.DIALOG_CLOSED.remove("overlayDialog");
 		OverlayEvents.OVERLAYS_CLOSED.remove("event_overs_closed");
@@ -63,6 +65,7 @@ export class InGameMode {
 		actions.set("scan", new ScannerActions(this.#root));
 		actions.set("camera", new CameraActions(this.#root));
 		actions.set("pin", new PinnedActions(this.#root));
+		actions.set("marker", new MarkerActions(this.#root));
 		actions.set("tools", new ToolbeltActions(this.#root));
 		actions.set("overlay", new OverlaysActions(this.#root, state));
 		actions.set("shop", new UpgradesActions(this.#root));

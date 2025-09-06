@@ -1,7 +1,7 @@
 import { BaseActions } from "../base/baseActions";
 import { BuildingScanner } from "../executers/scanners/buildingScanner";
 import { PatchScanner } from "../executers/scanners/patchScanner";
-import { ScanList } from "../lists/inGame/scannerActionList";
+import { ScannerActionList } from "../lists/inGame/scannerActionList";
 import { TutorialChecks } from "../../helpers/tutorialChecks";
 
 export class ScannerActions extends BaseActions {
@@ -11,11 +11,11 @@ export class ScannerActions extends BaseActions {
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(ScanList.actions);
+		super(ScannerActionList.actions);
 		super.addCallables(new Map([
-			[ScanList.scanTerrain, (e) => { return this.#scanTerrain(e)}],
-			[ScanList.scanPatch, (e) => { return this.#tryScanPatch(e)}],
-			[ScanList.scanBuildings, (e) => { return this.#scanBuildings(e)}],
+			[ScannerActionList.scanTerrain, (e) => { return this.#scanTerrain(e)}],
+			[ScannerActionList.scanPatch, (e) => { return this.#tryScanPatch(e)}],
+			[ScannerActionList.scanBuildings, (e) => { return this.#scanBuildings(e)}],
 		]));
 
 		this.#root = root;
@@ -24,7 +24,7 @@ export class ScannerActions extends BaseActions {
 	};
 
 	activate() {
-		const options = ScanList.getOptions(this.#root);
+		const options = ScannerActionList.getOptions(this.#root);
 		super.setOptions(options);
 		super.activate();
 	}
@@ -45,7 +45,7 @@ export class ScannerActions extends BaseActions {
 	#tryScanPatch(params) {
 		TutorialChecks.deepScanned = true;
 		return this.#patchScanner.scanAt(
-			params[ScanList.xPos], params[ScanList.yPos]
+			params[ScannerActionList.xPos], params[ScannerActionList.yPos]
 		)
 	}
 

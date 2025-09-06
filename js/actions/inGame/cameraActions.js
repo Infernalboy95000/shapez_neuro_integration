@@ -1,6 +1,6 @@
 import { BaseActions } from "../base/baseActions";
 import { CameraMover } from "../executers/camera/cameraMover";
-import { CamList } from "../lists/inGame/cameraActionList";
+import { CameraActionList } from "../lists/inGame/cameraActionList";
 
 export class CameraActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -8,10 +8,10 @@ export class CameraActions extends BaseActions {
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(CamList.actions);
+		super(CameraActionList.actions);
 		super.addCallables(new Map([
-			[CamList.move, (e) => { return this.#tryMoveCamera(e)}],
-			[CamList.zoom, (e) => { return this.#tryZoomCamera(e)}],
+			[CameraActionList.move, (e) => { return this.#tryMoveCamera(e)}],
+			[CameraActionList.zoom, (e) => { return this.#tryZoomCamera(e)}],
 		]));
 
 		this.#root = root;
@@ -19,7 +19,7 @@ export class CameraActions extends BaseActions {
 	};
 
 	activate() {
-		const options = CamList.getOptions(this.#root);
+		const options = CameraActionList.getOptions(this.#root);
 		super.setOptions(options);
 		super.activate();
 	}
@@ -30,7 +30,7 @@ export class CameraActions extends BaseActions {
 	*/
 	#tryMoveCamera(params) {
 		return this.#cameraMover.move(
-			params[CamList.xPos], params[CamList.yPos]
+			params[CameraActionList.xPos], params[CameraActionList.yPos]
 		)
 	}
 
@@ -40,7 +40,7 @@ export class CameraActions extends BaseActions {
 	*/
 	#tryZoomCamera(params) {
 		return this.#cameraMover.zoom(
-			params[CamList.zoomLevel]
+			params[CameraActionList.zoomLevel]
 		)
 	}
 }

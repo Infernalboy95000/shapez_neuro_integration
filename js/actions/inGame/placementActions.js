@@ -30,6 +30,7 @@ export class PlacementActions extends BaseActions {
 	};
 
 	activate() {
+		if (this.#root.camera.getIsMapOverlayActive()) { return; }
 		const buildings = this.#toolbelt.getTranslatedBuildings();
 		const options = PlacementActionList.getOptions(
 			this.#root, Array.from(buildings.keys())

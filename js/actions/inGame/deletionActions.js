@@ -19,6 +19,7 @@ export class DeletionActions extends BaseActions {
 	};
 
 	activate() {
+		if (this.#root.camera.getIsMapOverlayActive()) { return; }
 		const options = DeletionActionList.getOptions(this.#root);
 		super.setOptions(options);
 		super.activate();

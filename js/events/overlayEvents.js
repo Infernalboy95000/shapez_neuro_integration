@@ -67,7 +67,6 @@ export class OverlayEvents {
 	}
 
 	#activateOverlay() {
-		console.log("Is this working?");
 		const overlay = this.#overlays.peek();
 		switch (overlay) {
 			case "shop":

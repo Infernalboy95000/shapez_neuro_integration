@@ -7,7 +7,7 @@ export class MassDeleteActionList {
 	static deleteArea = "delete_in_area";
 	static actions = [
 		new SdkAction(
-			"delete_in_area", "Delete all buildings in an square area you choose."
+			this.deleteArea, "Delete all buildings in an square area you choose."
 		)
 	];
 

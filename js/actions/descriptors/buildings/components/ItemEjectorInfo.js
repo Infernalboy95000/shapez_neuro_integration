@@ -20,7 +20,6 @@ export class ItemEjectorInfo {
 		if (info.size > 0)
 			log.msg += `Outputs:`
 
-		console.log(info);
 		info.forEach((slots, direction) => {
 			log.msg += `\nto ${direction}:`
 			for (let i = 0; i < slots.length; i++) {
