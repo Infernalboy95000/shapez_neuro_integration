@@ -3,7 +3,7 @@ import { CoordsGrid } from "./helpers/coordsGrid";
 import { ActionsController } from "./actions/base/actionsController";
 import { TutorialMessager } from "./helpers/tutorialMessager";
 import { EventsController } from "./events/eventsController";
-const DEFAULT_URL = "localhost:8000";
+import { DefaultSettings } from "./defaultSettings";
 
 export class NeuroIntegration extends Mod {
 	/** @type {boolean} */ #booted = false;
@@ -13,8 +13,7 @@ export class NeuroIntegration extends Mod {
 	/** @type {EventsController} */ #eventsController;
 
 	init() {
-		// I wish I didn't need to do this check
-		this.#trySetDefaults();
+		DefaultSettings.Set(this);
 
 		this.signals.appBooted.add(() => {
 			this.#coordsGrid = new CoordsGrid(this);
@@ -43,29 +42,5 @@ export class NeuroIntegration extends Mod {
 	 * */
 	trySendTutorialMessage(message) {
 		return this.#tutorialMessager.TryAnnounceWithTutorial(message);
-	}
-
-	#trySetDefaults() {
-		let someDown = false;
-		if (this.settings.socketURL == undefined)
-		{
-			someDown = true;
-			this.settings.socketURL = DEFAULT_URL;
-		}
-
-		if (this.settings.forcedMapTime == undefined)
-		{
-			someDown = true;
-			this.settings.forcedMapTime = 5;
-		}
-		
-		if (this.settings.waitAfterHumanTime == undefined)
-		{
-			someDown = true;
-			this.settings.waitAfterHumanTime = 5;
-		}
-
-		if (someDown)
-			this.saveSettings();
 	}
 }
