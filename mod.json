@@ -14,6 +14,7 @@
 		"playerChooseMap": false,
 		"forceOpenMap": false,
 		"forcedMapTime": 5,
-		"mapAvailable" : "any_map"
+		"mapAvailable" : "any_map",
+		"waitAfterHumanTime": 5
 	}
 }

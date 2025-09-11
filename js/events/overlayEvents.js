@@ -85,6 +85,7 @@ export class OverlayEvents {
 				ActionsCollection.activateActions(["pause"]);
 				break;
 			default:
+				OverlayEvents.currentOverlay = null;
 				OverlayEvents.OVERLAYS_CLOSED.invoke();
 				break;
 		}

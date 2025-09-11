@@ -6,6 +6,7 @@ import { Dialog } from "shapez/core/modal_dialog_elements";
 
 export class DialogEvents {
 	/** @type {ActionEvent} */ static DIALOG_CLOSED = new ActionEvent();
+	/** @type {boolean} */ static dialogOpen = false;
 	/** @type {DialogActions} */ #dialogActions;
 
 	/** @param {import("../main").NeuroIntegration} mod */
@@ -27,11 +28,13 @@ export class DialogEvents {
 
 	/** @param {Dialog} dialog */
 	#onDialogOpenned(dialog) {
+		DialogEvents.dialogOpen = true;
 		ActionsCollection.deactivateAllActive();
 		this.#dialogActions.activateByDialog(dialog);
 	}
 
 	#onDialogClosed() {
+		DialogEvents.dialogOpen = false;
 		ActionsCollection.deactivateActions(["dialog"]);
 		DialogEvents.DIALOG_CLOSED.invoke();
 	}

@@ -7,12 +7,13 @@ import { HUDWaypoints } from "shapez/game/hud/parts/waypoints";
 import { MarkersDescriptor } from "../actions/descriptors/pins/markersDescriptor";
 import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../custom/randomUtils";
+import { DialogEvents } from "./dialogEvents";
 
-const TIME_WAIT_FOR_PLAYER = 5 * 1000;
 const ZOOM_TOLERANCE = 1;
 const MOVE_TOLERANCE = 3;
 
 export class InGameEvents {
+	/** @type {import("../main").NeuroIntegration} */ #mod;
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {number} */ #waitTime = 0;
 	/** @type {boolean} */ #moving;
@@ -23,6 +24,7 @@ export class InGameEvents {
 
 	/** @param {import("../main").NeuroIntegration} mod */
 	constructor(mod) {
+		this.#mod = mod;
 		const thisClass = this;
 
 		mod.modInterface.runAfterMethod(GameCore, "tick",
@@ -66,6 +68,10 @@ export class InGameEvents {
 		root.signals.upgradePurchased.add(this.#refreshShop, this);
 		root.hud.signals.shapePinRequested.add(this.#refreshPins, this);
 		OverlayEvents.OVERLAYS_CLOSED.add("event_overs_closed", () => { this.#onDialogClosed(); });
+		this.#waitTime = 0;
+		this.#moving = false;
+		this.#movingBySdk = false;
+		this.#movingByPlayer = false;
 	}
 
 	/** @param {number} deltaMs */
@@ -88,22 +94,18 @@ export class InGameEvents {
 		else {
 			this.#waitTime += deltaMs;
 			if (this.#movingByPlayer) {
-				if (this.#waitTime >= TIME_WAIT_FOR_PLAYER) {
+				if (this.#waitTime >= this.#mod.settings.waitAfterHumanTime * 1000) {
 					this.#waitTime = 0;
 					this.#moving = false;
 					this.#movingByPlayer = false;
-					ActionsCollection.activateActions([
-						"build", "delete", "massDelete", "scan", "camera", "marker"
-					]);
+					this.#tryRestoreMoveActions();
 				}
 			}
 			else if (this.#movingBySdk) {
 				this.#waitTime = 0;
 				this.#moving = false;
 				this.#movingBySdk = false;
-				ActionsCollection.activateActions([
-					"build", "delete", "massDelete", "scan", "camera", "marker"
-				]);
+				this.#tryRestoreMoveActions();
 			}
 		}
 
@@ -112,6 +114,14 @@ export class InGameEvents {
 
 		if (!RandomUtils.numbersEqualAprox(this.#root.camera.zoomLevel, this.#lastZoomLevel, ZOOM_TOLERANCE))
 			this.#lastZoomLevel = this.#root.camera.zoomLevel;
+	}
+
+	#tryRestoreMoveActions() {
+		if (OverlayEvents.currentOverlay == null && !DialogEvents.dialogOpen) {
+			ActionsCollection.activateActions([
+				"build", "delete", "massDelete", "scan", "camera", "marker"
+			]);
+		}
 	}
 
 	/** @returns {boolean} */
@@ -160,10 +170,12 @@ export class InGameEvents {
 	}
 
 	#onDialogClosed() {
-		ActionsCollection.activateActions([
-			"pin", "tools", "overlay", "marker", "build",
-			"delete", "massDelete", "scan", "camera"
-		]);
+		if (OverlayEvents.currentOverlay == null) {
+			ActionsCollection.activateActions([
+				"pin", "tools", "overlay", "marker", "build",
+				"delete", "massDelete", "scan", "camera"
+			]);
+		}
 	}
 
 	#onMarkersChanged() {

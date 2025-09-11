@@ -14,9 +14,7 @@ export class NeuroIntegration extends Mod {
 
 	init() {
 		// I wish I didn't need to do this check
-		if (this.settings.socketURL == undefined) {
-			this.#SaveDefaultSettings();
-		}
+		this.#trySetDefaults();
 
 		this.signals.appBooted.add(() => {
 			this.#coordsGrid = new CoordsGrid(this);
@@ -47,9 +45,27 @@ export class NeuroIntegration extends Mod {
 		return this.#tutorialMessager.TryAnnounceWithTutorial(message);
 	}
 
-	#SaveDefaultSettings() {
-		this.settings.socketURL = DEFAULT_URL;
-		this.settings.forcedMapTime = 5;
-		this.saveSettings();
+	#trySetDefaults() {
+		let someDown = false;
+		if (this.settings.socketURL == undefined)
+		{
+			someDown = true;
+			this.settings.socketURL = DEFAULT_URL;
+		}
+
+		if (this.settings.forcedMapTime == undefined)
+		{
+			someDown = true;
+			this.settings.forcedMapTime = 5;
+		}
+		
+		if (this.settings.waitAfterHumanTime == undefined)
+		{
+			someDown = true;
+			this.settings.waitAfterHumanTime = 5;
+		}
+
+		if (someDown)
+			this.saveSettings();
 	}
 }

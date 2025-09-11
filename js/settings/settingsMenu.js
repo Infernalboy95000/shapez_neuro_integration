@@ -89,8 +89,8 @@ export class SettingsMenu {
 
 	#createSettings() {
 		this.#connextionSettings();
-		this.#contextSettings();
 		this.#startupSettings();
+		this.#contextSettings();
 	}
 
 	#connextionSettings() {
@@ -133,6 +133,14 @@ export class SettingsMenu {
 			"Coordinates grid",
 			"Shows every tile's x/y position. Maybe usefull when using external vision.",
 			"sdkCoordsGrid"
+		));
+
+		contextSettings.addWaitAfterHumanNumber(new NumberSetting (
+			this.#mod, this.#menu,
+			"Wait after human move",
+			"The SDK will disallow the player to do movement actions if a human moves around the map. Set how many seconds will take to give back control to the player.",
+			this.#mod.settings.waitAfterHumanTime,
+			1, 10, 0.5, 's', "sdkWaitAfterHumanTime"
 		));
 	}
 

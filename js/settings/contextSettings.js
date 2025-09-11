@@ -1,3 +1,4 @@
+import { NumberSetting } from "./inputs/numberSetting";
 import { ToggleSetting } from "./inputs/toggleSetting";
 
 /**
@@ -7,6 +8,7 @@ import { ToggleSetting } from "./inputs/toggleSetting";
 export class ContextSettings {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {ToggleSetting} */ #coordsGridToogle;
+	/** @type {NumberSetting} */ #waitAfterHumanNumber;
 
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
@@ -22,9 +24,21 @@ export class ContextSettings {
 		this.#coordsGridToogle.set(this.#mod.settings.coordsGrid);
 	}
 
+	/** @param {NumberSetting} numberSetting */
+	addWaitAfterHumanNumber(numberSetting) {
+		this.#waitAfterHumanNumber = numberSetting;
+		this.#setWaitAfterHumanEvents();
+	}
+
 	#setCoordsGridEvents() {
 		this.#coordsGridToogle.onClicked = () => {
-			this.#onCoordsGridToogleClicked()
+			this.#onCoordsGridToogleClicked();
+		};
+	}
+
+	#setWaitAfterHumanEvents() {
+		this.#waitAfterHumanNumber.onDragEnded = (e) => {
+			this.#onWaitAfterHumanNumberDragEnded(e);
 		};
 	}
 
@@ -33,9 +47,19 @@ export class ContextSettings {
 		this.#mod.saveSettings();
 	}
 
+	#saveWaitAfterHumanSetting(value) {
+		this.#mod.settings.waitAfterHumanTime = value;
+		this.#mod.saveSettings();
+	}
+
 	#onCoordsGridToogleClicked() {
 		const value = !this.#mod.settings.coordsGrid;
 		this.#coordsGridToogle.set(value);
 		this.#saveCoordsGridSetting(value);
+	}
+
+	/** @param {number} value */
+	#onWaitAfterHumanNumberDragEnded(value) {
+		this.#saveWaitAfterHumanSetting(value);
 	}
 }
