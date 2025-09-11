@@ -8,6 +8,7 @@ import { StartupSettings } from "./startupSettings";
 import { ButtonSetting } from "./inputs/buttonSetting";
 import { OptionListSetting } from "./inputs/optionListSetting";
 import { NumberSetting } from "./inputs/numberSetting";
+import { InfoBlock } from "./infoBlock";
 
 export class SettingsMenu {
 	static ANY_MAP = "any_map";
@@ -91,6 +92,7 @@ export class SettingsMenu {
 		this.#connextionSettings();
 		this.#startupSettings();
 		this.#contextSettings();
+		this.#infoBlock();
 	}
 
 	#connextionSettings() {
@@ -188,6 +190,24 @@ export class SettingsMenu {
 			mapOptions, this.#mod.settings.mapAvailable, "any_map",
 			"sdkMapAvailable",
 		));
+	}
+
+	#infoBlock() {
+		new SettingCategory(this.#menu, "Others");
+		new InfoBlock(this.#menu, "Mod data",
+			`Running ${this.#mod.metadata.name} on version: ${this.#mod.metadata.version}<br>
+			Made by ${this.#mod.metadata.author}.`
+		);
+		new InfoBlock(this.#menu, "A message from the author",
+			`First of all, thank you for trying the shapez neuro integration.<br>
+			It may be complex and frustrating to use, and I will try to make it better. But this will take time.<br>
+			I, alone, already spent half a year trying to make this and, looking back, maybe it wasn't the best idea.<br>
+			I already knew this game will be hard to describe with words and harder to play. But I guess I made it,
+			and it woudln't be posible without the help of the whole neuro sama community, the nerds in #programming,
+			the great creator of the best AI streamers on twitch and, of course, you.<br>
+			Thank you for reading this. I hope you enjoy this integration.<br><br>
+			Infernal-Ekoro`
+		);
 	}
 
 	/** @return {Map} */
