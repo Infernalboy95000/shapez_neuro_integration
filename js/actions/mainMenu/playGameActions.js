@@ -1,3 +1,4 @@
+import { ModSettings } from "../../modSettings";
 import { SettingsMenu } from "../../settings/settingsMenu";
 import { BaseActions } from "../base/baseActions";
 import { MapLoader } from "../executers/menus/main/mapLoader";
@@ -93,7 +94,7 @@ export class PlayGameActions extends BaseActions {
 	#getAvailableActions() {
 		const actions = [];
 		let maps = [];
-		const allowedMap = this.#mod.settings.mapAvailable;
+		const allowedMap = ModSettings.get(ModSettings.KEYS.mapAvailable);
 		const saves = MapLoader.getCurrentMaps(this.#mod);
 
 		if (saves.length <= 1) {
@@ -120,7 +121,7 @@ export class PlayGameActions extends BaseActions {
 	#playGameOption() {
 		const options = [];
 		let maps = [];
-		const allowedMap = this.#mod.settings.mapAvailable;
+		const allowedMap = ModSettings.get(ModSettings.KEYS.mapAvailable);
 		const saves = MapLoader.getCurrentMaps(this.#mod);
 
 		if (saves.length <= 0 || allowedMap == SettingsMenu.NEW_MAP) {

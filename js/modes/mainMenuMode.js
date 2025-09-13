@@ -3,6 +3,7 @@ import { StatusDisplay } from "../visuals/statusDisplay";
 import { PlayGameActions } from "../actions/mainMenu/playGameActions";
 import { ActionsCollection } from "../actions/base/actionsCollection";
 import { DialogEvents } from "../events/dialogEvents";
+import { ModSettings } from "../modSettings";
 
 export class MainMenuMode {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -33,12 +34,12 @@ export class MainMenuMode {
 		if (SdkClient.isConnected()) {
 			this.#onConnectedActions();
 		}
-		else if (this.#mod.settings.autoConnect) {
+		else if (ModSettings.get(ModSettings.KEYS.autoConnect)) {
 			if (!SdkClient.isAttempting()) {
 				this.#StatusDisplay.setText(
 					"Connecting...", "attempting"
 				);
-				SdkClient.tryConnect(this.#mod.settings.socketURL);
+				SdkClient.tryConnect(ModSettings.get(ModSettings.KEYS.socketURL));
 			}
 		}
 	}
@@ -59,8 +60,8 @@ export class MainMenuMode {
 	}
 
 	#tryOpenGame() {
-		if (this.#mod.settings.forceOpenMap) {
-			const seconds = this.#mod.settings.forcedMapTime;
+		if (ModSettings.get(ModSettings.KEYS.forceOpenMap)) {
+			const seconds = ModSettings.get(ModSettings.KEYS.forcedMapTime);
 			if (seconds > 0) {
 				this.#timeout = setTimeout(() => {
 					this.#playActions.forcePlayMap();
@@ -71,7 +72,7 @@ export class MainMenuMode {
 				this.#playActions.forcePlayMap();
 			}
 		}
-		else if (this.#mod.settings.playerChooseMap) {
+		else if (ModSettings.get(ModSettings.KEYS.playerChooseMap)) {
 			ActionsCollection.activateActions(["play"]);
 		}
 	}
@@ -96,7 +97,7 @@ export class MainMenuMode {
 
 	#onDialogClosed()
 	{
-		if (this.#mod.settings.playerChooseMap) {
+		if (ModSettings.get(ModSettings.KEYS.playerChooseMap)) {
 			ActionsCollection.activateActions(["play"]);
 		}
 	}

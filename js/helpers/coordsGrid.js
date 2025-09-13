@@ -1,6 +1,7 @@
 import { globalConfig } from "shapez/core/config";
 import { MapChunkAggregate } from "shapez/game/map_chunk_aggregate";
 import { MapChunkView } from "shapez/game/map_chunk_view";
+import { ModSettings } from "../modSettings";
 
 export class CoordsGrid {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -18,7 +19,7 @@ export class CoordsGrid {
 			MapChunkView,
 			"drawForegroundStaticLayer",
 			function(parameters) {
-				if (!coords.#mod.settings.coordsGrid) { return; }
+				if (!ModSettings.get(ModSettings.KEYS.coordsGrid)) { return; }
 				if (coords.#canDrawChunk(this, parameters)) {
 					coords.#drawPreciseGrid(this, parameters);
 				}
@@ -29,7 +30,7 @@ export class CoordsGrid {
 			MapChunkAggregate,
 			"drawOverlay",
 			function(parameters) {
-				if (!coords.#mod.settings.coordsGrid) { return; }
+				if (!ModSettings.get(ModSettings.KEYS.coordsGrid)) { return; }
 				coords.#tryDrawAggregate(this, parameters);
 			}
 		);
@@ -40,7 +41,7 @@ export class CoordsGrid {
 	 * @param {import("shapez/core/draw_utils").DrawParameters} parameters 
 	 * */
 	#tryDrawAggregate(aggregate, parameters) {
-		if (!this.#mod.settings.coordsGrid) {return}
+		if (!ModSettings.get(ModSettings.KEYS.coordsGrid)) {return}
 		for (let x = 0; x < globalConfig.chunkAggregateSize; x++) {
 			for (let y = 0; y < globalConfig.chunkAggregateSize; y++) {
 				const chunk = aggregate.root.map

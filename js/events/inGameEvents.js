@@ -8,6 +8,7 @@ import { MarkersDescriptor } from "../actions/descriptors/pins/markersDescriptor
 import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../custom/randomUtils";
 import { DialogEvents } from "./dialogEvents";
+import { ModSettings } from "../modSettings";
 
 const ZOOM_TOLERANCE = 1;
 const MOVE_TOLERANCE = 3;
@@ -94,7 +95,7 @@ export class InGameEvents {
 		else {
 			this.#waitTime += deltaMs;
 			if (this.#movingByPlayer) {
-				if (this.#waitTime >= this.#mod.settings.waitAfterHumanTime * 1000) {
+				if (this.#waitTime >= ModSettings.get(ModSettings.KEYS.waitAfterHumanTime) * 1000) {
 					this.#waitTime = 0;
 					this.#moving = false;
 					this.#movingByPlayer = false;
