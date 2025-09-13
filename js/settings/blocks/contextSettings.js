@@ -33,7 +33,7 @@ export class ContextSettings {
 	/** @param {ToggleSetting} toogleSetting */
 	addDescriptiveActionsToogle(toogleSetting) {
 		this.#descriptiveActionsToogle = toogleSetting;
-		this.#coordsGridToogle.onClicked = () => {
+		this.#descriptiveActionsToogle.onClicked = () => {
 			this.#onDescriptiveActionsToogleClicked();
 		};
 		this.#descriptiveActionsToogle.set(ModSettings.get(ModSettings.KEYS.descriptiveActions));

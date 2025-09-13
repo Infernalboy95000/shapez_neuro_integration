@@ -1,3 +1,4 @@
+import { ModSettings } from "../../modSettings";
 import { BaseActions } from "../base/baseActions";
 import { GoalsDescriptor } from "../descriptors/pins/goalsDescriptor";
 import { ShapesPinner } from "../executers/pinners/shapesPinner";
@@ -27,9 +28,15 @@ export class PinnedActions extends BaseActions {
 			compile.unpin, compile.goal
 		);
 		super.setOptions(options);
-		const actions = [PinnedActionsList.goal, PinnedActionsList.shapeInfo];
+		const actions = [PinnedActionsList.shapeInfo];
+		const descriptive = ModSettings.get(ModSettings.KEYS.descriptiveActions);
+		if (descriptive) {
+			actions.push(PinnedActionsList.goal);
+		}
+
 		if (compile.unpin.length > 0) {
-			actions.push(PinnedActionsList.pinned);
+			if (descriptive)
+				actions.push(PinnedActionsList.pinned);
 			actions.push(PinnedActionsList.unpinShape);
 		}
 		super.activate(actions);

@@ -2,6 +2,7 @@ import { BaseActions } from "../base/baseActions";
 import { Dialog } from "shapez/core/modal_dialog_elements";
 import { DialogActionList } from "../lists/dialogs/dialogActionList";
 import { DialogController } from "../executers/dialogs/dialogController";
+import { ModSettings } from "../../modSettings";
 
 export class DialogActions extends BaseActions {
 	#bannedDialogs = ["dialog-Language"]
@@ -31,7 +32,10 @@ export class DialogActions extends BaseActions {
 			inputs.buttons, inputs.signals, inputs.text.min, inputs.text.max
 		));
 
-		const actions = [DialogActionList.read];
+		const actions = [];
+		if (ModSettings.get(ModSettings.KEYS.descriptiveActions))
+			actions.push(DialogActionList.read);
+
 		if (inputs.buttons.length > 0)
 			actions.push(DialogActionList.pressButton);
 

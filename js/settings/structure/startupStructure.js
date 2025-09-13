@@ -1,38 +1,87 @@
 import { ModSettings } from "../../modSettings";
-import { ContextSettings } from "../blocks/contextSettings";
+import { StartupSettings } from "../blocks/startupSettings";
 import { NumberSetting } from "../inputs/numberSetting";
+import { OptionListSetting } from "../inputs/optionListSetting";
 import { ToggleSetting } from "../inputs/toggleSetting";
 import { SettingCategory } from "../settingsCategory";
 
 export class StartupStructure {
+	static ANY_MAP = "any_map";
+	static ANY_OPTION = "any_option";
+	static NEW_MAP = "new_map";
+	static LAST_MAP = "last_map";
+
 	/**
 	 * @param {import("shapez/mods/mod").Mod} mod
 	 * @param {HTMLDivElement} menu
 	 */
 	static build(mod, menu) {
-		new SettingCategory(menu, "SDK Context");
-		const contextSettings = new ContextSettings();
+		new SettingCategory(menu, "Startup");
+		const startupSettngs = new StartupSettings();
 
-		contextSettings.addCorodsGridToogle(new ToggleSetting (
+		startupSettngs.addAutoConnectToogle(new ToggleSetting (
 			mod, menu,
-			"Coordinates grid",
-			"Shows every tile's x/y position. Maybe usefull when using external vision.",
-			"sdkCoordsGrid"
+			"Auto connect to player",
+			"Attempts to connect to the player when launching the game",
+			"sdkPlayerAutoConnect"
 		));
 
-		contextSettings.addDescriptiveActionsToogle(new ToggleSetting (
+		startupSettngs.addPlayerChooseMapToggle(new ToggleSetting (
 			mod, menu,
-			"Descriptive actions",
-			"Allows the player to use descriptive actions like 'scan buildings' to have some sense on what's going on. Maybe you want to disable them if the player is using external vision.",
-			"sdkDescriptiveActions"
+			"Player can choose map",
+			"Allows the player to start a map. This can be limited to certain maps.",
+			"sdkPlayerChooseMap"
 		));
 
-		contextSettings.addWaitAfterHumanNumber(new NumberSetting (
+		startupSettngs.addForceOpenMapToggle(new ToggleSetting (
 			mod, menu,
-			"Wait after human move",
-			"The SDK will disallow the player to do movement actions if a human moves around the map. Set how many seconds will take to give back control to the player.",
-			ModSettings.get(ModSettings.KEYS.waitAfterHumanTime),
-			1, 10, 0.5, 's', "sdkWaitAfterHumanTime"
+			"Force open map",
+			"Opens a map when entering the main menu. This can be limited to certain maps.",
+			"sdkForceOpenMap"
 		));
+
+		startupSettngs.addForceMapTimer(new NumberSetting (
+			mod, menu,
+			"Force map delay",
+			"Delays opening a map by force for a set ammount of seconds.",
+			ModSettings.get(ModSettings.KEYS.forcedMapTime), 0, 10, 0.1, 's',
+			"sdkForcedMapTimer"
+		));
+
+		const mapOptions = this.#getMapOptions(mod);
+		
+		startupSettngs.addMapAvailableOptions(new OptionListSetting(
+			mod, menu,
+			"Map to open",
+			"Which map will be allowed to be open by the player or forced to open. " +
+			"After selecting and creating a new map, this will set to continue it after",
+			mapOptions, ModSettings.get(ModSettings.KEYS.mapAvailable), "any_map",
+			"sdkMapAvailable",
+		));
+	}
+
+	/**
+	 * @param {import("shapez/mods/mod").Mod} mod
+	 * @return {Map} */
+	static #getMapOptions(mod) {
+		const mapOptions = new Map();
+		mapOptions.set(this.ANY_MAP, "Any map");
+		mapOptions.set(this.ANY_OPTION, "Any option");
+		mapOptions.set(this.NEW_MAP, "New Map");
+		mapOptions.set(this.LAST_MAP, "Continue");
+		const saves = mod.app.savegameMgr.getSavegamesMetaData();
+		let unnamedMaps = 0;
+
+		for (let i = 0; i < saves.length; i++) {
+			let mapName = saves[i].name;
+
+			if (!mapName) {
+				unnamedMaps++;
+				mapName = `Unnamed map ${unnamedMaps}`;
+			}
+			mapOptions.set(saves[i].internalId, mapName);
+		}
+
+		return mapOptions;
 	}
 }

@@ -111,7 +111,7 @@ export class OverlayEvents {
 				break;
 			default:
 				ActionsCollection.deactivateActions([
-					"build", "delete", "massDelete", "scan", "camera", "pin", "tools", "overlay"
+					"build", "delete", "massDelete", "scan", "camera", "pin", "marker", "tools", "overlay", 
 				]);
 				break;
 		}

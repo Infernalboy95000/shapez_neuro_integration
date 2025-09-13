@@ -1,3 +1,4 @@
+import { ModSettings } from "../../modSettings";
 import { BaseActions } from "../base/baseActions";
 import { PauseMenuDescriptor } from "../descriptors/overlays/pauseMenuDescriptor";
 import { PauseMenuActionList } from "../lists/overlays/pauseMenuActionList";
@@ -18,6 +19,15 @@ export class PauseMenuActions extends BaseActions {
 		this.#root = root;
 		this.#pauseDescriptor = new PauseMenuDescriptor(root);
 	};
+
+	activate() {
+		const actions = [];
+		if (ModSettings.get(ModSettings.KEYS.descriptiveActions))
+			actions.push(PauseMenuActionList.info);
+		actions.push(PauseMenuActionList.resume);
+		actions.push(PauseMenuActionList.exit);
+		super.activate(actions);
+	}
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#getInfo() {
