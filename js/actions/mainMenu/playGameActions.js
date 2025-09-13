@@ -120,12 +120,14 @@ export class PlayGameActions extends BaseActions {
 	/** @returns {{valid:boolean, msg:string}} */
 	#playGameOption() {
 		const options = [];
-		let maps = [];
 		const allowedMap = ModSettings.get(ModSettings.KEYS.mapAvailable);
 		const saves = MapLoader.getCurrentMaps(this.#mod);
 
 		if (saves.length <= 0 || allowedMap == SettingsMenu.NEW_MAP) {
-			options.push(() => {return this.#newGame()});
+			options.push(() => {
+				ModSettings.set(ModSettings.KEYS.mapAvailable, SettingsMenu.LAST_MAP);
+				return this.#newGame();
+			});
 		}
 		else if (allowedMap == SettingsMenu.LAST_MAP) {
 			options.push(() => {return this.#continueGame()});

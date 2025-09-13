@@ -49,12 +49,11 @@ export class StartupStructure {
 		));
 
 		const mapOptions = this.#getMapOptions(mod);
-		
 		startupSettngs.addMapAvailableOptions(new OptionListSetting(
 			mod, menu,
 			"Map to open",
 			"Which map will be allowed to be open by the player or forced to open. " +
-			"After selecting and creating a new map, this will set to continue it after",
+			"After selecting and creating a new map, it will set to continue.",
 			mapOptions, ModSettings.get(ModSettings.KEYS.mapAvailable), "any_map",
 			"sdkMapAvailable",
 		));
