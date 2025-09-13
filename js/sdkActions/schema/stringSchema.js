@@ -49,26 +49,26 @@ export class StringSchema extends SchemaBase {
 		const result = {valid: false, msg:""};
 
 		if (!data.params[this.getName()]) {
-			result.msg = `Missing parameter ${this.getName()}`;
+			result.msg = `Missing parameter "${this.getName()}"`;
 			return result;
 		}
 
 		const value = data.params[this.getName()];
 		if (typeof(value) != "string") {
-			result.msg = `Property ${this.getName()} is not a string`;
+			result.msg = `Value set in parameter "${this.getName()}" is not a string`;
 			return result;
 		}
 
 		if (this.#min != null) {
 			if (value.length < this.#min) {
-				result.msg = `Property ${this.getName()} has less characters than the minimum of: ${this.#min}`;
+				result.msg = `Value set in parameter "${this.getName()}" has less characters than the minimum of: ${this.#min}`;
 				return result;
 			}
 		}
 
 		if (this.#max != null) {
 			if (value.length > this.#max) {
-				result.msg = `Property ${this.getName()} has more characters than the maximum of: ${this.#max}`;
+				result.msg = `Value set in parameter "${this.getName()}" has more characters than the maximum of: ${this.#max}`;
 				return result;
 			}
 		}

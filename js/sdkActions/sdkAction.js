@@ -50,6 +50,7 @@ export class SdkAction {
 		for (let i = 0; i < this.#options.length; i++) {
 			const value = this.#options[i].check(data);
 			if (!value.valid) {
+				result.valid = false;
 				result.msg += value.msg;
 				if (i + 1 < this.#options.length) {
 					result.msg += "\r\n";
