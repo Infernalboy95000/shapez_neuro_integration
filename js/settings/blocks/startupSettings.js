@@ -1,44 +1,39 @@
-import { NumberSetting } from "./inputs/numberSetting";
-import { OptionListSetting } from "./inputs/optionListSetting";
-import { ToggleSetting } from "./inputs/toggleSetting";
+import { ModSettings } from "../../modSettings";
+import { NumberSetting } from "./../inputs/numberSetting";
+import { OptionListSetting } from "./../inputs/optionListSetting";
+import { ToggleSetting } from "./../inputs/toggleSetting";
 
 /**
  * Manages settings related to startup actions
  * @class ConnextionSettings
  */
 export class StartupSettings {
-	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {ToggleSetting} */ #autoConnectToggle;
 	/** @type {ToggleSetting} */ #playerChooseMapToggle;
 	/** @type {ToggleSetting} */ #forceOpenMapToggle;
 	/** @type {NumberSetting} */ #forceOpenTimer;
 	/** @type {OptionListSetting} */ #mapAwailableOptions;
 
-	/**
-	 * @param {import("shapez/mods/mod").Mod} mod
-	 */
-	constructor(mod) {
-		this.#mod = mod;
-	}
+	constructor() {}
 
 	/** @param {ToggleSetting} toogleSetting */
 	addAutoConnectToogle(toogleSetting) {
 		this.#autoConnectToggle = toogleSetting;
 		this.#setAutoConnectEvents();
-		this.#autoConnectToggle.set(this.#mod.settings.autoConnect);
+		this.#autoConnectToggle.set(ModSettings.get(ModSettings.KEYS.autoConnect));
 	}
 
 	/** @param {ToggleSetting} toogleSetting */
 	addPlayerChooseMapToggle(toogleSetting) {
 		this.#playerChooseMapToggle = toogleSetting;
 		this.#setPlayerChooseMapEvents();
-		this.#playerChooseMapToggle.set(this.#mod.settings.playerChooseMap);
+		this.#playerChooseMapToggle.set(ModSettings.get(ModSettings.KEYS.playerChooseMap));
 	}
 
 	/** @param {ToggleSetting} toogleSetting */
 	addForceOpenMapToggle(toogleSetting) {
-		const forceMap = this.#mod.settings.forceOpenMap;
-		const playerChoose = this.#mod.settings.playerChooseMap;
+		const forceMap = ModSettings.get(ModSettings.KEYS.forceOpenMap);
+		const playerChoose = ModSettings.get(ModSettings.KEYS.playerChooseMap);
 
 		this.#forceOpenMapToggle = toogleSetting;
 		this.#setForceOpenMapEvents();
@@ -46,7 +41,7 @@ export class StartupSettings {
 		// Player can choose and Force open are mutually exlusive
 		if (forceMap && playerChoose) {
 			this.#forceOpenMapToggle.set(false);
-			this.#saveForceOpenMapSetting(false);
+			this.#saveSetting(ModSettings.KEYS.forceOpenMap, false);
 		}
 		else {
 			this.#forceOpenMapToggle.set(forceMap);
@@ -95,66 +90,51 @@ export class StartupSettings {
 		}
 	}
 
-	#saveAutoConnectSetting(value) {
-		this.#mod.settings.autoConnect = value;
-		this.#mod.saveSettings();
-	}
-
-	#savePlayerChooseMapSetting(value) {
-		this.#mod.settings.playerChooseMap = value;
-		this.#mod.saveSettings();
-	}
-
-	#saveForceOpenMapSetting(value) {
-		this.#mod.settings.forceOpenMap = value;
-		this.#mod.saveSettings();
-	}
-
-	#saveForceOpenTimerSetting(value) {
-		this.#mod.settings.forcedMapTime = value;
-		this.#mod.saveSettings();
-	}
-
-	#saveMapAvailableSetting(value) {
-		this.#mod.settings.mapAvailable = value;
-		this.#mod.saveSettings();
+	#saveSetting(key, value) {
+		ModSettings.set(key, value);
+		ModSettings.save();
 	}
 
 	#onAutoConnectToogleClicked() {
-		const value = !this.#mod.settings.autoConnect;
+		const key = ModSettings.KEYS.autoConnect;
+		const value = !ModSettings.get(key);
 		this.#autoConnectToggle.set(value);
-		this.#saveAutoConnectSetting(value);
+		this.#saveSetting(key, value);
 	}
 
 	#onPlayerChooseMapToogleClicked() {
-		const value = !this.#mod.settings.playerChooseMap;
+		const chooseKey = ModSettings.KEYS.playerChooseMap;
+		const value = !ModSettings.get(chooseKey);
 		this.#playerChooseMapToggle.set(value);
-		this.#savePlayerChooseMapSetting(value);
+		this.#saveSetting(chooseKey, value);
 
 		// Player can choose and Force open are mutually exlusive
-		if (this.#mod.settings.forceOpenMap) {
+		const forceKey = ModSettings.KEYS.forceOpenMap;
+		if (ModSettings.get(forceKey)) {
 			this.#forceOpenMapToggle.set(false);
-			this.#saveForceOpenMapSetting(false);
+			this.#saveSetting(forceKey, false);
 		}
 	}
 
 	#onForceOpenMapToogleClicked() {
-		const value = !this.#mod.settings.forceOpenMap;
+		const forceKey = ModSettings.KEYS.forceOpenMap;
+		const value = !ModSettings.get(forceKey);
 		this.#forceOpenMapToggle.set(value);
-		this.#saveForceOpenMapSetting(value);
+		this.#saveSetting(forceKey, value);
 
 		// Player can choose and Force open are mutually exlusive
-		if (this.#mod.settings.playerChooseMap) {
+		const chooseKey = ModSettings.KEYS.playerChooseMap;
+		if (ModSettings.get(chooseKey)) {
 			this.#playerChooseMapToggle.set(false);
-			this.#savePlayerChooseMapSetting(false);
+			this.#saveSetting(chooseKey, false);
 		}
 	}
 
 	#onForceTimerDragEnded(value) {
-		this.#saveForceOpenTimerSetting(value);
+		this.#saveSetting(ModSettings.KEYS.forcedMapTime, value);
 	}
 
 	#onMapAvailableOptionChosed(optionID) {
-		this.#saveMapAvailableSetting(optionID);
+		this.#saveSetting(ModSettings.KEYS.mapAvailable, optionID);
 	}
 }

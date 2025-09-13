@@ -3,7 +3,7 @@ import { CoordsGrid } from "./helpers/coordsGrid";
 import { ActionsController } from "./actions/base/actionsController";
 import { TutorialMessager } from "./helpers/tutorialMessager";
 import { EventsController } from "./events/eventsController";
-import { DefaultSettings } from "./defaultSettings";
+import { ModSettings } from "./modSettings";
 
 export class NeuroIntegration extends Mod {
 	/** @type {boolean} */ #booted = false;
@@ -13,7 +13,7 @@ export class NeuroIntegration extends Mod {
 	/** @type {EventsController} */ #eventsController;
 
 	init() {
-		DefaultSettings.Set(this);
+		ModSettings.defaults(this);
 
 		this.signals.appBooted.add(() => {
 			this.#coordsGrid = new CoordsGrid(this);

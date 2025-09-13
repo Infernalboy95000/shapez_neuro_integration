@@ -1,8 +1,9 @@
 import { SOUNDS	} from "shapez/platform/sound";
-import { SdkClient } from "../sdkClient";
-import { TextSetting } from "./inputs/textSetting";
-import { ToggleSetting } from "./inputs/toggleSetting";
-import { ButtonSetting } from "./inputs/buttonSetting";
+import { SdkClient } from "../../sdkClient";
+import { TextSetting } from "./../inputs/textSetting";
+import { ToggleSetting } from "./../inputs/toggleSetting";
+import { ButtonSetting } from "./../inputs/buttonSetting";
+import { ModSettings } from "../../modSettings";
 
 /**
  * Manages settings related to connextion
@@ -24,7 +25,7 @@ export class ConnectionSettings {
 	/** @param {ButtonSetting} buttonSetting */
 	addSdkButton(buttonSetting) {
 		this.#sdkButton = buttonSetting;
-		this.#setSdkButtonEvents();
+		this.#sdkButton.onClicked = () => { this.#onSdkButtonClicked() };
 		this.#setSdkClientEvents();
 
 		if (SdkClient.isConnected()) {
@@ -39,27 +40,15 @@ export class ConnectionSettings {
 	/** @param {TextSetting} textSetting */
 	addSdkURL(textSetting) {
 		this.#sdkURL = textSetting;
-		this.#setSdkURLEvents();
+		this.#sdkURL.onFocusOut = (e) => { this.#onSdkUrlFocusOut(e) };
 		this.#updateSdkURLinputType();
 	}
 
 	/** @param {ToggleSetting} toogleSetting */
 	addHideURL(toogleSetting) {
 		this.#hideURL = toogleSetting;
-		this.#setHideURLEvents();
-		this.#hideURL.set(this.#mod.settings.hideURL);
-	}
-
-	#setSdkButtonEvents() {
-		this.#sdkButton.onClicked = () => { this.#onSdkButtonClicked() };
-	}
-
-	#setSdkURLEvents() {
-		this.#sdkURL.onFocusOut = (e) => { this.#onSdkUrlFocusOut(e) };
-	}
-
-	#setHideURLEvents() {
 		this.#hideURL.onClicked = () => { this.#onHideURLToogled() };
+		this.#hideURL.set(ModSettings.get(ModSettings.KEYS.hideURL));
 	}
 
 	#setSdkClientEvents() {
@@ -71,23 +60,19 @@ export class ConnectionSettings {
 		SdkClient.initCrash.add("settingsKo", () => { this.#onInitCrash() });
 	}
 
-	#onSdkButtonClicked() {
-		this.#sdkButtonAction();
-	}
-
 	#onSdkUrlFocusOut(value) {
-		this.#saveUrlSetting(value);
+		this.#saveSetting(ModSettings.KEYS.socketURL, value);
 	}
 
 	#onHideURLToogled() {
-		const value = !this.#mod.settings.hideURL;
+		const value = !ModSettings.KEYS.hideURL;
 		this.#hideURL.set(value);
-		this.#saveHideURLSetting(value);
+		this.#saveSetting(ModSettings.KEYS.hideURL, value);
 		this.#updateConnectionDescription();
 		this.#updateSdkURLinputType();
 	}
 
-	#sdkButtonAction() {
+	#onSdkButtonClicked() {
 		if (SdkClient.isConnected()) {
 			SdkClient.disconnect();
 			this.#showConnect();
@@ -97,7 +82,7 @@ export class ConnectionSettings {
 			this.#showCancel();
 			SdkClient.requestCancell();
 		}
-		else if (SdkClient.tryConnect(this.#mod.settings.socketURL)) {
+		else if (SdkClient.tryConnect(ModSettings.get(ModSettings.KEYS.socketURL))) {
 			this.#sdkButton.changeTitle("Connecting...");
 			this.#updateConnectionDescription();
 			this.#showCancel();
@@ -120,7 +105,7 @@ export class ConnectionSettings {
 	}
 
 	#updateSdkURLinputType() {
-		if (this.#mod.settings.hideURL) {
+		if (ModSettings.get(ModSettings.KEYS.hideURL)) {
 			this.#sdkURL.changeType("password");
 		}
 		else {
@@ -130,14 +115,14 @@ export class ConnectionSettings {
 
 	#updateConnectionDescription() {
 		if (SdkClient.isConnected()) {
-			if (this.#mod.settings.hideURL) {
+			if (ModSettings.get(ModSettings.KEYS.hideURL)) {
 				this.#sdkButton.changeDescription(`Connected.`);
 			} else {
 				this.#sdkButton.changeDescription(`Connected to: ${SdkClient.getCurrentURL()}`);
 			}
 		}
 		else if (SdkClient.isAttempting()) {
-			if (this.#mod.settings.hideURL) {
+			if (ModSettings.get(ModSettings.KEYS.hideURL)) {
 				this.#sdkButton.changeDescription(`Attempting connection...`);
 			}
 			else {
@@ -149,14 +134,9 @@ export class ConnectionSettings {
 		}
 	}
 
-	#saveUrlSetting(value) {
-		this.#mod.settings.socketURL = value;
-		this.#mod.saveSettings();
-	}
-
-	#saveHideURLSetting(value) {
-		this.#mod.settings.hideURL = value;
-		this.#mod.saveSettings();
+	#saveSetting(key, value) {
+		ModSettings.set(key, value);
+		ModSettings.save();
 	}
 
 	#onConnected() {
