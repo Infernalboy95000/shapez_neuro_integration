@@ -2,7 +2,7 @@ import { ModSettings } from "../../modSettings";
 import { SettingsMenu } from "../../settings/settingsMenu";
 import { BaseActions } from "../base/baseActions";
 import { MapLoader } from "../executers/menus/main/mapLoader";
-import { PlayGameActionList } from "../lists/PlayGameActionList";
+import { PlayGameActionList } from "../lists/mainMenu/PlayGameActionList";
 
 export class PlayGameActions extends BaseActions {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;

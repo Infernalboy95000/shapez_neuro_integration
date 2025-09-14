@@ -4,6 +4,7 @@ import { PlayGameActions } from "../actions/mainMenu/playGameActions";
 import { ActionsCollection } from "../actions/base/actionsCollection";
 import { DialogEvents } from "../events/dialogEvents";
 import { ModSettings } from "../modSettings";
+import { MainExtrasActions } from "../actions/mainMenu/mainExtrasActions";
 
 export class MainMenuMode {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -24,10 +25,7 @@ export class MainMenuMode {
 		DialogEvents.DIALOG_CLOSED.add("mainDialog", () => this.#onDialogClosed);
 		this.#open = true;
 		this.#playActions = new PlayGameActions(this.#mod, state);
-		ActionsCollection.addActions(new Map([
-			["play", this.#playActions]
-		]));
-
+		this.#declareActions(state);
 		const statusDisplayBox = this.#createStatusBox();
 		this.#StatusDisplay.show(statusDisplayBox);
 
@@ -46,17 +44,26 @@ export class MainMenuMode {
 
 	menuClosed() {
 		this.#open = false;
-		ActionsCollection.deactivateActions(["play"], true);
+		ActionsCollection.deactivateActions(["play", "extras"], true);
 		if (this.#timeout) {
 			clearTimeout(this.#timeout);
 		}
 		DialogEvents.DIALOG_CLOSED.remove("mainDialog");
 	}
 
+	/** @param {import("shapez/states/main_menu").MainMenuState} state */
+	#declareActions(state) {
+		const actions = new Map();
+		actions.set("play", this.#playActions);
+		actions.set("extras", new MainExtrasActions(state));
+		ActionsCollection.addActions(actions);
+	}
+
 	#onConnectedActions() {
 		if (this.#open) {
 			this.#tryOpenGame();
 		}
+		ActionsCollection.activateActions(["extras"]);
 	}
 
 	#tryOpenGame() {

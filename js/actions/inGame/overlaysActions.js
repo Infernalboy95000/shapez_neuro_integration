@@ -1,6 +1,7 @@
 import { InGameState } from "shapez/states/ingame";
 import { BaseActions } from "../base/baseActions";
 import { OverlaysActionList } from "../lists/inGame/overlaysActionList";
+import { ModSettings } from "../../modSettings";
 
 export class OverlaysActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -36,7 +37,8 @@ export class OverlaysActions extends BaseActions {
 			actions.push(OverlaysActionList.openStats);
 		}
 		actions.push(OverlaysActionList.saveGame);
-		actions.push(OverlaysActionList.pauseGame);
+		if (ModSettings.get(ModSettings.KEYS.allowPause))
+			actions.push(OverlaysActionList.pauseGame);
 
 		super.activate(actions);
 	}

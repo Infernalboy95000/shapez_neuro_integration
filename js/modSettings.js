@@ -1,28 +1,42 @@
 export class ModSettings {
 	static KEYS = {
+		// connection //
 		socketURL: "socketURL",
-		coordsGrid: "coordsGrid",
-		autoConnect: "autoConnect",
 		hideURL: "hideURL",
+		// context //
+		coordsGrid: "coordsGrid",
+		descriptiveActions: "descriptiveActions",
+		waitAfterHumanTime: "waitAfterHumanTime",
+		// startup //
+		autoConnect: "autoConnect",
 		playerChooseMap: "playerChooseMap",
 		forceOpenMap: "forceOpenMap",
-		descriptiveActions: "descriptiveActions",
 		forcedMapTime: "forcedMapTime",
 		mapAvailable: "mapAvailable",
-		waitAfterHumanTime: "waitAfterHumanTime",
+		// dangerous //
+		allowPause: "allowPause",
+		allowExit: "allowExit",
+		allowClose: "allowClose"
 	}
 
 	static #defaultValues = {
-		[this.KEYS.socketURL]: "localhost:8000",
-		[this.KEYS.coordsGrid]: false,
-		[this.KEYS.autoConnect]: false,
+		// connection //
 		[this.KEYS.hideURL]: true,
+		[this.KEYS.socketURL]: "localhost:8000",
+		// context //
+		[this.KEYS.coordsGrid]: false,
+		[this.KEYS.descriptiveActions]: true,
+		[this.KEYS.waitAfterHumanTime]: 5,
+		// startup //
+		[this.KEYS.autoConnect]: false,
 		[this.KEYS.playerChooseMap]: false,
 		[this.KEYS.forceOpenMap]: false,
-		[this.KEYS.descriptiveActions]: true,
 		[this.KEYS.forcedMapTime]: 5,
-		[this.KEYS.mapAvailable] : "any_map",
-		[this.KEYS.waitAfterHumanTime]: 5
+		[this.KEYS.mapAvailable]: "any_map",
+		// dangerous //
+		[this.KEYS.allowPause]: true,
+		[this.KEYS.allowExit]: false,
+		[this.KEYS.allowClose]: false,
 	}
 	/** @type {import("shapez/mods/mod").Mod}*/ static #mod;
 

@@ -24,8 +24,11 @@ export class PauseMenuActions extends BaseActions {
 		const actions = [];
 		if (ModSettings.get(ModSettings.KEYS.descriptiveActions))
 			actions.push(PauseMenuActionList.info);
+		
 		actions.push(PauseMenuActionList.resume);
-		actions.push(PauseMenuActionList.exit);
+		
+		if (ModSettings.get(ModSettings.KEYS.allowExit))
+			actions.push(PauseMenuActionList.exit);
 		super.activate(actions);
 	}
 

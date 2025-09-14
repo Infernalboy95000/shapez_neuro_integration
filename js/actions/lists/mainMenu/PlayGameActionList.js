@@ -1,6 +1,6 @@
-import { EnumSchema } from "../../sdkActions/schema/enumSchema";
-import { SchemaBase } from "../../sdkActions/schema/schemaBase";
-import { SdkAction } from "../../sdkActions/sdkAction";
+import { EnumSchema } from "../../../sdkActions/schema/enumSchema";
+import { SchemaBase } from "../../../sdkActions/schema/schemaBase";
+import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class PlayGameActionList {
 	static playGame = "play_game";
@@ -10,16 +10,16 @@ export class PlayGameActionList {
 	static actions = [
 		// This action is used when only one map is allowed, to simplify
 		new SdkAction(this.playGame,
-			"Play the game"
+			"Play the game."
 		),
 		new SdkAction(this.newGame,
-			"Play in a new map"
+			"Play in a new map."
 		),
 		new SdkAction(this.continueGame,
-			"Continue last played map"
+			"Continue last played map."
 		),
 		new SdkAction(this.loadGame,
-			"Select the map you want to load"
+			"Select the map you want to load."
 		)
 	];
 

@@ -3,6 +3,7 @@ import { ConnectionStructure } from "./structure/connectionStructure";
 import { ContextStructure } from "./structure/contextStructure";
 import { StartupStructure } from "./structure/startupStructure";
 import { InfoStructure } from "./structure/infoStructure";
+import { DangerousStructure } from "./structure/dangerousStructure";
 
 export class SettingsMenu {
 	static ANY_MAP = "any_map";
@@ -86,6 +87,7 @@ export class SettingsMenu {
 		ConnectionStructure.build(this.#mod, this.#menu);
 		ContextStructure.build(this.#mod, this.#menu);
 		StartupStructure.build(this.#mod, this.#menu);
+		DangerousStructure.build(this.#mod, this.#menu);
 		InfoStructure.build(this.#mod, this.#menu);
 	}
 }
