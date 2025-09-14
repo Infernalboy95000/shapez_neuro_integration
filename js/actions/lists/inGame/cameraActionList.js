@@ -19,12 +19,9 @@ export class CameraActionList {
 	static yPos = "y";
 	static zoomLevel = "zoom_percent";
 
-	/**
-	 * @param {import("shapez/game/root").GameRoot} root
-	 * @returns {Map<string, Array<SchemaBase>>}
-	 * */
+	/** @returns {Map<string, Array<SchemaBase>>} */
 	static getOptions(root) {
-		const limits = ViewScanner.getVisibleLimits(root).allScaled(2);
+		const limits = ViewScanner.getVisibleLimits().allScaled(2);
 		const minZoom = Math.round(root.camera.getMinimumZoom() * 100);
 		const maxZoom = Math.round(root.camera.getMaximumZoom() * 100);
 		const options = {

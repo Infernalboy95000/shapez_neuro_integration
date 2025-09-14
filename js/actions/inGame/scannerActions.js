@@ -4,6 +4,7 @@ import { PatchScanner } from "../executers/scanners/patchScanner";
 import { ScannerActionList } from "../lists/inGame/scannerActionList";
 import { TutorialChecks } from "../../helpers/tutorialChecks";
 import { ModSettings } from "../../modSettings";
+import { SdkClient } from "../../sdkClient";
 
 export class ScannerActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -26,9 +27,14 @@ export class ScannerActions extends BaseActions {
 
 	activate() {
 		if (!ModSettings.get(ModSettings.KEYS.descriptiveActions)) { return; }
-		const options = ScannerActionList.getOptions(this.#root);
+		const options = ScannerActionList.getOptions();
 		super.setOptions(options);
 		super.activate();
+		SdkClient.sendMessage(
+			`Auto scanning visible zone:\n` +
+			`Terrain information: ${this.#scanTerrain().msg}` +
+			`Buildings information: ${this.#scanBuildings().msg}`, true
+		)
 	}
 
 	/**

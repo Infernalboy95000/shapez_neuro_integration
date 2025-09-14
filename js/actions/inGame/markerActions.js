@@ -30,7 +30,7 @@ export class MarkerActions extends BaseActions {
 				actions.push(MarkerActionList.editMarker);
 		}
 
-		super.setOptions(MarkerActionList.getOptions(this.#root, info.all, info.editable));
+		super.setOptions(MarkerActionList.getOptions(info.all, info.editable));
 		super.activate(actions);
 	}
 

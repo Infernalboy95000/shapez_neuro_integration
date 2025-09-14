@@ -8,13 +8,17 @@ import { ColorItem } from "shapez/game/items/color_item";
 import { ShapeItem } from "shapez/game/items/shape_item";
 import { ShapeCode } from "../../shapes/shapeCode";
 import { ColorCodes } from "../../shapes/colorCodes";
+import { ViewScanner } from "../../camera/viewScanner";
 
 export class BeltInfo {
+	/** @type {boolean} */ static #beltCutted = false;
+
 	/**
 	 * @param {EntityComponentStorage} belt
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
 	static describe(belt) {
+		this.#beltCutted = false;
 		let log = {msg:"", describedIDs:new Array()};
 		const path = belt.Belt.assignedPath.entityPath;
 		if (path.length > 1) {
@@ -26,13 +30,16 @@ export class BeltInfo {
 			log.msg = `It's facing ${rotName}.`;
 		}
 
-		let connected = belt.Belt.assignedPath.boundAcceptor;
-		if (connected) {
-			const acceptor = belt.Belt.assignedPath.computeAcceptingEntityAndSlot().entity;
-			log.msg += ` It's connected to ${StaticEntityInfo.simple(acceptor.components.StaticMapEntity)}.`
-		}
-		else {
-			log.msg += " It's not connected to any building.";
+		let connected;
+		if (!this.#beltCutted) {
+			connected = belt.Belt.assignedPath.boundAcceptor;
+			if (connected) {
+				const acceptor = belt.Belt.assignedPath.computeAcceptingEntityAndSlot().entity;
+				log.msg += ` It's connected to ${StaticEntityInfo.simple(acceptor.components.StaticMapEntity)}.`
+			}
+			else {
+				log.msg += " It's not connected to any building.";
+			}
 		}
 
 		if (belt.Belt.assignedPath.items.length > 0) {
@@ -84,6 +91,11 @@ export class BeltInfo {
 
 		let lastDirection = path[0].components.StaticMapEntity.originalRotation;
 		for (let i = 0; i < path.length; i++) {
+			if (!ViewScanner.isBuildingVisible(path[i])) {
+				this.#beltCutted = true;
+				log.msg += ` Continues outside of view.`;
+				break;
+			}
 			const entity = path[i].components.StaticMapEntity;
 			const currentDirection = entity.originalRotation;
 			const rotName = RotationCodes.getRotationName(currentDirection);

@@ -33,7 +33,7 @@ export class PlacementActions extends BaseActions {
 		if (this.#root.camera.getIsMapOverlayActive()) { return; }
 		const buildings = this.#toolbelt.getTranslatedBuildings();
 		const options = PlacementActionList.getOptions(
-			this.#root, Array.from(buildings.keys())
+			Array.from(buildings.keys())
 		);
 		super.setOptions(options);
 		super.activate();

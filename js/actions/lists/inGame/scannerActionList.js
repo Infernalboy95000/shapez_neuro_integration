@@ -22,12 +22,9 @@ export class ScannerActionList {
 	static xPos = "x";
 	static yPos = "y";
 
-	/**
-	 * @param {import("shapez/game/root").GameRoot} root
-	 * @returns {Map<string, Array<SchemaBase>>}
-	 * */
-	static getOptions(root) {
-		const limits = ViewScanner.getVisibleLimits(root);
+	/** @returns {Map<string, Array<SchemaBase>>} */
+	static getOptions() {
+		const limits = ViewScanner.getVisibleLimits();
 		const options = {
 			[this.xPos]:
 			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),

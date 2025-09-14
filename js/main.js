@@ -4,6 +4,7 @@ import { ActionsController } from "./actions/base/actionsController";
 import { TutorialMessager } from "./helpers/tutorialMessager";
 import { EventsController } from "./events/eventsController";
 import { ModSettings } from "./modSettings";
+import { ViewScanner } from "./actions/descriptors/camera/viewScanner";
 
 export class NeuroIntegration extends Mod {
 	/** @type {boolean} */ #booted = false;
@@ -24,6 +25,7 @@ export class NeuroIntegration extends Mod {
 		});
 
 		this.signals.gameStarted.add(root => {
+			ViewScanner.asignRoot(root);
 			this.#actionsController.newGameOpenned(root);
 			this.#eventsController.updateRoot(root);
 			this.#tutorialMessager.notifyGameOpenned();

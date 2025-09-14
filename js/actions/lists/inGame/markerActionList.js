@@ -26,13 +26,12 @@ export class MarkerActionList {
 	static markerEdit = "marker_to_edit";
 
 	/**
-	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {Array<string>} all
 	 * @param {Array<string>} editable
 	 * @returns {Map<string, Array<SchemaBase>>}
 	 * */
-	static getOptions(root, all, editable) {
-		const limits = ViewScanner.getVisibleLimits(root);
+	static getOptions(all, editable) {
+		const limits = ViewScanner.getVisibleLimits();
 		const options = {
 			[this.xPos]:
 			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),

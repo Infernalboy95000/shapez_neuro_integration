@@ -15,7 +15,7 @@ export class PatchScanner {
 	/** @returns {{valid:boolean, msg:string}} */
 	scanInView() {
 		const result = {valid: false, msg: ""};
-		const chunks = ViewScanner.getVisibleChunks(this.#root);
+		const chunks = ViewScanner.getVisibleChunks();
 		chunks.forEach((chunk) => {
 			for (let i = 0; i < chunk.patches.length; i++) {
 				result.valid = true;

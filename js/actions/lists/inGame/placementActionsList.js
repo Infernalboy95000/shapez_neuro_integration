@@ -35,12 +35,11 @@ export class PlacementActionList {
 	static lineLength = "line_length";
 
 	/**
-	 * @param {import("shapez/game/root").GameRoot} root
 	 * @param {Array<string>} buildNames
 	 * @returns {Map<string, Array<SchemaBase>>}
 	 * */
-	static getOptions(root, buildNames) {
-		const limits = ViewScanner.getVisibleLimits(root);
+	static getOptions(buildNames) {
+		const limits = ViewScanner.getVisibleLimits();
 		const rotNames = RotationCodes.getCodes();
 		const options = {
 			[this.build]: new EnumSchema(this.build, buildNames),

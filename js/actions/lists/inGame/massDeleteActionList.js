@@ -16,12 +16,9 @@ export class MassDeleteActionList {
 	static upRight_xPos = "upper_right_corner_x";
 	static upRight_yPos = "upper_right_corner_y";
 
-	/**
-	 * @param {import("shapez/game/root").GameRoot} root
-	 * @returns {Map<string, Array<SchemaBase>>}
-	 * */
-	static getOptions(root) {
-		const limits = ViewScanner.getVisibleLimits(root);
+	/** @returns {Map<string, Array<SchemaBase>>} */
+	static getOptions() {
+		const limits = ViewScanner.getVisibleLimits();
 		const options = {
 			[this.lowLeft_xPos]:
 			new NumberSchema(this.lowLeft_xPos, 1, limits.x, limits.x + limits.w - 1),
