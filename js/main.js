@@ -26,6 +26,7 @@ export class NeuroIntegration extends Mod {
 		this.signals.gameStarted.add(root => {
 			this.#actionsController.newGameOpenned(root);
 			this.#eventsController.updateRoot(root);
+			this.#tutorialMessager.notifyGameOpenned();
 		});
 
 		this.signals.stateEntered.add(state	=> {
@@ -34,13 +35,5 @@ export class NeuroIntegration extends Mod {
 				this.#tutorialMessager.notifyStateChange(state);
 			}
 		});
-	}
-
-	/**
-	 * @param {string} message
-	 * @returns {boolean}
-	 * */
-	trySendTutorialMessage(message) {
-		return this.#tutorialMessager.TryAnnounceWithTutorial(message);
 	}
 }

@@ -1,4 +1,5 @@
 import { ModSettings } from "../../modSettings";
+import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
 import { BaseActions } from "../base/baseActions";
 import { MapLoader } from "../executers/menus/main/mapLoader";
@@ -36,6 +37,7 @@ export class PlayGameActions extends BaseActions {
 			super.setOptions(options);
 		}
 		super.activate(actions.actions);
+		SdkClient.sendMessage("Main menu is openned. You can choose to play the game now.", true);
 	}
 
 	forcePlayMap() {

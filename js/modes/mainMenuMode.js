@@ -22,7 +22,7 @@ export class MainMenuMode {
 
 	/** @param {import("shapez/states/main_menu").MainMenuState} state */
 	menuOpenned(state) {
-		DialogEvents.DIALOG_CLOSED.add("mainDialog", () => this.#onDialogClosed);
+		DialogEvents.DIALOG_CLOSED.add("mainDialog", () => { this.#onDialogClosed() });
 		this.#open = true;
 		this.#playActions = new PlayGameActions(this.#mod, state);
 		this.#declareActions(state);
@@ -74,6 +74,7 @@ export class MainMenuMode {
 					this.#playActions.forcePlayMap();
 					this.#timeout = null;
 				}, seconds * 1000);
+				SdkClient.sendMessage(`A map is going to be openned in ${seconds} seconds. Please wait.`, true);
 			}
 			else {
 				this.#playActions.forcePlayMap();
@@ -82,6 +83,9 @@ export class MainMenuMode {
 		else if (ModSettings.get(ModSettings.KEYS.playerChooseMap)) {
 			ActionsCollection.activateActions(["play"]);
 		}
+		else {
+			SdkClient.sendMessage("The main menu is openned, but you have no permissions to open any map. Please wait till a human let's you play.", true);
+		} 
 	}
 
 	/** @returns {HTMLDivElement} */
@@ -102,10 +106,7 @@ export class MainMenuMode {
 		return statusDisplay;
 	}
 
-	#onDialogClosed()
-	{
-		if (ModSettings.get(ModSettings.KEYS.playerChooseMap)) {
-			ActionsCollection.activateActions(["play"]);
-		}
+	#onDialogClosed() {
+		this.#onConnectedActions();
 	}
 }

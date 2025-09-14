@@ -77,9 +77,6 @@ export class InGameMode {
 	}
 
 	#announceOpening() {
-		const welcomeMessage = "A map has loaded. Now you can play the game!";
-		if (!this.#mod.trySendTutorialMessage(welcomeMessage)) {
-			SdkClient.sendMessage(welcomeMessage);
-		}
+		SdkClient.sendMessage("A map has loaded. Now you can play the game!", true);
 	}
 }

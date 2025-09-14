@@ -12,7 +12,7 @@ ingame:
 
             1_1_extractor: >-
                 Place an <strong>extractor</strong> on top of an <strong>uncolored circle shape tile</strong> to extract it!<br><br>
-                The extractor outputs the shape under it's shape tile, to the side it's facing, indefinitely!.
+                The extractor outputs the shape under it's shape tile, to the side it's facing, indefinitely!
 
             1_1_buildings_scan: >-
                 <strong>Scan buildings</strong> to locate where the hub is and accepts items.
