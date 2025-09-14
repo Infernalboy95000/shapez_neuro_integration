@@ -35,6 +35,7 @@ export class ConnectionSettings {
 			this.#onReattempting();
 			this.#showCancel();
 		}
+		this.#updateConnectionDescription();
 	}
 
 	/** @param {TextSetting} textSetting */
@@ -65,7 +66,7 @@ export class ConnectionSettings {
 	}
 
 	#onHideURLToogled() {
-		const value = !ModSettings.KEYS.hideURL;
+		const value = !ModSettings.get(ModSettings.KEYS.hideURL);
 		this.#hideURL.set(value);
 		this.#saveSetting(ModSettings.KEYS.hideURL, value);
 		this.#updateConnectionDescription();
@@ -118,7 +119,7 @@ export class ConnectionSettings {
 			if (ModSettings.get(ModSettings.KEYS.hideURL)) {
 				this.#sdkButton.changeDescription(`Connected.`);
 			} else {
-				this.#sdkButton.changeDescription(`Connected to: ${SdkClient.getCurrentURL()}`);
+				this.#sdkButton.changeDescription(`Connected to: ${SdkClient.getCurrentURL()}.`);
 			}
 		}
 		else if (SdkClient.isAttempting()) {

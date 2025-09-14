@@ -17,7 +17,7 @@ export class ConnectionStructure {
 		connSettings.addSdkButton(new ButtonSetting(
 			mod, menu,
 			"SDK integration",
-			"Connect the SDK integration to your player",
+			"Connect the SDK integration to your player.",
 			"Connect",
 			ButtonSetting.Style.DEFAULT,
 			"sdkStatus"
@@ -26,7 +26,7 @@ export class ConnectionStructure {
 		connSettings.addSdkURL(new TextSetting (
 			mod, menu,
 			"SDK URL",
-			"The URL the SDK will use next time is connected",
+			"The URL the SDK will use next time is connected.",
 			"sdkURL",
 			"text",
 			ModSettings.get(ModSettings.KEYS.socketURL),

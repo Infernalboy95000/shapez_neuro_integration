@@ -5,11 +5,13 @@ import { ActionsCollection } from "../actions/base/actionsCollection";
 import { DialogEvents } from "../events/dialogEvents";
 import { ModSettings } from "../modSettings";
 import { MainExtrasActions } from "../actions/mainMenu/mainExtrasActions";
+import { MainMenuConnector } from "../settings/mainMenuConnector";
 
 export class MainMenuMode {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
 	/** @type {PlayGameActions} */ #playActions;
 	/** @type {StatusDisplay} */ #StatusDisplay;
+	/** @type {MainMenuConnector} */ #SdkConnector;
 	/** @type {boolean} */ #open = false;
 	/** @type {NodeJS.Timeout} */ #timeout;
 
@@ -17,6 +19,7 @@ export class MainMenuMode {
 	constructor(mod) {
 		this.#mod = mod;
 		this.#StatusDisplay = new StatusDisplay();
+		this.#SdkConnector = new MainMenuConnector(mod);
 		SdkClient.connected.add("mainConn", () => this.#onConnectedActions());
 	}
 
@@ -28,6 +31,7 @@ export class MainMenuMode {
 		this.#declareActions(state);
 		const statusDisplayBox = this.#createStatusBox();
 		this.#StatusDisplay.show(statusDisplayBox);
+		this.#SdkConnector.show(this.#StatusDisplay, statusDisplayBox);
 
 		if (SdkClient.isConnected()) {
 			this.#onConnectedActions();
