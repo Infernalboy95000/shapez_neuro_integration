@@ -25,14 +25,14 @@ export class MainMenuConnector {
 		if (this.#button) {
 			this.#button.remove();
 		}
-		this.#create(parent);
+		this.#create(parent.querySelector(""));
 	}
 
 	/** @param {Element} parent */
 	#create(parent) {
 		const divParent = document.createElement("div");
 		divParent.id = "sdkInputParent";
-		divParent.textContent = "IP:";
+		divParent.textContent = "URL:";
 		parent.appendChild(divParent);
 
 		const divContainer = document.createElement("div");
