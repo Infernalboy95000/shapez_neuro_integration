@@ -10,6 +10,7 @@ import { T } from "shapez/translations";
 import { HUDSettingsMenu } from "shapez/game/hud/parts/settings_menu";
 import { ActionEvent } from "../custom/actionEvent";
 import { DialogEvents } from "./dialogEvents";
+import { TutorialChecks } from "../helpers/tutorialChecks";
 
 export class OverlayEvents {
 	/** @type {ActionEvent} */ static OVERLAYS_CLOSED = new ActionEvent();

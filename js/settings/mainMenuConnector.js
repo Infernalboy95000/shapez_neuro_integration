@@ -25,7 +25,7 @@ export class MainMenuConnector {
 		if (this.#button) {
 			this.#button.remove();
 		}
-		this.#create(parent.querySelector(""));
+		this.#create(parent);
 	}
 
 	/** @param {Element} parent */

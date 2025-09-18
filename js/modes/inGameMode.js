@@ -35,6 +35,12 @@ export class InGameMode {
 	/** @param {InGameState} state */
 	gameOpenned(state) {
 		if (SdkClient.isConnected()) {
+			if (this.#root.hubGoals.level > 1) {
+				TutorialChecks.scanned = true;
+				TutorialChecks.deepScanned = true;
+				TutorialChecks.buildingScanned = true;
+			}
+
 			this.#declareActions(state);
 			this.#announceOpening();
 			ActionsCollection.activateActions([

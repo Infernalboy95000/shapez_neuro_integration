@@ -15,9 +15,9 @@ export class ScannerActions extends BaseActions {
 	constructor(root) {
 		super(ScannerActionList.actions);
 		super.addCallables(new Map([
-			[ScannerActionList.scanTerrain, (e) => { return this.#scanTerrain(e)}],
+			[ScannerActionList.scanTerrain, (e) => { return this.#scanTerrain()}],
 			[ScannerActionList.scanPatch, (e) => { return this.#tryScanPatch(e)}],
-			[ScannerActionList.scanBuildings, (e) => { return this.#scanBuildings(e)}],
+			[ScannerActionList.scanBuildings, (e) => { return this.#scanBuildings()}],
 		]));
 
 		this.#root = root;
@@ -30,18 +30,19 @@ export class ScannerActions extends BaseActions {
 		const options = ScannerActionList.getOptions();
 		super.setOptions(options);
 		super.activate();
-		SdkClient.sendMessage(
-			`Auto scanning visible zone:\n` +
-			`Terrain information: ${this.#scanTerrain().msg}` +
-			`Buildings information: ${this.#scanBuildings().msg}`, true
-		)
+
+		if (TutorialChecks.scanned && TutorialChecks.buildingScanned)
+		{
+			SdkClient.sendMessage(
+				`Auto scanning visible zone:\n` +
+				`Terrain information: ${this.#scanTerrain().msg}` +
+				`Buildings information: ${this.#scanBuildings().msg}`, true
+			)
+		}
 	}
 
-	/**
-	 * @param {Object} params
-	 * @returns {{valid:boolean, msg:string}}
-	*/
-	#scanTerrain(params) {
+	/** @returns {{valid:boolean, msg:string}} */
+	#scanTerrain() {
 		TutorialChecks.scanned = true;
 		return this.#patchScanner.scanInView();
 	}
@@ -57,11 +58,8 @@ export class ScannerActions extends BaseActions {
 		)
 	}
 
-	/**
-	 * @param {Object} params
-	 * @returns {{valid:boolean, msg:string}}
-	*/
-	#scanBuildings(params) {
+	/** @returns {{valid:boolean, msg:string}} */
+	#scanBuildings() {
 		TutorialChecks.buildingScanned = true;
 		return this.#buildsScanner.scanInView();
 	}
