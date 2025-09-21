@@ -15,9 +15,9 @@ export class PauseMenuDescriptor {
 		const numBelts = this.#root.entityMgr.getAllWithComponent(BeltComponent).length;
 		const numBuilds = this.#root.entityMgr.getAllWithComponent(StaticMapEntityComponent).length - numBelts;
 
-		const msg = `${numBelts} belts placed. ` +
-		`${numBuilds} buildings placed. ` +
-		`${minutesPlayed} minutes played.`;
+		const msg = `Belts placed: ${numBelts}. ` +
+		`Buildings placed: ${numBuilds}. ` +
+		`Minutes played: ${minutesPlayed}.`;
 
 		return msg;
 	}

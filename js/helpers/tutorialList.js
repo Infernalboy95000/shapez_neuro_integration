@@ -5,6 +5,7 @@ import { WireComponent } from "shapez/game/components/wire";
 import { ShapeItem } from "shapez/game/items/shape_item";
 import { GameRoot } from "shapez/game/root";
 import { TutorialChecks } from "./tutorialChecks";
+import { ModSettings } from "../modSettings";
 
 export class TutorialList {
 	static tutorialsByLevel = [
@@ -14,8 +15,11 @@ export class TutorialList {
 			{
 				id: "1_0_scan",
 				condition: /** @param {GameRoot} root */ root => {
-					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
+					if (!ModSettings.get(ModSettings.KEYS.descriptiveActions)) {
+						return false;
+					}
 
+					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
 					if (miners.length === 0 && TutorialChecks.scanned == false) {
 						return true;
 					}
@@ -28,8 +32,10 @@ export class TutorialList {
 			{
 				id: "1_0_deep_scan",
 				condition: /** @param {GameRoot} root */ root => {
+					if (!ModSettings.get(ModSettings.KEYS.descriptiveActions)) {
+						return false;
+					}
 					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
-
 					if (miners.length === 0 && TutorialChecks.deepScanned == false) {
 						return true;
 					}
@@ -48,9 +54,30 @@ export class TutorialList {
 			{
 				id: "1_1_buildings_scan",
 				condition: /** @param {GameRoot} root */ root => {
-					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
+					if (!ModSettings.get(ModSettings.KEYS.descriptiveActions)) {
+						return false;
+					}
 
+					const miners = root.entityMgr.getAllWithComponent(MinerComponent);
 					if (miners.length > 0 && TutorialChecks.buildingScanned == false) {
+						const paths = root.systemMgr.systems.belt.beltPaths;
+						for (let i = 0; i < paths.length; i++) {
+							const path = paths[i];
+							const acceptingEntity = path.computeAcceptingEntityAndSlot().entity;
+							if (!acceptingEntity || !acceptingEntity.components.Hub) {
+								continue;
+							}
+							// Find a miner which delivers to this belt path
+							for (let k = 0; k < miners.length; ++k) {
+								const miner = miners[k];
+								if (miner.components.ItemEjector.slots[0].cachedBeltPath === path) {
+									TutorialChecks.scanned = true;
+									TutorialChecks.deepScanned = true;
+									TutorialChecks.buildingScanned = true;
+									return false;
+								}
+							}
+						}
 						return true;
 					}
 					else {
@@ -74,6 +101,9 @@ export class TutorialList {
 						for (let k = 0; k < miners.length; ++k) {
 							const miner = miners[k];
 							if (miner.components.ItemEjector.slots[0].cachedBeltPath === path) {
+								TutorialChecks.scanned = true;
+								TutorialChecks.deepScanned = true;
+								TutorialChecks.buildingScanned = true;
 								return false;
 							}
 						}

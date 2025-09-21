@@ -1,7 +1,9 @@
+import { ModSettings } from "../../modSettings";
+import { SdkClient } from "../../sdkClient";
 import { SettingsMenu } from "../../settings/settingsMenu";
 import { BaseActions } from "../base/baseActions";
 import { MapLoader } from "../executers/menus/main/mapLoader";
-import { PlayGameActionList } from "../lists/PlayGameActionList";
+import { PlayGameActionList } from "../lists/mainMenu/PlayGameActionList";
 
 export class PlayGameActions extends BaseActions {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
@@ -35,6 +37,7 @@ export class PlayGameActions extends BaseActions {
 			super.setOptions(options);
 		}
 		super.activate(actions.actions);
+		SdkClient.sendMessage("Main menu is openned. You can choose to play the game now.", true);
 	}
 
 	forcePlayMap() {
@@ -93,7 +96,7 @@ export class PlayGameActions extends BaseActions {
 	#getAvailableActions() {
 		const actions = [];
 		let maps = [];
-		const allowedMap = this.#mod.settings.mapAvailable;
+		const allowedMap = ModSettings.get(ModSettings.KEYS.mapAvailable);
 		const saves = MapLoader.getCurrentMaps(this.#mod);
 
 		if (saves.length <= 1) {
@@ -119,12 +122,14 @@ export class PlayGameActions extends BaseActions {
 	/** @returns {{valid:boolean, msg:string}} */
 	#playGameOption() {
 		const options = [];
-		let maps = [];
-		const allowedMap = this.#mod.settings.mapAvailable;
+		const allowedMap = ModSettings.get(ModSettings.KEYS.mapAvailable);
 		const saves = MapLoader.getCurrentMaps(this.#mod);
 
 		if (saves.length <= 0 || allowedMap == SettingsMenu.NEW_MAP) {
-			options.push(() => {return this.#newGame()});
+			options.push(() => {
+				ModSettings.set(ModSettings.KEYS.mapAvailable, SettingsMenu.LAST_MAP);
+				return this.#newGame();
+			});
 		}
 		else if (allowedMap == SettingsMenu.LAST_MAP) {
 			options.push(() => {return this.#continueGame()});

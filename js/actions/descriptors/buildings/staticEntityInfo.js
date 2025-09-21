@@ -2,6 +2,7 @@ import { Vector } from "shapez/core/vector";
 import { EntityComponentStorage } from "shapez/game/entity_components";
 import { RandomUtils } from "../../../custom/randomUtils";
 import { T } from "shapez/translations";
+import { StaticMapEntityComponent } from "shapez/game/components/static_map_entity";
 
 export class StaticEntityInfo {
 
@@ -20,11 +21,8 @@ export class StaticEntityInfo {
 
 		const staticEntity = components.StaticMapEntity;
 		const origin = staticEntity.origin;
-		const entitiyName = staticEntity.getMetaBuilding().getId();
-		const variant = staticEntity.getVariant();
-		const buildName = T.buildings[entitiyName][variant].name;
 
-		log.msg = `Found ${buildName} at x: ${origin.x}, y: ${origin.y}.`;
+		log.msg = `Found ${this.simple(staticEntity)} at x: ${origin.x}, y: ${origin.y}.`;
 
 		const direction = staticEntity.rotation;
 		const size = RandomUtils.directionalSize(staticEntity.getTileSize(), direction);
@@ -39,5 +37,27 @@ export class StaticEntityInfo {
 			log.msg += "\nWarning: It cannot be removed!"
 		}
 		return log;
+	}
+
+	/**
+	 * @param {StaticMapEntityComponent} staticEntity
+	 * @returns {string}
+	 */
+	static simple(staticEntity) {
+		let msg = "";
+
+		const entitiyName = staticEntity.getMetaBuilding().getId();
+		const variant = staticEntity.getVariant();
+		/** @type {string} */ const buildName = T.buildings[entitiyName][variant].name;
+
+		if (entitiyName == "hub")
+			msg += "the";
+		else if (buildName.search(/^[aeiou]/gi) > -1)
+			msg += "an";
+		else
+			msg += "a";
+		msg += ` ${buildName.toLowerCase()}`;
+
+		return msg;
 	}
 }

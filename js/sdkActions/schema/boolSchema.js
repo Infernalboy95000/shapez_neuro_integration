@@ -29,13 +29,13 @@ export class BoolSchema extends SchemaBase {
 		const result = {valid: false, msg:""};
 
 		if (!data.params[this.getName()]) {
-			result.msg = `Missing parameter ${this.getName()}`;
+			result.msg = `Missing parameter "${this.getName()}"`;
 			return result;
 		}
 
 		const value = data.params[this.getName()];
 		if (typeof(value) != "boolean") {
-			result.msg = `Property ${this.getName()} is not a boolean (true or false)`;
+			result.msg = `Value set in parameter "${this.getName()}" is not a boolean (true or false)`;
 			return result;
 		}
 

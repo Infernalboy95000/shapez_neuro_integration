@@ -6,7 +6,6 @@ import { StatisticsPanelController } from "../executers/overlays/statisticsPanel
 export class StatisticsActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {StatisticsPanelController} */ #statsPanel;
-	
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
 		super(StatisticsActionList.actions);

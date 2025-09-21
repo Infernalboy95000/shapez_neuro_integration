@@ -3,7 +3,8 @@ import { CoordsGrid } from "./helpers/coordsGrid";
 import { ActionsController } from "./actions/base/actionsController";
 import { TutorialMessager } from "./helpers/tutorialMessager";
 import { EventsController } from "./events/eventsController";
-const DEFAULT_URL = "localhost:8000";
+import { ModSettings } from "./modSettings";
+import { ViewScanner } from "./actions/descriptors/camera/viewScanner";
 
 export class NeuroIntegration extends Mod {
 	/** @type {boolean} */ #booted = false;
@@ -13,10 +14,7 @@ export class NeuroIntegration extends Mod {
 	/** @type {EventsController} */ #eventsController;
 
 	init() {
-		// I wish I didn't need to do this check
-		if (this.settings.socketURL == undefined) {
-			this.#SaveDefaultSettings();
-		}
+		ModSettings.defaults(this);
 
 		this.signals.appBooted.add(() => {
 			this.#coordsGrid = new CoordsGrid(this);
@@ -27,8 +25,10 @@ export class NeuroIntegration extends Mod {
 		});
 
 		this.signals.gameStarted.add(root => {
+			ViewScanner.asignRoot(root);
 			this.#actionsController.newGameOpenned(root);
 			this.#eventsController.updateRoot(root);
+			this.#tutorialMessager.notifyGameOpenned();
 		});
 
 		this.signals.stateEntered.add(state	=> {
@@ -37,19 +37,5 @@ export class NeuroIntegration extends Mod {
 				this.#tutorialMessager.notifyStateChange(state);
 			}
 		});
-	}
-
-	/**
-	 * @param {string} message
-	 * @returns {boolean}
-	 * */
-	trySendTutorialMessage(message) {
-		return this.#tutorialMessager.TryAnnounceWithTutorial(message);
-	}
-
-	#SaveDefaultSettings() {
-		this.settings.socketURL = DEFAULT_URL;
-		this.settings.forcedMapTime = 5;
-		this.saveSettings();
 	}
 }

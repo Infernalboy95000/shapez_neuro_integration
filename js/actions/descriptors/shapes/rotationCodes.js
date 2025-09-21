@@ -1,18 +1,23 @@
 /** Constains all allowed rotation angles for shapes. */
 export class RotationCodes {
 	static #codes = new Map([
-		["UP", 0],
-		["RIGHT", 90],
-		["DOWN", 180],
-		["LEFT", 270]
+		["up", 0],
+		["right", 90],
+		["down", 180],
+		["left", 270]
 	])
 
 	static #directions = new Map([
-		["top", this.#codes.get("UP")],
-		["right", this.#codes.get("RIGHT")],
-		["bottom", this.#codes.get("DOWN")],
-		["left", this.#codes.get("LEFT")],
+		["top", this.#codes.get("up")],
+		["right", this.#codes.get("right")],
+		["bottom", this.#codes.get("down")],
+		["left", this.#codes.get("left")],
 	])
+
+	/** @returns {Array<string>} */
+	static getCodes() {
+		return Array.from(this.#codes.keys());
+	}
 
 	/**
 	 * @param {string} direction

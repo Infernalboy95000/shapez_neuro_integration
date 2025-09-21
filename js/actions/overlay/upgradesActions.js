@@ -1,4 +1,5 @@
 import { BaseActions } from "../base/baseActions";
+import { GoalsDescriptor } from "../descriptors/pins/goalsDescriptor";
 import { UpgradesPanelController } from "../executers/overlays/upgradesPanelController";
 import { ShapesPinner } from "../executers/pinners/shapesPinner";
 import { UpgradesActionList } from "../lists/overlays/upgradesActionList";
@@ -26,12 +27,21 @@ export class UpgradesActions extends BaseActions {
 	};
 
 	activate() {
-		const compile = this.#panel.compileInfo();
+		const compile = GoalsDescriptor.compileInfo(this.#root);
 		const options = UpgradesActionList.getOptions(
-			compile.boosts, compile.full, compile.pin, compile.unpin
+			compile.boosts, compile.full, compile.pin, compile.unpin, compile.goal
 		);
 		super.setOptions(options);
-		super.activate();
+		const actions = [UpgradesActionList.getInfo];
+		if (compile.full.length > 0)
+			actions.push(UpgradesActionList.upgrade);
+
+		if (compile.pin.length > 0)
+			actions.push(UpgradesActionList.pinShape);
+
+		if (compile.unpin.length > 0)
+			actions.push(UpgradesActionList.unpinShape);
+		super.activate(actions);
 	}
 
 	/**
@@ -66,7 +76,6 @@ export class UpgradesActions extends BaseActions {
 	 * @param {Object} params
 	 * @returns {{valid:boolean, msg:string}}
 	*/
-
 	#tryUnpinShape(params) {
 		const result = this.#panel.tryShowAsUnpinned(params[UpgradesActionList.shapeToUnpin]);
 		if (result.valid) {

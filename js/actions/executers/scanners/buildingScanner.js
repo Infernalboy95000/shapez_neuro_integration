@@ -12,13 +12,17 @@ export class BuildingScanner {
 	/** @returns {{valid:boolean, msg:string}} */
 	scanInView() {
 		const result = {valid: false, msg: ""};
-		const chunks = ViewScanner.getVisibleChunks(this.#root);
+		const chunks = ViewScanner.getVisibleChunks();
+		const limits = ViewScanner.getVisibleLimits();
 		const inspections = new Set();
 		const skipped = [];
 
 		chunks.forEach((chunk) => {
 			const entities = chunk.containedEntitiesByLayer.regular;
 			for (let i = 0; i < entities.length; i++) {
+				if (!ViewScanner.isBuildingVisible(entities[i]))
+					continue;
+
 				result.valid = true;
 				if (!inspections.has(entities[i].uid)) {
 					const description = BuildingDescriptor.describe(this.#root, entities[i]);
@@ -39,7 +43,6 @@ export class BuildingScanner {
 		});
 
 		for (let i = 0; i < skipped.length; i++) {
-			console.log(skipped);
 			if (!inspections.has(skipped[i].uid)) {
 				const description = BuildingDescriptor.describe(this.#root, skipped[i], true);
 				if (description.msg != "") {

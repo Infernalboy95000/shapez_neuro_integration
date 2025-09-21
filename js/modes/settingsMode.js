@@ -30,7 +30,8 @@ export class SettingsMode {
 	playerConntected() {
 		SdkClient.sendMessage(
 			`Welcome to shapez. ` +
-			`Please, wait till a human finishes setting up your SDK permissions to play.`
+			`Please, wait till a human finishes setting up your SDK permissions to play.`,
+			true
 		)
 	}
 
@@ -38,6 +39,7 @@ export class SettingsMode {
 		SdkClient.sendMessage(
 			`A human entered the settings menu. ` +
 			`Please, wait patiently till they finish.`,
+			true
 		);
 	}
 }

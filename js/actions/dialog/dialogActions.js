@@ -2,9 +2,11 @@ import { BaseActions } from "../base/baseActions";
 import { Dialog } from "shapez/core/modal_dialog_elements";
 import { DialogActionList } from "../lists/dialogs/dialogActionList";
 import { DialogController } from "../executers/dialogs/dialogController";
+import { ModSettings } from "../../modSettings";
+import { SdkClient } from "../../sdkClient";
 
 export class DialogActions extends BaseActions {
-	#bannedDialogs = ["dialog-Language"]
+	#bannedDialogs = ["dialog-Language", "dialog-Rename Savegame", "dialog-Confirm deletion"];
 
 	/** @type {import("../../main").NeuroIntegration} */ #mod
 	/** @type {DialogController} */ #controller;
@@ -25,27 +27,33 @@ export class DialogActions extends BaseActions {
 
 	/** @param {Dialog} dialog */
 	activateByDialog(dialog) {
-		console.log(dialog);
-		if (this.#isBannedDialog(dialog)) { return; }
+		if (this.#isBannedDialog(dialog)) {
+			SdkClient.sendMessage("A human has openned a dialog you have no access to. Please wait till they're done.", true);
+			return;
+		}
 		const inputs = this.#controller.inspect(dialog);
 		super.setOptions(DialogActionList.getOptions(
-			inputs.buttons, inputs.signals
+			inputs.buttons, inputs.signals, inputs.text.min, inputs.text.max
 		));
 
-		const actions = [DialogActionList.read];
+		const actions = [];
+		if (ModSettings.get(ModSettings.KEYS.descriptiveActions))
+			actions.push(DialogActionList.read);
+
 		if (inputs.buttons.length > 0)
 			actions.push(DialogActionList.pressButton);
 
 		if (inputs.signals.length > 0)
 			actions.push(DialogActionList.setSignal);
 
-		if (inputs.text)
+		if (inputs.text.has)
 			actions.push(DialogActionList.writeText);
 
 		if (inputs.close)
 			actions.push(DialogActionList.closeWindow);
 
 		this.activate(actions);
+		SdkClient.sendMessage(`A dialog has openned. Here's what it says:\n${this.#read().msg}`);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */

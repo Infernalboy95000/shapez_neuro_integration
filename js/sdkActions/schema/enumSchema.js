@@ -33,13 +33,13 @@ export class EnumSchema extends SchemaBase {
 		const result = {valid: false, msg:""};
 		
 		if (!data.params[this.getName()]) {
-			result.msg = `Missing parameter ${this.getName()}`;
+			result.msg = `Missing parameter "${this.getName()}"`;
 			return result;
 		}
 		
 		const value = data.params[this.getName()];
 		if (typeof(value) != "string") {
-			result.msg = `Property ${this.getName()} is not a string`;
+			result.msg = `Value set in parameter "${this.getName()}" is not a string`;
 			return result;
 		}
 

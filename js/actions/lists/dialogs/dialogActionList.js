@@ -33,13 +33,16 @@ export class DialogActionList {
 
 	/**
 	 * @param {Array<string>} buttons
+	 * @param {Array<string>} signals
+	 * @param {number} min
+	 * @param {number} max
 	 * @returns {Map<string, Array<SchemaBase>>}
 	 * */
-	static getOptions(buttons, signals) {
+	static getOptions(buttons, signals, min, max) {
 		const options = {
 			[this.button]:new EnumSchema(this.button, buttons),
 			[this.signal]:new EnumSchema(this.signal, signals),
-			[this.text]:new StringSchema(this.text, 0, 256)
+			[this.text]:new StringSchema(this.text, min, max)
 		};
 		return this.#mapOptions(options);
 	}

@@ -1,8 +1,8 @@
 import { Vector } from "shapez/core/vector";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
-import { RandomUtils } from "../../../custom/randomUtils";
 import { ShapeCode } from "../shapes/shapeCode";
+import { ColorCodes } from "../shapes/colorCodes";
 
 export class AdvancedPatchDescriptor {
 	/**
@@ -16,7 +16,7 @@ export class AdvancedPatchDescriptor {
 		const layerPatches = this.#collectLayerInfo(chunk);
 		const layerPatch = layerPatches.get(patchCode);
 		if (layerPatch) {
-			msg = this.#describeLayerInfo(patchCode, layerPatch);
+			msg = this.#describeLayerInfo(patch.item, layerPatch);
 		}
 		return msg;
 	}
@@ -56,17 +56,18 @@ export class AdvancedPatchDescriptor {
 	}
 
 	/**
-	 * @param {string} patchKey
+	 * @param {BaseItem} item
 	 * @param {{type: string; positions: Array<Vector>}} tiles
 	 * @returns {string}
 	 * */
-	static #describeLayerInfo(patchKey, tiles) {
+	static #describeLayerInfo(item, tiles) {
 		let describedKey = "unknown";
 		if (tiles.type == "color") {
-			describedKey = RandomUtils.capitalizeFirst(patchKey);
+			describedKey = ColorCodes.describe(item.getAsCopyableKey());
 		}
 		else if (tiles.type == "shape") {
-			describedKey = ShapeCode.describe(patchKey);
+			// @ts-ignore
+			describedKey = ShapeCode.describe(item.definition);
 		}
 
 		let msg = `Patch of ${describedKey} ${tiles.type} found in these positions:`;

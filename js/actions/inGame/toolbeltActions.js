@@ -2,7 +2,7 @@ import { HUDWiresOverlay } from "shapez/game/hud/parts/wires_overlay";
 import { BaseActions } from "../base/baseActions";
 import { ToolbeltSelector } from "../executers/selectors/toolbeltSelector";
 import { ToolbeltInfo } from "../executers/toolbelt/toolbeltInfo";
-import { ToolsList } from "../lists/inGame/toolbeltActionList";
+import { ToolbeltActionList } from "../lists/inGame/toolbeltActionList";
 import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
 
 export class ToolbeltActions extends BaseActions {
@@ -12,11 +12,11 @@ export class ToolbeltActions extends BaseActions {
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(ToolsList.actions);
+		super(ToolbeltActionList.actions);
 		super.addCallables(new Map([
-			[ToolsList.getStats, (e) => { return this.#tryGetBuildingStats(e)}],
-			[ToolsList.wiresLayer, () => { return this.#wiresLayer()}],
-			[ToolsList.defaultLayer, () => { return this.#defaultLayer()}]
+			[ToolbeltActionList.getStats, (e) => { return this.#tryGetBuildingStats(e)}],
+			[ToolbeltActionList.wiresLayer, () => { return this.#wiresLayer()}],
+			[ToolbeltActionList.defaultLayer, () => { return this.#defaultLayer()}]
 		]));
 
 		this.#root = root;
@@ -25,18 +25,18 @@ export class ToolbeltActions extends BaseActions {
 	};
 
 	activate() {
-		const actions = [ToolsList.getStats];
+		const actions = [ToolbeltActionList.getStats];
 		if (this.#root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers)) {
 			if (this.#root.currentLayer == "wires") {
-			actions.push(ToolsList.defaultLayer);
+			actions.push(ToolbeltActionList.defaultLayer);
 			}
 			else {
-				actions.push(ToolsList.wiresLayer);
+				actions.push(ToolbeltActionList.wiresLayer);
 			}
 		}
 
 		const buildings = this.#toolbeltSelector.getTranslatedBuildings();
-		const options = ToolsList.getOptions(Array.from(buildings.keys()));
+		const options = ToolbeltActionList.getOptions(Array.from(buildings.keys()));
 		super.setOptions(options);
 		super.activate(actions);
 	}
@@ -47,7 +47,7 @@ export class ToolbeltActions extends BaseActions {
 	*/
 	#tryGetBuildingStats(params) {
 		const buildings = this.#toolbeltSelector.getTranslatedBuildings();
-		const building = buildings.get(params[ToolsList.build]);
+		const building = buildings.get(params[ToolbeltActionList.build]);
 		return this.#toolbeltInfo.buildingInfo(
 			building.id, building.variant
 		);

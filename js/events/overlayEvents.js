@@ -8,11 +8,16 @@ import { Stack } from "../custom/types/stack";
 import { SdkClient } from "../sdkClient";
 import { T } from "shapez/translations";
 import { HUDSettingsMenu } from "shapez/game/hud/parts/settings_menu";
+import { ActionEvent } from "../custom/actionEvent";
 import { DialogEvents } from "./dialogEvents";
+import { TutorialChecks } from "../helpers/tutorialChecks";
 
 export class OverlayEvents {
-	/** @type {import("shapez/game/root").GameRoot} */ #root;
+	/** @type {ActionEvent} */ static OVERLAYS_CLOSED = new ActionEvent();
+	/** @type {string} */ static currentOverlay;
 	/** @type {ShapeDefinition} */ static lastShapeDescribed;
+
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {Stack} */ #overlays = new Stack();
 
 	/** @param {import("../main").NeuroIntegration} mod */
@@ -59,7 +64,7 @@ export class OverlayEvents {
 		this.#root = root;
 		root.hud.signals.unlockNotificationFinished.add(() => {this.#overlayClosed()});
 		root.signals.storyGoalCompleted.add(this.#onStoryGoalCompleted, this);
-		//DialogEvents.DIALOG_CLOSED.add("overlayDialog", () => this.#activateOverlay);
+		DialogEvents.DIALOG_CLOSED.add("overlayDialog", () => { this.#activateOverlay() });
 	}
 
 	#activateOverlay() {
@@ -81,9 +86,8 @@ export class OverlayEvents {
 				ActionsCollection.activateActions(["pause"]);
 				break;
 			default:
-				ActionsCollection.activateActions([
-					"build", "delete", "scan", "camera", "pin", "tools", "overlay"
-				]);
+				OverlayEvents.currentOverlay = null;
+				OverlayEvents.OVERLAYS_CLOSED.invoke();
 				break;
 		}
 	}
@@ -108,7 +112,7 @@ export class OverlayEvents {
 				break;
 			default:
 				ActionsCollection.deactivateActions([
-					"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+					"build", "delete", "massDelete", "scan", "camera", "pin", "marker", "tools", "overlay", 
 				]);
 				break;
 		}
@@ -119,12 +123,14 @@ export class OverlayEvents {
 		this.#deactivateOverlay();
 		this.#overlays.push(overlay);
 		this.#activateOverlay();
+		OverlayEvents.currentOverlay = overlay;
 	}
 
 	#overlayClosed() {
 		this.#deactivateOverlay();
 		this.#overlays.pop();
 		this.#activateOverlay();
+		OverlayEvents.currentOverlay = this.#overlays.peek();
 	}
 
 	/**

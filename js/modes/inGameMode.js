@@ -14,6 +14,10 @@ import { ShapeInfoActions } from "../actions/overlay/shapeInfoActions";
 import { StatisticsActions } from "../actions/overlay/statisticsActions";
 import { LevelRewardActions } from "../actions/overlay/levelRewardActions";
 import { PauseMenuActions } from "../actions/overlay/pauseMenuActions";
+import { MassDeleteActions } from "../actions/inGame/massDeleteActions";
+import { DialogEvents } from "../events/dialogEvents";
+import { OverlayEvents } from "../events/overlayEvents";
+import { MarkerActions } from "../actions/inGame/markerActions";
 
 export class InGameMode {
 	/** @type {import("../main").NeuroIntegration} */ #mod;
@@ -31,10 +35,17 @@ export class InGameMode {
 	/** @param {InGameState} state */
 	gameOpenned(state) {
 		if (SdkClient.isConnected()) {
+			if (this.#root.hubGoals.level > 1) {
+				TutorialChecks.scanned = true;
+				TutorialChecks.deepScanned = true;
+				TutorialChecks.buildingScanned = true;
+			}
+
 			this.#declareActions(state);
 			this.#announceOpening();
 			ActionsCollection.activateActions([
-				"build", "delete", "scan", "camera", "pin", "tools", "overlay"
+				"build", "delete", "massDelete", "scan", "camera", "pin",
+				"marker", "tools", "overlay"
 			])
 		}
 	}
@@ -44,9 +55,11 @@ export class InGameMode {
 		TutorialChecks.deepScanned = false;
 		TutorialChecks.buildingScanned = false;
 		ActionsCollection.deactivateActions([
-			"build", "delete", "scan", "camera", "pin", "tools", "overlay",
-			"shop", "shape", "stats", "reward", "pause"
-		], true)
+			"build", "delete", "massDelete", "scan", "camera", "pin", "marker",
+			"tools", "overlay", "shop", "shape", "stats", "reward", "pause"
+		], true);
+		DialogEvents.DIALOG_CLOSED.remove("overlayDialog");
+		OverlayEvents.OVERLAYS_CLOSED.remove("event_overs_closed");
 	}
 
 	/** @param {InGameState} state */
@@ -54,9 +67,11 @@ export class InGameMode {
 		const actions = new Map();
 		actions.set("build", new PlacementActions(this.#root));
 		actions.set("delete", new DeletionActions(this.#root));
+		actions.set("massDelete", new MassDeleteActions(this.#root));
 		actions.set("scan", new ScannerActions(this.#root));
 		actions.set("camera", new CameraActions(this.#root));
 		actions.set("pin", new PinnedActions(this.#root));
+		actions.set("marker", new MarkerActions(this.#root));
 		actions.set("tools", new ToolbeltActions(this.#root));
 		actions.set("overlay", new OverlaysActions(this.#root, state));
 		actions.set("shop", new UpgradesActions(this.#root));
@@ -68,9 +83,6 @@ export class InGameMode {
 	}
 
 	#announceOpening() {
-		const welcomeMessage = "A map has loaded. Now you can play the game!";
-		if (!this.#mod.trySendTutorialMessage(welcomeMessage)) {
-			SdkClient.sendMessage(welcomeMessage);
-		}
+		SdkClient.sendMessage("A map has loaded. Now you can play the game!", true);
 	}
 }

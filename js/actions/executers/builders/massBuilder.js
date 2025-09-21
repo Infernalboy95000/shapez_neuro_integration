@@ -22,7 +22,7 @@ export class MassBuilder {
 	 * @param {string} rotName
 	 * @param {number} posX
 	 * @param {number} posY
-	 * @param {("UP"|"DOWN"|"LEFT"|"RIGHT")} dir
+	 * @param {string} dir
 	 * @param {number} lineLength
 	 * @returns {{valid:boolean, msg:string}} */
 	tryPlaceBuildingLine(buildName, variant, rotName, posX, posY, dir, lineLength) {

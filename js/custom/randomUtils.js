@@ -29,6 +29,31 @@ export class RandomUtils {
 	}
 
 	/**
+	 * @param {Vector} vector1
+	 * @param {Vector} vector2
+	 * @param {number} tolerance
+	 * @returns {boolean}
+	 */
+	static vectorsEqualAprox(vector1, vector2, tolerance) {
+		if (!this.numbersEqualAprox(vector1.x, vector2.x, tolerance))
+			return false;
+
+		if (!this.numbersEqualAprox(vector1.y, vector2.y, tolerance))
+			return false;
+		return true;
+	}
+
+	/**
+	 * @param {number} num1
+	 * @param {number} num2
+	 * @param {number} tolerance
+	 * @returns {boolean}
+	 */
+	static numbersEqualAprox(num1, num2, tolerance) {
+		return (Math.abs(num1 - num2) < tolerance)
+	}
+
+	/**
 	 * @param {Vector} vector
 	 * @param {string} direction
 	 * @param {number} ammount

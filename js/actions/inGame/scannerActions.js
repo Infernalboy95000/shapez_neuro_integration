@@ -1,8 +1,10 @@
 import { BaseActions } from "../base/baseActions";
 import { BuildingScanner } from "../executers/scanners/buildingScanner";
 import { PatchScanner } from "../executers/scanners/patchScanner";
-import { ScanList } from "../lists/inGame/scannerActionList";
+import { ScannerActionList } from "../lists/inGame/scannerActionList";
 import { TutorialChecks } from "../../helpers/tutorialChecks";
+import { ModSettings } from "../../modSettings";
+import { SdkClient } from "../../sdkClient";
 
 export class ScannerActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -11,11 +13,11 @@ export class ScannerActions extends BaseActions {
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(ScanList.actions);
+		super(ScannerActionList.actions);
 		super.addCallables(new Map([
-			[ScanList.scanTerrain, (e) => { return this.#scanTerrain(e)}],
-			[ScanList.scanPatch, (e) => { return this.#tryScanPatch(e)}],
-			[ScanList.scanBuildings, (e) => { return this.#scanBuildings(e)}],
+			[ScannerActionList.scanTerrain, (e) => { return this.#scanTerrain()}],
+			[ScannerActionList.scanPatch, (e) => { return this.#tryScanPatch(e)}],
+			[ScannerActionList.scanBuildings, (e) => { return this.#scanBuildings()}],
 		]));
 
 		this.#root = root;
@@ -24,16 +26,26 @@ export class ScannerActions extends BaseActions {
 	};
 
 	activate() {
-		const options = ScanList.getOptions(this.#root);
+		if (!ModSettings.get(ModSettings.KEYS.descriptiveActions)) { return; }
+		const options = ScannerActionList.getOptions();
 		super.setOptions(options);
 		super.activate();
+
+		if (
+			ModSettings.get(ModSettings.KEYS.descriptiveActions) &&
+			TutorialChecks.scanned && TutorialChecks.buildingScanned
+		)
+		{
+			SdkClient.sendMessage(
+				`Auto scanning visible zone:\n` +
+				`Terrain information: ${this.#scanTerrain().msg}` +
+				`Buildings information: ${this.#scanBuildings().msg}`, true
+			)
+		}
 	}
 
-	/**
-	 * @param {Object} params
-	 * @returns {{valid:boolean, msg:string}}
-	*/
-	#scanTerrain(params) {
+	/** @returns {{valid:boolean, msg:string}} */
+	#scanTerrain() {
 		TutorialChecks.scanned = true;
 		return this.#patchScanner.scanInView();
 	}
@@ -45,15 +57,12 @@ export class ScannerActions extends BaseActions {
 	#tryScanPatch(params) {
 		TutorialChecks.deepScanned = true;
 		return this.#patchScanner.scanAt(
-			params[ScanList.xPos], params[ScanList.yPos]
+			params[ScannerActionList.xPos], params[ScannerActionList.yPos]
 		)
 	}
 
-	/**
-	 * @param {Object} params
-	 * @returns {{valid:boolean, msg:string}}
-	*/
-	#scanBuildings(params) {
+	/** @returns {{valid:boolean, msg:string}} */
+	#scanBuildings() {
 		TutorialChecks.buildingScanned = true;
 		return this.#buildsScanner.scanInView();
 	}

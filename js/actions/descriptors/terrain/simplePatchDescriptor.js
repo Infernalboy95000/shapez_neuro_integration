@@ -1,6 +1,5 @@
 import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../../../custom/randomUtils";
-import { ShapeCode } from "../shapes/shapeCode";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { SignalDescriptor } from "../signals/signalDescriptor";
@@ -22,18 +21,18 @@ export class SimplePatchDescriptor {
 		switch (patchType) {
 			case "shape":
 				msg = `${description} shape patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
+				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 			case "color":
 				msg = `${description} color patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
+				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 			default:
 				msg = `unknown patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}`;
+				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 		}
 
-		return msg;
+		return RandomUtils.capitalizeFirst(msg);
 	}
 }

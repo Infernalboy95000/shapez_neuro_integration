@@ -9,7 +9,6 @@ export class BuildingDescriptor {
 	 * @returns {{msg:string, describedIDs:Array<number>}}
 	 * */
 	static describe(root, entity, force = false) {
-		//console.log(entity);
 		const response = {msg:"", describedIDs:[entity.uid], skipped:[]};
 		response.msg += `${StaticEntityInfo.describe(root, entity.components).msg}`;
 		if (response.msg != "") { response.msg += "\n"; }

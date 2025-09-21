@@ -1,29 +1,26 @@
 import { BaseActions } from "../base/baseActions";
-import { MassDeleter } from "../executers/deleters/massDeleter";
 import { SingleDeleter } from "../executers/deleters/singleDeleter";
-import { DelList } from "../lists/inGame/deletionActionsList";
+import { DeletionActionList } from "../lists/inGame/deletionActionsList";
 
-/** Manages all actions related to deletion. */
+/** Manages actions related to deletion. */
 export class DeletionActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {SingleDeleter} */ #singleDeleter;
-	/** @type {MassDeleter} */ #massDeleter;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(DelList.actions);
+		super(DeletionActionList.actions);
 		super.addCallables(new Map([
-			[DelList.deleteBuild, (e) => { return this.#tryDeleteBuilding(e)}],
-			[DelList.deleteArea, (e) => { return this.#tryDeleteArea(e)}],
+			[DeletionActionList.deleteBuild, (e) => { return this.#tryDeleteBuilding(e)}],
 		]));
 
 		this.#root = root;
 		this.#singleDeleter = new SingleDeleter(root);
-		this.#massDeleter = new MassDeleter(root);
 	};
 
 	activate() {
-		const options = DelList.getOptions(this.#root);
+		if (this.#root.camera.getIsMapOverlayActive()) { return; }
+		const options = DeletionActionList.getOptions();
 		super.setOptions(options);
 		super.activate();
 	}
@@ -34,18 +31,7 @@ export class DeletionActions extends BaseActions {
 	*/
 	#tryDeleteBuilding(params) {
 		return this.#singleDeleter.tryDeleteBuilding(
-			params[DelList.xPos], params[DelList.yPos]
+			params[DeletionActionList.xPos], params[DeletionActionList.yPos]
 		);
-	}
-
-	/**
-	 * @param {Object} params
-	 * @returns {{valid:boolean, msg:string}}
-	*/
-	#tryDeleteArea(params) {
-		return this.#massDeleter.areaDelete(
-			params[DelList.lowLeft_xPos], params[DelList.lowLeft_yPos],
-			params[DelList.upRight_xPos], params[DelList.upRight_yPos]
-		)
 	}
 }

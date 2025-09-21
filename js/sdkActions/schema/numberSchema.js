@@ -60,33 +60,33 @@ export class NumberSchema extends SchemaBase {
 		const result = {valid: false, msg:""};
 
 		if (!data.params[this.getName()]) {
-			result.msg = `Missing parameter ${this.getName()}`;
+			result.msg = `Missing parameter "${this.getName()}"`;
 			return result;
 		}
 		
 		const value = data.params[this.getName()];
 		if (typeof(value) != "number") {
-			result.msg = `Property ${this.getName()} is not a number`;
+			result.msg = `Value set in parameter "${this.getName()}" is not a number`;
 			return result;
 		}
 
 		if (this.#multipleOf != null) {
 			if (value % this.#multipleOf != 0) {
-				result.msg = `Property ${this.getName()} is not multiple of ${this.#multipleOf}`;
+				result.msg = `Value set in parameter "${this.getName()}" is not multiple of ${this.#multipleOf}`;
 				return result;
 			}
 		}
 
 		if (this.#min != null) {
 			if (value < this.#min) {
-				result.msg = `Property ${this.getName()} is smaller than the minimum of: ${this.#min}`;
+				result.msg = `Value set in parameter "${this.getName()}" is smaller than the minimum of: ${this.#min}`;
 				return result;
 			}
 		}
 
 		if (this.#max != null) {
 			if (value > this.#max) {
-				result.msg = `Property ${this.getName()} is bigger than the maximum of: ${this.#max}`;
+				result.msg = `Value set in parameter "${this.getName()}" is bigger than the maximum of: ${this.#max}`;
 				return result;
 			}
 		}

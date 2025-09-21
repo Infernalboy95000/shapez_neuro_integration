@@ -1,13 +1,9 @@
 import { SOUNDS	} from "shapez/platform/sound";
-import { SettingCategory } from "./settingsCategory";
-import { ToggleSetting } from "./inputs/toggleSetting";
-import { TextSetting } from "./inputs/textSetting";
-import { ConnectionSettings } from "./connectionSettings";
-import { ContextSettings } from "./contextSettings";
-import { StartupSettings } from "./startupSettings";
-import { ButtonSetting } from "./inputs/buttonSetting";
-import { OptionListSetting } from "./inputs/optionListSetting";
-import { NumberSetting } from "./inputs/numberSetting";
+import { ConnectionStructure } from "./structure/connectionStructure";
+import { ContextStructure } from "./structure/contextStructure";
+import { StartupStructure } from "./structure/startupStructure";
+import { InfoStructure } from "./structure/infoStructure";
+import { DangerousStructure } from "./structure/dangerousStructure";
 
 export class SettingsMenu {
 	static ANY_MAP = "any_map";
@@ -88,120 +84,10 @@ export class SettingsMenu {
 	}
 
 	#createSettings() {
-		this.#connextionSettings();
-		this.#contextSettings();
-		this.#startupSettings();
-	}
-
-	#connextionSettings() {
-		new SettingCategory(this.#menu, "Player connection", true);
-		const connSettings = new ConnectionSettings(this.#mod);
-
-		connSettings.addSdkButton(new ButtonSetting(
-			this.#mod, this.#menu,
-			"SDK integration",
-			"Connect the SDK integration to your player",
-			"Connect",
-			ButtonSetting.Style.DEFAULT,
-			"sdkStatus"
-		));
-
-		connSettings.addSdkURL(new TextSetting (
-			this.#mod, this.#menu,
-			"SDK URL",
-			"The URL the SDK will use next time is connected",
-			"sdkURL",
-			"text",
-			this.#mod.settings.socketURL,
-			256
-		));
-		
-		connSettings.addHideURL(new ToggleSetting (
-			this.#mod, this.#menu,
-			"Hide URL",
-			"Hides the connection URL everywhere, even on it's input field.",
-			"sdkHideURL"
-		));
-	}
-
-	#contextSettings() {
-		new SettingCategory(this.#menu, "SDK Context");
-		const contextSettings = new ContextSettings(this.#mod);
-
-		contextSettings.addCorodsGridToogle(new ToggleSetting (
-			this.#mod, this.#menu,
-			"Coordinates grid",
-			"Shows every tile's x/y position. Maybe usefull when using external vision.",
-			"sdkCoordsGrid"
-		));
-	}
-
-	#startupSettings() {
-		new SettingCategory(this.#menu, "Startup");
-
-		const startupSettngs = new StartupSettings(this.#mod);
-
-		startupSettngs.addAutoConnectToogle(new ToggleSetting (
-			this.#mod, this.#menu,
-			"Auto connect to player",
-			"Attempts to connect to the player when launching the game",
-			"sdkPlayerAutoConnect"
-		));
-
-		startupSettngs.addPlayerChooseMapToggle(new ToggleSetting (
-			this.#mod, this.#menu,
-			"Player can choose map",
-			"Allows the player to start a map. This can be limited to certain maps.",
-			"sdkPlayerChooseMap"
-		));
-
-		startupSettngs.addForceOpenMapToggle(new ToggleSetting (
-			this.#mod, this.#menu,
-			"Force open map",
-			"Opens a map when entering the main menu. This can be limited to certain maps.",
-			"sdkForceOpenMap"
-		));
-
-		startupSettngs.addForceMapTimer(new NumberSetting (
-			this.#mod, this.#menu,
-			"Force map delay",
-			"Delays opening a map by force for a set ammount of seconds.",
-			this.#mod.settings.forcedMapTime, 0, 10, 0.1, 's',
-			"sdkForcedMapTimer"
-		));
-
-		const mapOptions = this.#getMapOptions();
-		
-		startupSettngs.addMapAvailableOptions(new OptionListSetting(
-			this.#mod, this.#menu,
-			"Map to open",
-			"Which map will be allowed to be open by the player or forced to open. " +
-			"After selecting and creating a new map, this will set to continue it after",
-			mapOptions, this.#mod.settings.mapAvailable, "any_map",
-			"sdkMapAvailable",
-		));
-	}
-
-	/** @return {Map} */
-	#getMapOptions() {
-		const mapOptions = new Map();
-		mapOptions.set(SettingsMenu.ANY_MAP, "Any map");
-		mapOptions.set(SettingsMenu.ANY_OPTION, "Any option");
-		mapOptions.set(SettingsMenu.NEW_MAP, "New Map");
-		mapOptions.set(SettingsMenu.LAST_MAP, "Continue");
-		const saves = this.#mod.app.savegameMgr.getSavegamesMetaData();
-		let unnamedMaps = 0;
-
-		for (let i = 0; i < saves.length; i++) {
-			let mapName = saves[i].name;
-
-			if (!mapName) {
-				unnamedMaps++;
-				mapName = `Unnamed map ${unnamedMaps}`;
-			}
-			mapOptions.set(saves[i].internalId, mapName);
-		}
-
-		return mapOptions;
+		ConnectionStructure.build(this.#mod, this.#menu);
+		ContextStructure.build(this.#mod, this.#menu);
+		StartupStructure.build(this.#mod, this.#menu);
+		DangerousStructure.build(this.#mod, this.#menu);
+		InfoStructure.build(this.#mod, this.#menu);
 	}
 }

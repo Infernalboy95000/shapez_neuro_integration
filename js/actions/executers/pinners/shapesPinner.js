@@ -35,7 +35,7 @@ export class ShapesPinner {
 			return {valid: false, msg: "The shape is already pinned."};
 		}
 
-		pinned.pinNewShape(shape);
+		this.#root.hud.signals.shapePinRequested.dispatch(shape);
 		return {valid: true, msg: "Successfully pinned shape."};
 	}
 
@@ -53,7 +53,7 @@ export class ShapesPinner {
 		const pinned = this.#root.hud.parts.pinnedShapes;
 
 		if (pinned.isShapePinned(shapeCode)) {
-			pinned.unpinShape(shapeCode);
+			this.#root.hud.signals.shapeUnpinRequested.dispatch(shapeCode);
 			result.valid = true;
 			result.msg = "successfully unpinned shape.";
 		}

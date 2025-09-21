@@ -1,6 +1,8 @@
+import { ModSettings } from "../../modSettings";
 import { BaseActions } from "../base/baseActions";
+import { GoalsDescriptor } from "../descriptors/pins/goalsDescriptor";
 import { ShapesPinner } from "../executers/pinners/shapesPinner";
-import { PinList } from "../lists/inGame/pinnedActionsList";
+import { PinnedActionsList } from "../lists/inGame/pinnedActionsList";
 
 export class PinnedActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
@@ -8,29 +10,61 @@ export class PinnedActions extends BaseActions {
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
-		super(PinList.actions);
+		super(PinnedActionsList.actions);
 		super.addCallables(new Map([
-			[PinList.goal, (e) => { return this.#describeGoalShape(e)}],
-			[PinList.pinned, (e) => { return this.#describePinnedShapes(e)}],
+			[PinnedActionsList.goal, () => { return this.#describeGoalShape()}],
+			[PinnedActionsList.pinned, () => { return this.#describePinnedShapes()}],
+			[PinnedActionsList.shapeInfo, (e) => { return this.#tryFullyDescribeShape(e)}],
+			[PinnedActionsList.unpinShape, (e) => { return this.#tryUnpinShape(e)}],
 		]));
 
 		this.#root = root;
 		this.#shapesPinner = new ShapesPinner(root);
 	};
 
-	/**
-	 * @param {Object} params
-	 * @returns {{valid:boolean, msg:string}}
-	*/
-	#describeGoalShape(params) {
+	activate() {
+		const compile = GoalsDescriptor.compileInfo(this.#root);
+		const options = PinnedActionsList.getOptions(
+			compile.unpin, compile.goal
+		);
+		super.setOptions(options);
+		const actions = [PinnedActionsList.shapeInfo];
+		const descriptive = ModSettings.get(ModSettings.KEYS.descriptiveActions);
+		if (descriptive) {
+			actions.push(PinnedActionsList.goal);
+		}
+
+		if (compile.unpin.length > 0) {
+			if (descriptive)
+				actions.push(PinnedActionsList.pinned);
+			actions.push(PinnedActionsList.unpinShape);
+		}
+		super.activate(actions);
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#describeGoalShape() {
 		return this.#shapesPinner.describeGoalShape();
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#describePinnedShapes() {
+		return this.#shapesPinner.describePinnedShapes();
 	}
 
 	/**
 	 * @param {Object} params
 	 * @returns {{valid:boolean, msg:string}}
 	*/
-	#describePinnedShapes(params) {
-		return this.#shapesPinner.describePinnedShapes();
+	#tryFullyDescribeShape(params) {
+		return this.#shapesPinner.fullyDescribeShape(params[PinnedActionsList.shape]);
+	}
+
+	/**
+	 * @param {Object} params
+	 * @returns {{valid:boolean, msg:string}}
+	*/
+	#tryUnpinShape(params) {
+		return this.#shapesPinner.tryUnpinShape(params[PinnedActionsList.shapeToUnpin]);
 	}
 }

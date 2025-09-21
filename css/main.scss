@@ -62,15 +62,18 @@ html[data-theme=dark]
 	color:rgb(135, 249, 255);
 }
 
-#state_SettingsState button.settings.button.styledButton.good {
+#state_SettingsState button.settings.button.styledButton.good,
+#state_MainMenuState .sdkStatusDisplay button.settings.button.styledButton.good {
 	background-color: rgb(102, 187, 106);
 }
 
-#state_SettingsState button.settings.button.styledButton.maybe {
+#state_SettingsState button.settings.button.styledButton.maybe,
+#state_MainMenuState .sdkStatusDisplay button.settings.button.styledButton.maybe {
 	background-color: rgb(215, 210, 111);
 }
 
-#state_SettingsState button.settings.button.styledButton.bad {
+#state_SettingsState button.settings.button.styledButton.bad,
+#state_MainMenuState .sdkStatusDisplay button.settings.button.styledButton.bad {
 	background-color: rgb(239, 80, 114);
 }
 
@@ -112,6 +115,43 @@ html[data-theme=dark]
 	letter-spacing: .01em;
 	color:#d63ce4;
 	margin: 0;
+}
+
+#state_MainMenuState .sdkStatusDisplay input.input-text,
+#state_MainMenuState .sdkStatusDisplay input.input-password {
+	background-color: #eee;
+	color: #333438;
+	padding-top: calc(2px*var(--ui-scale));
+	padding-bottom: calc(2px*var(--ui-scale));
+	padding-left: calc(5px*var(--ui-scale));
+	padding-right: calc(5px*var(--ui-scale));
+	margin: 0px 0px 0px 10px;
+	width: 180px;
+	font-size: calc(11px*var(--ui-scale));
+}
+
+#state_MainMenuState #sdkInputParent {
+	display: flex;
+	align-items: center;
+	width: inherit;
+	justify-content: flex-start;
+	color: #555;
+}
+
+html[data-theme=dark]
+#state_MainMenuState #sdkInputParent {
+	color: #e1e4ed;
+}
+
+#state_MainMenuState #sdkInputContainer {
+	display: flex;
+	align-items: center;
+	width: inherit;
+	justify-content: space-between;
+}
+
+#sdk_client_status_display {
+	margin-bottom: 7px;
 }
 
 #sdk_client_status_display.connected {

@@ -13,7 +13,6 @@ export class DialogDescriptor {
 	 * */
 	describe(dialog) {
 		const htmlString = dialog.dialogElem.querySelector(".content").innerHTML;
-		console.log(htmlString);
 		const msg = `${dialog.title}\n` +
 		`${this.#scrapeWallOfText(htmlString)}`;
 
@@ -25,7 +24,7 @@ export class DialogDescriptor {
 	 * @returns {{
 	 *		buttons:Map<string, ClickDetector>,
 	 *		signals:Map<string, ClickDetector>,
-	 *		text:HTMLInputElement
+	 *		text:FormElementInput
 	 *		close:ClickDetector
 	 * }}
 	 */
@@ -37,7 +36,7 @@ export class DialogDescriptor {
 		/** @type {Array<ClickDetector>} */
 		const clicks = dialog.clickDetectors;
 
-		/** @type {{signals:Array<BaseItem>, text:HTMLInputElement}} */
+		/** @type {{signals:Array<BaseItem>, text:FormElementInput}} */
 		let forms;
 		
 		let currentSignal = 0;
@@ -70,7 +69,7 @@ export class DialogDescriptor {
 
 	/**
 	 * @param {DialogWithForm} dialogForm
-	 * @returns {{signals:Array<BaseItem>, text:HTMLInputElement}}
+	 * @returns {{signals:Array<BaseItem>, text:FormElementInput}}
 	 * */
 	#mapForms(dialogForm) {
 		const result = {signals:[], text:null}
@@ -85,7 +84,7 @@ export class DialogDescriptor {
 			}
 			else if (forms[i] instanceof FormElementInput) {
 				// @ts-ignore
-				result.text = forms[i].element;
+				result.text = forms[i];
 			}
 		}
 		return result;

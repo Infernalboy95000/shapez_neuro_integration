@@ -47,15 +47,24 @@ export class ActionsCollection {
 
 	/** @returns {{valid:boolean, msg:string}} */
 	static tryPlayerAction(action) {
+		let invalid = null;
 		let result = null;
 		this.#actions.forEach((baseAction) => {
 			if (result == null) {
 				result = baseAction.tryAction(action);
 			}
+
+			if (result != null && result.msg == "You can't execute this action now") {
+				invalid = result;
+				result = null;
+			}
 		})
 
 		if (result == null) {
-			result = {valid:false, msg:"Unknown action."};
+			if (invalid == null)
+				result = {valid:false, msg:"Unknown action."};
+			else
+				result = invalid;
 		}
 
 		return result;

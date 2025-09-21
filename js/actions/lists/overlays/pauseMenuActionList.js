@@ -1,7 +1,7 @@
 import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class PauseMenuActionList {
-	static info = "save_info";
+	static info = "save_file_info";
 	static resume = "resume_game";
 	static exit = "exit_to_main_menu";
 	static actions = [

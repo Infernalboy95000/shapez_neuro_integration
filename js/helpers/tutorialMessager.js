@@ -1,16 +1,27 @@
 import { HUDInteractiveTutorial } from "shapez/game/hud/parts/interactive_tutorial";
 import { SdkClient } from "../sdkClient";
 import { TutorialList } from "./tutorialList";
+import { waitNextFrame } from "shapez/core/utils";
+import { DialogEvents } from "../events/dialogEvents";
+import { OverlayEvents } from "../events/overlayEvents";
 
 export class TutorialMessager {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+	/** @type {boolean} */ #gameOpenned = false;
 	/** @type {boolean} */ #gameLoaded = false;
-	/** @type {string} */ #message = "";
+	/** @type {string} */ #queuedMessage = null;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		const currentClass = this;
 		this.#mod = mod;
+		DialogEvents.DIALOG_CLOSED.add("tutorialListenDialog", () => {
+			this.#trySendQueuedMessage();
+		});
+
+		OverlayEvents.OVERLAYS_CLOSED.add("tutorialListenOverlays", () => {
+			this.#trySendQueuedMessage();
+		});
 
 		this.#mod.modInterface.replaceMethod(
 			HUDInteractiveTutorial,
@@ -34,7 +45,6 @@ export class TutorialMessager {
 			}
 		)
 
-
 		this.#mod.modInterface.runAfterMethod(
 			HUDInteractiveTutorial,
 			"onHintChanged",
@@ -46,40 +56,51 @@ export class TutorialMessager {
 		);
 	}
 
-	/**
-	 * @param {string} message
-	 * @returns {boolean}
-	 * */
-	TryAnnounceWithTutorial(message) {
-		this.#gameLoaded = true;
-		if (this.#message != "") {
-			const msg = `${message} ${this.#message}`;
-			this.#message = "";
-			return (this.#trySendMessage(msg));
-		}
-		else {
-			return false;
-		}
+	notifyGameOpenned() {
+		this.#gameOpenned = true;
+		this.#trySendQueuedMessage();
 	}
 
 	notifyStateChange(state) {
-		if (state.key != "InGameState") {
+		if (state.key == "InGameState") {
+			this.#gameLoaded = true;
+			this.#trySendQueuedMessage();
+		}
+		else {
 			this.#gameLoaded = false;
+		}
+
+		if (state.key == "MainMenuState") {
+			this.#gameOpenned = false;
 		}
 	}
 
 	/**
 	 * @param {string} message
-	 * @returns {boolean}
 	 * */
 	#trySendMessage(message) {
-		if (this.#gameLoaded) {
-			SdkClient.sendMessage(message);
-			return true;
-		}
-		else {
-			this.#message = message;
-			return false;
+		waitNextFrame().then(() => {
+			if (
+				this.#gameLoaded &&
+				this.#gameOpenned &&
+				!DialogEvents.dialogOpen &&
+				OverlayEvents.currentOverlay == null
+			) {
+				SdkClient.sendMessage(message);
+			}
+			else {
+				this.#queuedMessage = message;
+			}
+		});
+	}
+
+	#trySendQueuedMessage() {
+		if (this.#queuedMessage != null)
+		{
+			if (!DialogEvents.dialogOpen && OverlayEvents.currentOverlay == null) {
+				SdkClient.sendMessage(this.#queuedMessage);
+				this.#queuedMessage = null;
+			}
 		}
 	}
 }
