@@ -20,7 +20,7 @@ export class MassDeleteActions extends BaseActions {
 	};
 
 	activate() {
-		const options = MassDeleteActionList.getOptions(this.#root);
+		const options = MassDeleteActionList.getOptions();
 		super.setOptions(options);
 		super.activate();
 	}

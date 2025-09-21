@@ -1,7 +1,7 @@
 {
 	"entry": "main.js",
 	"id": "neuro_integration",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"name": "Shapez Neuro Integration",
 	"author": "Infernal_Ekoro",
 	"description": "Let's any player compatible with the neuroSDK play Shapez on their own",

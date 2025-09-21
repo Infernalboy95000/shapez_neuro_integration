@@ -1,5 +1,4 @@
 import { AreaSelector } from "../selectors/areaSelector";
-import { HUDMassSelector } from "shapez/game/hud/parts/mass_selector";
 
 /** Allows removing an entire area full of buildings.*/
 export class MassDeleter {
@@ -27,13 +26,10 @@ export class MassDeleter {
 			};
 		}
 
-		/** @type {HUDMassSelector} */ //@ts-ignore
-		const selector = this.#root.hud.parts.massSelector;
-		selector.selectedUids = new Set(selection);
-		selector.confirmDelete();
+		this.#areaSelector.deleteSelected();
 		if (
 			!this.#root.app.settings.getAllSettings().disableCutDeleteWarnings &&
-			selector.selectedUids.size > 100
+			this.#areaSelector.isBig()
 		) {
 			return {
 				valid: true,
@@ -43,7 +39,7 @@ export class MassDeleter {
 		else {
 			return {
 				valid: true,
-				msg: `Successfully deleted ${selSize} building${selSize > 1 ? "s": ""}`
+				msg: `Successfully deleted ${selSize} building${selSize == 1 ? "": "s"}.`
 			};
 		}
 	}

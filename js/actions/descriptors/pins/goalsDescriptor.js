@@ -2,16 +2,18 @@ import { ShapeDefinition } from "shapez/game/shape_definition";
 import { ShapeCode } from "../shapes/shapeCode";
 import { ColorCodes } from "../shapes/colorCodes";
 import { T } from "shapez/translations";
+import { enumHubGoalRewards } from "shapez/game/tutorial_goals";
+import { formatBigNumber } from "shapez/core/utils";
 
 export class GoalsDescriptor {
 	static quadNames = ["Top right", "Bottom right", "Bottom left", "Top left"];
 
 	/**
 	 * @param {import("shapez/game/root").GameRoot} root
-	 * @returns {{boosts:Array<string>, full:Array<string>, pin:Array<string>, unpin:Array<string>, goal:string}}
+	 * @returns {{boosts:Array<string>, full:Array<string>, pin:Array<string>, unpin:Array<string>, goal:string, blueprint:string}}
 	 * */
 	static compileInfo(root) {
-		const compile = { boosts:["all"], full:[], pin:[], unpin: [], goal:""};
+		const compile = { boosts:["all"], full:[], pin:[], unpin: [], goal:"", blueprint:""};
 		const upgrades = root.gameMode.getUpgrades();
 		const currentGoalShape = root.hubGoals.currentGoal.definition.getHash();
 		compile.goal = currentGoalShape;
@@ -42,6 +44,9 @@ export class GoalsDescriptor {
 				compile.full.push(T.shopUpgrades[id].name)
 			}
 		}
+		if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
+			compile.blueprint = root.gameMode.getBlueprintShapeKey();
+		}
 		return compile;
 	}
 
@@ -55,8 +60,25 @@ export class GoalsDescriptor {
 		if (goal) {
 			const shape = ShapeCode.describe(goal.definition);
 			msg = `Your goal shape is: ${shape}. ` +
-				`You delivered ${root.hubGoals.getCurrentGoalDelivered()} ` +
-				`out of ${goal.required} required`;
+				`You delivered ${formatBigNumber(root.hubGoals.getCurrentGoalDelivered())} ` +
+				`out of ${formatBigNumber(goal.required)} required`;
+		}
+
+		return msg;
+	}
+
+	/**
+	 * @param {import("shapez/game/root").GameRoot} root
+	 * @returns {string}
+	 * */
+	static describeBlueprintShape(root) {
+		const blueprintKey = root.gameMode.getBlueprintShapeKey();
+		const definition = ShapeDefinition.fromShortKey(blueprintKey);
+		let msg = "";
+		if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_blueprints)) {
+			const shape = ShapeCode.describe(definition);
+			msg = `The blueprint shape is: ${shape}. ` +
+				`You have ${formatBigNumber(root.hubGoals.getShapesStoredByKey(blueprintKey))} `;
 		}
 
 		return msg;
@@ -76,7 +98,7 @@ export class GoalsDescriptor {
 				const shape = ShapeCode.describe(pinned.pinnedShapes[i]);
 				const current = root.hubGoals.getShapesStoredByKey(pinned.pinnedShapes[i]);
 				const goal = pinned.findGoalValueForShape(pinned.pinnedShapes[i]);
-				msg += `${shape}. Delivered: ${current} out of ${goal}`;
+				msg += `${shape}. Delivered: ${formatBigNumber(current)} out of ${formatBigNumber(goal)}`;
 				if (i + 1 < pinned.pinnedShapes.length) {
 					msg += `\r\n`;
 				}
