@@ -31,7 +31,10 @@ export class ScannerActions extends BaseActions {
 		super.setOptions(options);
 		super.activate();
 
-		if (TutorialChecks.scanned && TutorialChecks.buildingScanned)
+		if (
+			ModSettings.get(ModSettings.KEYS.descriptiveActions) &&
+			TutorialChecks.scanned && TutorialChecks.buildingScanned
+		)
 		{
 			SdkClient.sendMessage(
 				`Auto scanning visible zone:\n` +
