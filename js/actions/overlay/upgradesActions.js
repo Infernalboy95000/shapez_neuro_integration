@@ -32,7 +32,7 @@ export class UpgradesActions extends BaseActions {
 			compile.boosts, compile.full, compile.pin, compile.unpin, compile.goal
 		);
 		super.setOptions(options);
-		const actions = [UpgradesActionList.getInfo];
+		const actions = [UpgradesActionList.getInfo, UpgradesActionList.shapeInfo, UpgradesActionList.close];
 		if (compile.full.length > 0)
 			actions.push(UpgradesActionList.upgrade);
 
