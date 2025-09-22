@@ -9,6 +9,7 @@ import { formatBigNumber } from "shapez/core/utils";
 /** Allows pasting a selected blueprint.*/
 export class BlueprintPaster {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
+	/** @type {number} */ #rotationNumber = 0;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
@@ -61,20 +62,33 @@ export class BlueprintPaster {
 		if (!RotationCodes.isRotationValid(rotName)) {
 			rotName == "up";
 		}
+
+		while (this.#rotationNumber != 0) {
+			blueprinter.currentBlueprint.get().rotateCw();
+			this.#rotationNumber += 1;
+			if (this.#rotationNumber > 3) {
+				this.#rotationNumber = 0;
+			}
+		}
+
 		const rotCodes = RotationCodes.getCodes();
 		let rotations = 0;
 
 		for (let i = 0; i < rotCodes.length; i++) {
 			if (rotCodes[i] == rotName) {
-				rotations = i + 1;
+				rotations = i;
 			}
 		}
+		this.#rotationNumber = rotations;
 
 		for (let i = 0; i < rotations; i++) {
 			blueprinter.currentBlueprint.get().rotateCw();
 		}
 
-		blueprinter.onMouseDown(new Vector(posX, posY).toWorldSpace(), enumMouseButton.left);
+		const pos = new Vector(posX, posY).toWorldSpace();
+		const screenPos = this.#root.camera.worldToScreen(pos);
+
+		blueprinter.onMouseDown(screenPos, enumMouseButton.left);
 		const newAmmount = this.#root.hubGoals.getShapesStoredByKey(this.#root.gameMode.getBlueprintShapeKey());
 
 		if (!blueprinter.getHasFreeCopyPaste() && piecesAmmount == newAmmount) {
