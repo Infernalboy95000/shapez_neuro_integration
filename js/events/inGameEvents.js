@@ -12,6 +12,7 @@ import { ModSettings } from "../modSettings";
 import { waitNextFrame } from "shapez/core/utils";
 import { HUDBlueprintPlacer } from "shapez/game/hud/parts/blueprint_placer";
 import { STOP_PROPAGATION } from "shapez/core/signal";
+import { InGameState } from "shapez/states/ingame";
 
 const ZOOM_TOLERANCE = 1;
 const MOVE_TOLERANCE = 3;
@@ -66,6 +67,12 @@ export class InGameEvents {
 			function() {
 				thisClass.#onBlueprintCancelled();
 				return STOP_PROPAGATION;
+			}
+		);
+
+		mod.modInterface.runAfterMethod(InGameState, "stageLeavingGame",
+			function() {
+				thisClass.#onGameExit();
 			}
 		);
 	}
@@ -219,5 +226,9 @@ export class InGameEvents {
 
 	#onBlueprintCancelled() {
 		this.#refreshBlueprints();
+	}
+
+	#onGameExit() {
+		ActionsCollection.deactivateActions(["pause"]);
 	}
 }
