@@ -52,6 +52,7 @@ export class PlayGameActions extends BaseActions {
 	/** @returns {{valid:boolean, msg:string}} */
 	#newGame() {
 		MapLoader.newGame(this.#state);
+		ModSettings.set(ModSettings.KEYS.mapAvailable, SettingsMenu.LAST_MAP);
 		return {valid: true, msg: "Creating a new map."};
 	}
 
