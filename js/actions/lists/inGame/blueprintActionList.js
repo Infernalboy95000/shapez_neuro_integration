@@ -45,19 +45,19 @@ export class BlueprintActionList {
 			[this.rot]: new EnumSchema(this.rot, rotNames),
 
 			[this.xPos]:
-			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.xPos, limits.x, limits.x + limits.w - 1),
 			[this.yPos]:
-			new NumberSchema(this.yPos, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.yPos, limits.y, limits.y + limits.h - 1),
 
 			[this.lowLeft_xPos]:
-			new NumberSchema(this.lowLeft_xPos, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.lowLeft_xPos, limits.x, limits.x + limits.w - 1),
 			[this.lowLeft_yPos]:
-			new NumberSchema(this.lowLeft_yPos, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.lowLeft_yPos, limits.y, limits.y + limits.h - 1),
 
 			[this.upRight_xPos]:
-			new NumberSchema(this.upRight_xPos, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.upRight_xPos, limits.x, limits.x + limits.w - 1),
 			[this.upRight_yPos]:
-			new NumberSchema(this.upRight_yPos, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.upRight_yPos, limits.y, limits.y + limits.h - 1),
 		};
 		return this.#mapOptions(options);
 	}

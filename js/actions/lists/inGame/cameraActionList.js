@@ -26,12 +26,12 @@ export class CameraActionList {
 		const maxZoom = Math.round(root.camera.getMaximumZoom() * 100);
 		const options = {
 			[this.xPos]:
-			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.xPos, limits.x, limits.x + limits.w - 1),
 			[this.yPos]:
-			new NumberSchema(this.yPos, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.yPos, limits.y, limits.y + limits.h - 1),
 
 			[this.zoomLevel]:
-			new NumberSchema(this.zoomLevel, 1, minZoom, maxZoom),
+			new NumberSchema(this.zoomLevel, minZoom, maxZoom),
 		};
 		return this.#mapOptions(options);
 	}

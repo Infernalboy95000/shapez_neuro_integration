@@ -2,23 +2,20 @@ import { SchemaBase } from "./schemaBase";
 
 /** Schema that accepts a number, with certain filters */
 export class NumberSchema extends SchemaBase {
-	/** @type {number} */ #multipleOf;
 	/** @type {number} */ #min;
 	/** @type {number} */ #max;
 
 	/**
 	 * @param {string} propertyName
-	 * @param {number} multipleOf
 	 * @param {number} min
 	 * @param {number} max
 	 * @param {boolean} required
 	*/
 	constructor(
-		propertyName, multipleOf = null,
+		propertyName,
 		min = null, max = null, required = true
 	) {
 		super(propertyName, required);
-		this.#multipleOf = multipleOf;
 		this.#min = min;
 		this.#max = max;
 	}
@@ -29,12 +26,6 @@ export class NumberSchema extends SchemaBase {
 			[this.getName()]: {
 				type: 'number'
 			}
-		}
-
-		if (this.#multipleOf != null) {
-			Object.assign(
-				schema[this.getName()], {'multipleOf': this.#multipleOf}
-			);
 		}
 
 		if (this.#min != null) {
@@ -70,13 +61,6 @@ export class NumberSchema extends SchemaBase {
 			return result;
 		}
 
-		if (this.#multipleOf != null) {
-			if (value % this.#multipleOf != 0) {
-				result.msg = `Value set in parameter "${this.getName()}" is not multiple of ${this.#multipleOf}`;
-				return result;
-			}
-		}
-
 		if (this.#min != null) {
 			if (value < this.#min) {
 				result.msg = `Value set in parameter "${this.getName()}" is smaller than the minimum of: ${this.#min}`;
@@ -90,6 +74,8 @@ export class NumberSchema extends SchemaBase {
 				return result;
 			}
 		}
+
+		data.params[this.getName()] = Math.round(value);
 
 		result.valid = true;
 		return result;

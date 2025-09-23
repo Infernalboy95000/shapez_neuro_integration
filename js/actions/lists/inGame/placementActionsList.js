@@ -46,22 +46,22 @@ export class PlacementActionList {
 			[this.endHorizontal]: new BoolSchema(this.endHorizontal),
 			[this.rot]: new EnumSchema(this.rot, rotNames),
 			[this.dir]: new EnumSchema(this.dir, rotNames),
-			[this.lineLength]: new NumberSchema(this.lineLength, 1, 2, limits.w),
+			[this.lineLength]: new NumberSchema(this.lineLength, 2, limits.w),
 
 			[this.xPos]:
-			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.xPos, limits.x, limits.x + limits.w - 1),
 			[this.yPos]:
-			new NumberSchema(this.yPos, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.yPos, limits.y, limits.y + limits.h - 1),
 
 			[this.xPos1]:
-			new NumberSchema(this.xPos1, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.xPos1, limits.x, limits.x + limits.w - 1),
 			[this.yPos1]:
-			new NumberSchema(this.yPos1, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.yPos1, limits.y, limits.y + limits.h - 1),
 
 			[this.xPos2]:
-			new NumberSchema(this.xPos2, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.xPos2, limits.x, limits.x + limits.w - 1),
 			[this.yPos2]:
-			new NumberSchema(this.yPos2, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.yPos2, limits.y, limits.y + limits.h - 1),
 		};
 		return this.#mapOptions(options);
 	}
