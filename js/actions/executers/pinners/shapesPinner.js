@@ -72,6 +72,17 @@ export class ShapesPinner {
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
+	describeBlueprintShape() {
+		const result = {valid:false, msg:"You cannot use blueprints right now."}
+		const msg = GoalsDescriptor.describeBlueprintShape(this.#root);
+		if (msg != "") {
+			result.valid = true;
+			result.msg = msg;
+		}
+		return result;
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
 	describePinnedShapes() {
 		const result = {valid:false, msg:"You have no shapes pinned."}
 		const msg = GoalsDescriptor.describePinnedShapes(this.#root);

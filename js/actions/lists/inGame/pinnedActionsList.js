@@ -4,12 +4,16 @@ import { SdkAction } from "../../../sdkActions/sdkAction";
 
 export class PinnedActionsList {
 	static goal = "show_current_goal";
+	static blueprint = "show_blueprint_shape";
 	static pinned = "list_pinned_shapes";
 	static unpinShape = "unpin_shape";
 	static shapeInfo = "get_shape_details";
 	static actions = [
 		new SdkAction(this.goal,
 			"Describe what's the current shape you have to deliver to the HUB in order to get to the next level."
+		),
+		new SdkAction(this.blueprint,
+			"Describe the blueprint shape and how much of them you have."
 		),
 		new SdkAction(this.pinned,
 			"Get the list of shapes you have pinned. Those are related to upgrade goals."

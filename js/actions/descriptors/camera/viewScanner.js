@@ -48,7 +48,6 @@ export class ViewScanner {
 	static isBuildingVisible(entity) {
 		const visible = this.#root.camera.getVisibleRect().toTileCullRectangle();
 		const buildingRect = entity.components.StaticMapEntity.getTileSpaceBounds()
-		console.log(`Visible: ${visible}, buildRect: ${buildingRect}`);
 		return visible.containsRect(buildingRect);
 	}
 }

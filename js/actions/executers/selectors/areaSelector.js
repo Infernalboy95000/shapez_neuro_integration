@@ -1,11 +1,15 @@
 import { Vector } from "shapez/core/vector";
+import { HUDMassSelector } from "shapez/game/hud/parts/mass_selector";
 
 export class AreaSelector {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
+	/** @type {HUDMassSelector} */ #selector;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
 		this.#root = root;
+		// @ts-ignore
+		this.#selector = this.#root.hud.parts.massSelector;
 	}
 
 	/**
@@ -36,6 +40,39 @@ export class AreaSelector {
 				}
 			}
 		}
+
+		if (selection.size > 0)
+			this.#selector.selectedUids = new Set(selection);
 		return selection;
+	}
+
+	copySelected() {
+		this.#selector.startCopy();
+	}
+
+	cutSelected() {
+		this.#selector.confirmCut();
+	}
+
+	deleteSelected() {
+		this.#selector.confirmDelete();
+	}
+
+	clearBelts() {
+		this.#selector.clearBelts();
+	}
+
+	deselect() {
+		this.#selector.clearSelection();
+	}
+
+	/** @return {boolean} */
+	isBig() {
+		return this.#selector.selectedUids.size > 100;
+	}
+
+	/** @return {boolean} */
+	somethingSelected() {
+		return this.#selector.selectedUids != null && this.#selector.selectedUids.size > 0;
 	}
 }

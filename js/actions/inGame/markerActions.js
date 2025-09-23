@@ -23,12 +23,10 @@ export class MarkerActions extends BaseActions {
 	activate() {
 		const info = MarkersDescriptor.collectInfo(this.#root);
 		const actions = [MarkerActionList.placeMarker];
-		if (this.#root.camera.getIsMapOverlayActive()) {
-			if (info.all.length > 0)
-				actions.push(MarkerActionList.goToMarker);
-			if (info.editable.length > 0)
-				actions.push(MarkerActionList.editMarker);
-		}
+		if (info.all.length > 0)
+			actions.push(MarkerActionList.goToMarker);
+		if (info.editable.length > 0)
+			actions.push(MarkerActionList.editMarker);
 
 		super.setOptions(MarkerActionList.getOptions(info.all, info.editable));
 		super.activate(actions);

@@ -10,7 +10,6 @@ import { T } from "shapez/translations";
 import { HUDSettingsMenu } from "shapez/game/hud/parts/settings_menu";
 import { ActionEvent } from "../custom/actionEvent";
 import { DialogEvents } from "./dialogEvents";
-import { TutorialChecks } from "../helpers/tutorialChecks";
 
 export class OverlayEvents {
 	/** @type {ActionEvent} */ static OVERLAYS_CLOSED = new ActionEvent();
@@ -112,7 +111,7 @@ export class OverlayEvents {
 				break;
 			default:
 				ActionsCollection.deactivateActions([
-					"build", "delete", "massDelete", "scan", "camera", "pin", "marker", "tools", "overlay", 
+					"build", "delete", "massDelete", "scan", "camera", "pin", "marker", "tools", "overlay", "blueprint" 
 				]);
 				break;
 		}

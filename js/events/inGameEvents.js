@@ -9,6 +9,12 @@ import { Vector } from "shapez/core/vector";
 import { RandomUtils } from "../custom/randomUtils";
 import { DialogEvents } from "./dialogEvents";
 import { ModSettings } from "../modSettings";
+import { waitNextFrame } from "shapez/core/utils";
+import { HUDBlueprintPlacer } from "shapez/game/hud/parts/blueprint_placer";
+import { STOP_PROPAGATION } from "shapez/core/signal";
+import { InGameState } from "shapez/states/ingame";
+import { SdkClient } from "../sdkClient";
+import { T } from "shapez/translations";
 
 const ZOOM_TOLERANCE = 1;
 const MOVE_TOLERANCE = 3;
@@ -58,6 +64,19 @@ export class InGameEvents {
 				thisClass.#onMarkersChanged();
 			}
 		);
+
+		mod.modInterface.runAfterMethod(HUDBlueprintPlacer, "abortPlacement",
+			function() {
+				thisClass.#onBlueprintCancelled();
+				return STOP_PROPAGATION;
+			}
+		);
+
+		mod.modInterface.runAfterMethod(InGameState, "stageLeavingGame",
+			function() {
+				thisClass.#onGameExit();
+			}
+		);
 	}
 
 	/** @param {import("shapez/game/root").GameRoot} root */
@@ -68,6 +87,9 @@ export class InGameEvents {
 		root.signals.editModeChanged.add(this.#layersSwitched, this);
 		root.signals.upgradePurchased.add(this.#refreshShop, this);
 		root.hud.signals.shapePinRequested.add(this.#refreshPins, this);
+		root.hud.signals.buildingsSelectedForCopy.add(this.#onBlueprintCreated, this);
+		root.hud.signals.pasteBlueprintRequested.add(this.#onBlueprintPasted, this);
+		root.signals.gameSaved.add(this.#onGameSaved, this);
 		OverlayEvents.OVERLAYS_CLOSED.add("event_overs_closed", () => { this.#onDialogClosed(); });
 		this.#waitTime = 0;
 		this.#moving = false;
@@ -85,7 +107,7 @@ export class InGameEvents {
 			if (this.#hasMovedThisFrame()) {
 				this.#moving = true;
 				ActionsCollection.deactivateActions([
-					"build", "delete", "massDelete", "scan", "camera", "marker"
+					"build", "delete", "massDelete", "scan", "camera", "marker", "blueprint"
 				]);
 			}
 		}
@@ -120,7 +142,7 @@ export class InGameEvents {
 	#tryRestoreMoveActions() {
 		if (OverlayEvents.currentOverlay == null && !DialogEvents.dialogOpen) {
 			ActionsCollection.activateActions([
-				"build", "delete", "massDelete", "scan", "camera", "marker"
+				"build", "delete", "massDelete", "scan", "camera", "marker", "blueprint"
 			]);
 		}
 	}
@@ -147,8 +169,8 @@ export class InGameEvents {
 	/** @param {Layer} layer */
 	#layersSwitched(layer) {
 		if (this.#root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers)) {
-			ActionsCollection.deactivateActions(["build", "tools"]);
-			ActionsCollection.activateActions(["build", "tools"]);
+			ActionsCollection.deactivateActions(["build", "tools", "blueprint"]);
+			ActionsCollection.activateActions(["build", "tools", "blueprint"]);
 		}
 	}
 
@@ -170,21 +192,50 @@ export class InGameEvents {
 		}
 	}
 
+	#refreshBlueprints() {
+		waitNextFrame().then(() => {
+			if (OverlayEvents.currentOverlay == null && !DialogEvents.dialogOpen) {
+				ActionsCollection.deactivateActions(["blueprint"]);
+				ActionsCollection.activateActions(["blueprint"]);
+			}
+		});
+	}
+
 	#onDialogClosed() {
 		if (OverlayEvents.currentOverlay == null) {
 			ActionsCollection.activateActions([
 				"pin", "tools", "overlay", "marker", "build",
-				"delete", "massDelete", "scan", "camera"
+				"delete", "massDelete", "scan", "camera", "blueprint"
 			]);
 		}
 	}
 
 	#onMarkersChanged() {
-		if (this.#root && OverlayEvents.currentOverlay == null)
+		if (this.#root && OverlayEvents.currentOverlay == null && !DialogEvents.dialogOpen)
 		{
 			MarkersDescriptor.refreshMarkers(this.#root);
 			ActionsCollection.deactivateActions(["marker"]);
 			ActionsCollection.activateActions(["marker"]);
 		}
+	}
+
+	#onBlueprintCreated() {
+		this.#refreshBlueprints();
+	}
+
+	#onBlueprintPasted() {
+		this.#refreshBlueprints();
+	}
+
+	#onBlueprintCancelled() {
+		this.#refreshBlueprints();
+	}
+
+	#onGameSaved() {
+		SdkClient.sendMessage(T.ingame.notifications.gameSaved, true);
+	}
+
+	#onGameExit() {
+		ActionsCollection.deactivateActions(["pause"]);
 	}
 }

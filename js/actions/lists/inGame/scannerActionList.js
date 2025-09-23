@@ -27,9 +27,9 @@ export class ScannerActionList {
 		const limits = ViewScanner.getVisibleLimits();
 		const options = {
 			[this.xPos]:
-			new NumberSchema(this.xPos, 1, limits.x, limits.x + limits.w - 1),
+			new NumberSchema(this.xPos, limits.x, limits.x + limits.w - 1),
 			[this.yPos]:
-			new NumberSchema(this.yPos, 1, limits.y, limits.y + limits.h - 1),
+			new NumberSchema(this.yPos, limits.y, limits.y + limits.h - 1),
 		};
 		return this.#mapOptions(options);
 	}

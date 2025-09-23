@@ -13,6 +13,7 @@ export class PinnedActions extends BaseActions {
 		super(PinnedActionsList.actions);
 		super.addCallables(new Map([
 			[PinnedActionsList.goal, () => { return this.#describeGoalShape()}],
+			[PinnedActionsList.blueprint, () => { return this.#describeBlueprintShape()}],
 			[PinnedActionsList.pinned, () => { return this.#describePinnedShapes()}],
 			[PinnedActionsList.shapeInfo, (e) => { return this.#tryFullyDescribeShape(e)}],
 			[PinnedActionsList.unpinShape, (e) => { return this.#tryUnpinShape(e)}],
@@ -39,12 +40,22 @@ export class PinnedActions extends BaseActions {
 				actions.push(PinnedActionsList.pinned);
 			actions.push(PinnedActionsList.unpinShape);
 		}
+
+		if (compile.blueprint != "") {
+			actions.push(PinnedActionsList.blueprint);
+		}
+
 		super.activate(actions);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#describeGoalShape() {
 		return this.#shapesPinner.describeGoalShape();
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	#describeBlueprintShape() {
+		return this.#shapesPinner.describeBlueprintShape();
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
