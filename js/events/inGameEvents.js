@@ -13,6 +13,8 @@ import { waitNextFrame } from "shapez/core/utils";
 import { HUDBlueprintPlacer } from "shapez/game/hud/parts/blueprint_placer";
 import { STOP_PROPAGATION } from "shapez/core/signal";
 import { InGameState } from "shapez/states/ingame";
+import { SdkClient } from "../sdkClient";
+import { T } from "shapez/translations";
 
 const ZOOM_TOLERANCE = 1;
 const MOVE_TOLERANCE = 3;
@@ -87,6 +89,7 @@ export class InGameEvents {
 		root.hud.signals.shapePinRequested.add(this.#refreshPins, this);
 		root.hud.signals.buildingsSelectedForCopy.add(this.#onBlueprintCreated, this);
 		root.hud.signals.pasteBlueprintRequested.add(this.#onBlueprintPasted, this);
+		root.signals.gameSaved.add(this.#onGameSaved, this);
 		OverlayEvents.OVERLAYS_CLOSED.add("event_overs_closed", () => { this.#onDialogClosed(); });
 		this.#waitTime = 0;
 		this.#moving = false;
@@ -226,6 +229,10 @@ export class InGameEvents {
 
 	#onBlueprintCancelled() {
 		this.#refreshBlueprints();
+	}
+
+	#onGameSaved() {
+		SdkClient.sendMessage(T.ingame.notifications.gameSaved, true);
 	}
 
 	#onGameExit() {
