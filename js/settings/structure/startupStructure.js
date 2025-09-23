@@ -22,21 +22,21 @@ export class StartupStructure {
 		startupSettngs.addAutoConnectToogle(new ToggleSetting (
 			mod, menu,
 			"Auto connect to player",
-			"Attempts to connect to the player when launching the game",
+			"Attempts to connect to the player when launching the game and every time you go to the main menu.",
 			"sdkPlayerAutoConnect"
 		));
 
 		startupSettngs.addPlayerChooseMapToggle(new ToggleSetting (
 			mod, menu,
 			"Player can choose map",
-			"Allows the player to start a map. This can be limited to certain maps.",
+			"Allows the player to start a map. This can be limited to a certain map.",
 			"sdkPlayerChooseMap"
 		));
 
 		startupSettngs.addForceOpenMapToggle(new ToggleSetting (
 			mod, menu,
 			"Force open map",
-			"Opens a map when entering the main menu. This can be limited to certain maps.",
+			"Opens a map when entering the main menu. This can be limited to a certain map.",
 			"sdkForceOpenMap"
 		));
 
