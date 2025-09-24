@@ -2,14 +2,21 @@ import { globalConfig } from "shapez/core/config";
 import { MapChunkAggregate } from "shapez/game/map_chunk_aggregate";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { ModSettings } from "../modSettings";
+import { RandomUtils } from "../custom/randomUtils";
 
 export class CoordsGrid {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
 
 	/** @param {import("shapez/mods/mod").Mod} mod */
 	constructor(mod) {
 		this.#mod = mod;
 		this.#asignDrawFunction();
+	}
+
+	/** @param {import("shapez/game/root").GameRoot} */ root;
+	updateRoot(root) {
+		this.#root = root;
 	}
 
 	#asignDrawFunction() {
@@ -103,19 +110,22 @@ export class CoordsGrid {
 		const chunkWidth = chunk.worldSpaceRectangle.w / chunk.tileSpaceRectangle.w;
 		const chunkHeight = chunk.worldSpaceRectangle.h / chunk.tileSpaceRectangle.h;
 		const context = this.#contextMapGridFont(parameters);
+		let size = 10;
+		if (this.#root != null)
+			size = this.#root.camera.zoomLevel * 7;
 
 		context.fillText(
 			`x: ${chunk.tileX}`,
 			chunk.worldSpaceRectangle.x,
-			chunk.worldSpaceRectangle.y + (chunkHeight / 2),
-			chunkWidth * 5
+			chunk.worldSpaceRectangle.y + (chunkHeight),
+			chunkWidth * 20
 		);
 
 		context.fillText(
 			`y: ${chunk.tileY}`,
 			chunk.worldSpaceRectangle.x,
-			chunk.worldSpaceRectangle.y + chunkHeight + (chunkHeight / 3),
-			chunkWidth * 5
+			chunk.worldSpaceRectangle.y + chunkHeight + (chunkHeight * 2) / size,
+			chunkWidth * 20
 		);
 	}
 
@@ -137,8 +147,12 @@ export class CoordsGrid {
 	 * */
 	#contextMapGridFont(parameters) {
 		const context = parameters.context;
+		let size = 20;
+		if (this.#root != null)
+			size = 10 / this.#root.camera.zoomLevel;
+
 		context.fillStyle = "rgba(58, 193, 177, 1)";
-		context.font = "18px GameFont";
+		context.font = `${size}px GameFont`;
 
 		return context;
 	}
