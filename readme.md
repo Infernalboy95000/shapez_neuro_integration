@@ -9,6 +9,7 @@ This tool allows any client (player) that supports the [neuro SDK](https://githu
 
 This mod gives to the player:
 - The option to play a map chosen by you in settings (even a new one), or any of the available.
+	- There's also a way to force open a map, if you don't trust your player.
 - The ability to respond to all dialogs that can happen.
 	- *rename map, delete map and language menu are excluded.*
 - Every action a human player can do inside a map (Includes end game)
@@ -22,10 +23,20 @@ This mod gives to the player:
 - A visual grid that shows every coordinate of the grid.
 	- *Only usefull for debug or with visual data as input.*
 
+> [!NOTE]
+> The player has no access to the settings menu. This is your safe menu for when you want to be sure the player does nothing.
+
+## What's missing?
+
+- The text descriptior of the signal layer
+- Some way to cancel the "force play map"
+- Context upgrades. Maybe even an option to automatically refresh the buildings context every few seconds.
+- Lots of testing
+
 ## How to install?
 
 > [!WARNING]
-> Mods in shapez can only be installed in the full version of steam
+> Mods in shapez can only be installed in the full version of steam.
 
 1. Download the latest file in the releases menu
 2. Move the .js file to your shapez mod folder

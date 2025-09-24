@@ -47,19 +47,19 @@ export class ShapeCode {
 		sameShapes.forEach((positions) => {
 			const pos = positions[0];
 			if (positions.length == 1) {
-				msg += `${this.#corners[pos]} quarter ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape}`;
+				msg += `${this.#corners[pos]} quarter ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape.toLowerCase()}`;
 			}
 			else if (positions.length == 2) {
 				if (positions[0] % 2 == positions[1] % 2)
-					msg += `mirrored quarters ${this.#corners[positions[0]]} and ${this.#corners[positions[1]]} ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape}`;
+					msg += `mirrored quarters ${this.#corners[positions[0]]} and ${this.#corners[positions[1]]} ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape.toLowerCase()}`;
 				else
-					msg += `${this.#halfs[pos]} half ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape}`;
+					msg += `${this.#halfs[pos]} half ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape.toLowerCase()}`;
 			}
 			else if (positions.length == 3) {
-				msg += `three quarters ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape} missing ${this.#quarters[pos]}`;
+				msg += `three quarters ${ColorCodes.describe(layer[pos].color)} ${layer[pos].subShape.toLowerCase()} missing ${this.#quarters[pos]}`;
 			}
 			else {
-				msg += `${ColorCodes.describe(layer[0].color)} ${layer[0].subShape}`;
+				msg += `${ColorCodes.describe(layer[0].color)} ${layer[0].subShape.toLowerCase()}`;
 			}
 			current += 1;
 			if (current < sameShapes.size)

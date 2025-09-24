@@ -10,6 +10,7 @@ export class ScannerActions extends BaseActions {
 	/** @type {import("shapez/game/root").GameRoot} */ #root;
 	/** @type {PatchScanner} */ #patchScanner;
 	/** @type {BuildingScanner} */ #buildsScanner;
+	/** @type {boolean} */ #overview = false;
 
 	/** @param {import("shapez/game/root").GameRoot} root */
 	constructor(root) {
@@ -31,23 +32,39 @@ export class ScannerActions extends BaseActions {
 		super.setOptions(options);
 		super.activate();
 
+		let msg = "";
+		if (!this.#overview && this.#root.camera.getIsMapOverlayActive()) {
+			msg += `Entered overview mode. You cannot build and text descriptions are a lot simpler. ` +
+			`Zoom closer if you wish to enable those actions again.`
+			this.#overview = true;
+		}
+
+		if (this.#overview && !this.#root.camera.getIsMapOverlayActive()) {
+			msg += `Exited overview mode. All functions are available again.`
+			this.#overview = false;
+		}
+
 		if (
 			ModSettings.get(ModSettings.KEYS.descriptiveActions) &&
 			TutorialChecks.scanned && TutorialChecks.buildingScanned
 		)
 		{
-			SdkClient.sendMessage(
-				`Auto scanning visible zone:\n` +
-				`Terrain information: ${this.#scanTerrain().msg}` +
-				`Buildings information: ${this.#scanBuildings().msg}`, true
-			)
+			msg += `Auto scanning visible zone:\n` +
+				`Terrain information:${this.#scanTerrain().msg}\n` +
+				`Buildings information:${this.#scanBuildings().msg}`;
 		}
+
+		if (msg != "")
+			SdkClient.sendMessage(msg, true);
 	}
 
 	/** @returns {{valid:boolean, msg:string}} */
 	#scanTerrain() {
 		TutorialChecks.scanned = true;
-		return this.#patchScanner.scanInView();
+		if (this.#root.camera.getIsMapOverlayActive())
+			return this.#patchScanner.scanInOverview();
+		else
+			return this.#patchScanner.scanInView();
 	}
 
 	/**
@@ -64,6 +81,9 @@ export class ScannerActions extends BaseActions {
 	/** @returns {{valid:boolean, msg:string}} */
 	#scanBuildings() {
 		TutorialChecks.buildingScanned = true;
-		return this.#buildsScanner.scanInView();
+		if (this.#root.camera.getIsMapOverlayActive())
+			return this.#buildsScanner.scanInOverview();
+		else
+			return this.#buildsScanner.scanInView();
 	}
 }
