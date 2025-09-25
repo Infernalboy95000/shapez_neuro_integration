@@ -19,8 +19,9 @@ export class ActionsController {
 		this.#mod = mod;
 		this.#MainMenuMode = new MainMenuMode(mod);
 		this.#SettingsMode = new SettingsMode(mod);
-		SdkClient.connected.add("actCtrCon", () => { this.#onPlayerConnected()});
-		SdkClient.action.add("actCtrAct", (e) => { this.#onPlayerAction(e)});
+		SdkClient.disconnected.add("actDisconnect", () => { this.#onPlayerDisconnected(); })
+		SdkClient.connected.add("actCtrCon", () => { this.#onPlayerConnected(); });
+		SdkClient.action.add("actCtrAct", (e) => { this.#onPlayerAction(e); });
 	}
 
 	notifyStateChange(state) {
@@ -59,6 +60,10 @@ export class ActionsController {
 					this.#InGameMode.gameClosed();
 				break;
 		}
+	}
+
+	#onPlayerDisconnected() {
+		ActionsCollection.deactivateAllActive();
 	}
 
 	#onPlayerConnected() {
