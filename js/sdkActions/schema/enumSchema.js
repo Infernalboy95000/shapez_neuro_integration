@@ -32,7 +32,7 @@ export class EnumSchema extends SchemaBase {
 	check(data) {
 		const result = {valid: false, msg:""};
 		
-		if (!data.params[this.getName()]) {
+		if (data.params[this.getName()] == undefined) {
 			result.msg = `Missing parameter "${this.getName()}"`;
 			return result;
 		}

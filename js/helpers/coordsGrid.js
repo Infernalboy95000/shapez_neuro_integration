@@ -2,7 +2,6 @@ import { globalConfig } from "shapez/core/config";
 import { MapChunkAggregate } from "shapez/game/map_chunk_aggregate";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { ModSettings } from "../modSettings";
-import { RandomUtils } from "../custom/randomUtils";
 
 export class CoordsGrid {
 	/** @type {import("shapez/mods/mod").Mod} */ #mod;
