@@ -21,7 +21,7 @@ export class ModSettings {
 
 	static #defaultValues = {
 		// connection //
-		[this.KEYS.hideURL]: true,
+		[this.KEYS.hideURL]: false,
 		[this.KEYS.socketURL]: "localhost:8000",
 		// context //
 		[this.KEYS.coordsGrid]: false,

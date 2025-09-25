@@ -11,7 +11,7 @@
 		"socketURL": "localhost:8000",
 		"coordsGrid": false,
 		"autoConnect": false,
-		"hideURL": true,
+		"hideURL": false,
 		"playerChooseMap": false,
 		"forceOpenMap": false,
 		"descriptiveActions": true,
