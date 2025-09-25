@@ -1,0 +1,167 @@
+input[type=password] {
+    padding: calc(11px*var(--ui-scale)) calc(12px*var(--ui-scale));
+    margin: calc(10px*var(--ui-scale)) calc(0px*var(--ui-scale));
+    border: 0;
+    cursor: text;
+    display: block;
+    box-sizing: border-box;
+    background: #f7f8fa;
+    color: #eee;
+    text-align: left;
+    -webkit-user-select: text!important;
+    -moz-user-select: text!important;
+    -ms-user-select: text!important;
+    user-select: text!important;
+    pointer-events: all!important;
+    font-size: calc(16px*var(--ui-scale));
+    line-height: calc(21px*var(--ui-scale));
+    font-weight: 400;
+    font-family: GameFont,sans-serif;
+    letter-spacing: .01em;
+    border-radius: calc(6px*var(--ui-scale));
+    transition: background-color .1s ease-in-out!important;
+    color: #fff;
+    background-color: #fff;
+}
+
+#state_SettingsState input.input-text,
+#state_SettingsState input.input-password {
+	background-color: #eee;
+	color: #333438;
+	padding-top: calc(2px*var(--ui-scale));
+	padding-bottom: calc(2px*var(--ui-scale));
+	padding-left: calc(5px*var(--ui-scale));
+	padding-right: calc(5px*var(--ui-scale));
+	margin: 0px 0px 0px 10px;
+	font-size: calc(11px*var(--ui-scale));
+}
+
+#state_SettingsState input.errored {
+	background-color: #facece;
+}
+
+#state_SettingsState .container .content .categoryContainer .category .title:not(.first) {
+	margin-top: calc(10px*var(--ui-scale));
+}
+
+#state_SettingsState .container .content .categoryContainer .category .title {
+	background-color:rgb(223, 225, 236);
+}
+
+html[data-theme=dark]
+#state_SettingsState .container .content .categoryContainer .category .title {
+	background-color:rgb(46, 49, 56);
+}
+
+#state_SettingsState .title>.row>label {
+	color:rgb(11, 135, 144);
+}
+
+html[data-theme=dark]
+#state_SettingsState .title>.row>label {
+	color:rgb(135, 249, 255);
+}
+
+#state_SettingsState button.settings.button.styledButton.good,
+#state_MainMenuState .sdkStatusDisplay button.settings.button.styledButton.good {
+	background-color: rgb(102, 187, 106);
+}
+
+#state_SettingsState button.settings.button.styledButton.maybe,
+#state_MainMenuState .sdkStatusDisplay button.settings.button.styledButton.maybe {
+	background-color: rgb(215, 210, 111);
+}
+
+#state_SettingsState button.settings.button.styledButton.bad,
+#state_MainMenuState .sdkStatusDisplay button.settings.button.styledButton.bad {
+	background-color: rgb(239, 80, 114);
+}
+
+#state_MainMenuState .sideContainer .sdkStatusDisplay {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	background: #fff;
+	grid-row: 1/2;
+	position: relative;
+	text-align: left;
+	align-items: flex-start;
+	width: calc(250px *var(--ui-scale));
+	padding: calc(15px *var(--ui-scale));
+	padding-bottom: calc(10px *var(--ui-scale));
+	border-radius: calc(6px *var(--ui-scale));
+	box-shadow: 0 calc(5px*var(--ui-scale)) calc(15px *var(--ui-scale)) rgba(0,0,0,.2);
+}
+
+html[data-theme=dark]
+#state_MainMenuState .sideContainer .sdkStatusDisplay {
+	background: #484c58;
+}
+
+#state_MainMenuState .sideContainer .sdkStatusDisplay .header {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	text-transform: uppercase;
+	margin-bottom: calc(10px*var(--ui-scale));
+}
+
+#state_MainMenuState .sideContainer .sdkStatusDisplay h3 {
+	font-size: calc(19px*var(--ui-scale));
+	line-height: calc(21px*var(--ui-scale));
+	font-weight: 400;
+	font-family: GameFont,sans-serif;
+	letter-spacing: .01em;
+	color:#d63ce4;
+	margin: 0;
+}
+
+#state_MainMenuState .sdkStatusDisplay input.input-text,
+#state_MainMenuState .sdkStatusDisplay input.input-password {
+	background-color: #eee;
+	color: #333438;
+	padding-top: calc(2px*var(--ui-scale));
+	padding-bottom: calc(2px*var(--ui-scale));
+	padding-left: calc(5px*var(--ui-scale));
+	padding-right: calc(5px*var(--ui-scale));
+	margin: 0px 0px 0px 10px;
+	width: 180px;
+	font-size: calc(11px*var(--ui-scale));
+}
+
+#state_MainMenuState #sdkInputParent {
+	display: flex;
+	align-items: center;
+	width: inherit;
+	justify-content: flex-start;
+	color: #555;
+}
+
+html[data-theme=dark]
+#state_MainMenuState #sdkInputParent {
+	color: #e1e4ed;
+}
+
+#state_MainMenuState #sdkInputContainer {
+	display: flex;
+	align-items: center;
+	width: inherit;
+	justify-content: space-between;
+}
+
+#sdk_client_status_display {
+	margin-bottom: 7px;
+}
+
+#sdk_client_status_display.connected {
+	color: rgb(102, 187, 106);
+}
+
+#sdk_client_status_display.attempting {
+	color: rgb(215, 210, 111);
+}
+
+#sdk_client_status_display.error {
+	color: rgb(239, 80, 114);
+}

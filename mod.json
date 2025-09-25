@@ -1,11 +1,22 @@
 {
-    "entry": "main.js",
-    "id": "neuro_integration",
-    "version": "0.0.1",
-    "name": "Shapez Neuro Integration",
-    "author": "Infernal_Ekoro",
-    "description": "Let's Neuro and Evil play Shapez on their own",
-    "website": "",
-    "settings": { "timesLaunched": 0 },
-	"doesNotAffectSavegame": true
+	"entry": "main.js",
+	"id": "neuro_integration",
+	"version": "0.1.0",
+	"name": "Shapez Neuro Integration",
+	"author": "Infernal_Ekoro",
+	"description": "Let's any player compatible with the neuroSDK play Shapez on their own",
+	"website": "",
+	"doesNotAffectSavegame": true,
+	"settings": {
+		"socketURL": "localhost:8000",
+		"coordsGrid": false,
+		"autoConnect": false,
+		"hideURL": false,
+		"playerChooseMap": false,
+		"forceOpenMap": false,
+		"descriptiveActions": true,
+		"forcedMapTime": 5,
+		"mapAvailable" : "any_map",
+		"waitAfterHumanTime": 5
+	}
 }

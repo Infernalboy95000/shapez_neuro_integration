@@ -1,0 +1,90 @@
+import { SdkClient } from "../sdkClient";
+import { PlacementActions } from "../actions/inGame/placementActions";
+import { DeletionActions } from "../actions/inGame/deletionActions";
+import { ScannerActions } from "../actions/inGame/scannerActions";
+import { CameraActions } from "../actions/inGame/cameraActions";
+import { PinnedActions } from "../actions/inGame/pinnedActions";
+import { ToolbeltActions } from "../actions/inGame/toolbeltActions";
+import { TutorialChecks } from "../helpers/tutorialChecks";
+import { OverlaysActions } from "../actions/inGame/overlaysActions";
+import { InGameState } from "shapez/states/ingame";
+import { UpgradesActions } from "../actions/overlay/upgradesActions";
+import { ActionsCollection } from "../actions/base/actionsCollection";
+import { ShapeInfoActions } from "../actions/overlay/shapeInfoActions";
+import { StatisticsActions } from "../actions/overlay/statisticsActions";
+import { LevelRewardActions } from "../actions/overlay/levelRewardActions";
+import { PauseMenuActions } from "../actions/overlay/pauseMenuActions";
+import { MassDeleteActions } from "../actions/inGame/massDeleteActions";
+import { DialogEvents } from "../events/dialogEvents";
+import { OverlayEvents } from "../events/overlayEvents";
+import { MarkerActions } from "../actions/inGame/markerActions";
+import { BlueprintActions } from "../actions/inGame/blueprintActions";
+
+export class InGameMode {
+	/** @type {import("../main").NeuroIntegration} */ #mod;
+	/** @type {import("shapez/game/root").GameRoot} */ #root;
+
+	/**
+	 * @param {import("../main").NeuroIntegration} mod
+	 * @param {import("shapez/game/root").GameRoot} root
+	 */
+	constructor(mod, root) {
+		this.#mod = mod;
+		this.#root = root;
+	}
+
+	/** @param {InGameState} state */
+	gameOpenned(state) {
+		if (SdkClient.isConnected()) {
+			if (this.#root.hubGoals.level > 1) {
+				TutorialChecks.scanned = true;
+				TutorialChecks.deepScanned = true;
+				TutorialChecks.buildingScanned = true;
+			}
+
+			this.#declareActions(state);
+			this.#announceOpening();
+			ActionsCollection.activateActions([
+				"build", "delete", "massDelete", "scan", "camera", "pin",
+				"marker", "tools", "overlay", "blueprint"
+			])
+		}
+	}
+
+	gameClosed() {
+		TutorialChecks.scanned = false;
+		TutorialChecks.deepScanned = false;
+		TutorialChecks.buildingScanned = false;
+		ActionsCollection.deactivateActions([
+			"build", "delete", "massDelete", "scan", "camera", "pin", "marker",
+			"tools", "overlay", "shop", "shape", "stats", "reward", "pause", "blueprint"
+		], true);
+		DialogEvents.DIALOG_CLOSED.remove("overlayDialog");
+		OverlayEvents.OVERLAYS_CLOSED.remove("event_overs_closed");
+	}
+
+	/** @param {InGameState} state */
+	#declareActions(state) {
+		const actions = new Map();
+		actions.set("build", new PlacementActions(this.#root));
+		actions.set("delete", new DeletionActions(this.#root));
+		actions.set("massDelete", new MassDeleteActions(this.#root));
+		actions.set("scan", new ScannerActions(this.#root));
+		actions.set("camera", new CameraActions(this.#root));
+		actions.set("pin", new PinnedActions(this.#root));
+		actions.set("marker", new MarkerActions(this.#root));
+		actions.set("tools", new ToolbeltActions(this.#root));
+		actions.set("overlay", new OverlaysActions(this.#root, state));
+		actions.set("shop", new UpgradesActions(this.#root));
+		actions.set("shape", new ShapeInfoActions(this.#root));
+		actions.set("stats", new StatisticsActions(this.#root));
+		actions.set("reward", new LevelRewardActions(this.#root));
+		actions.set("pause", new PauseMenuActions(this.#root));
+		actions.set("blueprint", new BlueprintActions(this.#root));
+		ActionsCollection.addActions(actions);
+	}
+
+	#announceOpening() {
+		SdkClient.sendMessage("A map has loaded. Now you can play the game!", true);
+	}
+}
