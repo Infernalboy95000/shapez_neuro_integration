@@ -1,5 +1,4 @@
 import { Vector } from "shapez/core/vector";
-import { RandomUtils } from "../../../custom/randomUtils";
 import { BaseItem } from "shapez/game/base_item";
 import { MapChunkView } from "shapez/game/map_chunk_view";
 import { SignalDescriptor } from "../signals/signalDescriptor";
@@ -10,7 +9,7 @@ export class SimplePatchDescriptor {
 	 * @param {{pos: Vector; item: BaseItem; size: number}} patch
 	 * @returns {string}
 	 * */
-	static describe(chunk, patch) {
+	static describe(chunk, patch, exact = true) {
 		let msg = "";
 		const patchPos = new Vector(chunk.tileX, chunk.tileY);
 		patchPos.x = Math.floor(patchPos.x + patch.pos.x);
@@ -20,19 +19,22 @@ export class SimplePatchDescriptor {
 
 		switch (patchType) {
 			case "shape":
-				msg = `${description} shape patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
+				msg = `${description} shape patch`;
+				if (exact)
+					msg += ` found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 			case "color":
-				msg = `${description} color patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
+				msg = `${description} color patch`;
+				if (exact)
+					msg += ` found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 			default:
-				msg = `unknown patch ` +
-				`found at x: ${patchPos.x}, y: ${patchPos.y}.`;
+				msg = `unknown patch`;
+				if (exact)
+					msg += ` found at x: ${patchPos.x}, y: ${patchPos.y}.`;
 				break;
 		}
 
-		return RandomUtils.capitalizeFirst(msg);
+		return msg;
 	}
 }

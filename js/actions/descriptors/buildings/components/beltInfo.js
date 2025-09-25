@@ -86,7 +86,7 @@ export class BeltInfo {
 		let origin = path[0].components.StaticMapEntity.origin;
 		const dir = path[0].components.StaticMapEntity.originalRotation;
 		const dirName = RotationCodes.getRotationName(dir);
-		log.msg = `Belt line starting it's path at: ` +
+		log.msg = `Found belt line starting it's path at: ` +
 		`x: ${origin.x}, y: ${origin.y} facing ${dirName}.`;
 
 		let lastDirection = path[0].components.StaticMapEntity.originalRotation;

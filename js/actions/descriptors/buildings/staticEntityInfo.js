@@ -46,11 +46,11 @@ export class StaticEntityInfo {
 	static simple(staticEntity) {
 		let msg = "";
 
-		const entitiyName = staticEntity.getMetaBuilding().getId();
+		const entityName = staticEntity.getMetaBuilding().getId();
 		const variant = staticEntity.getVariant();
-		/** @type {string} */ const buildName = T.buildings[entitiyName][variant].name;
+		/** @type {string} */ const buildName = T.buildings[entityName][variant].name;
 
-		if (entitiyName == "hub")
+		if (entityName == "hub")
 			msg += "the";
 		else if (buildName.search(/^[aeiou]/gi) > -1)
 			msg += "an";

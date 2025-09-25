@@ -20,16 +20,49 @@ export class PatchScanner {
 			for (let i = 0; i < chunk.patches.length; i++) {
 				result.valid = true;
 				result.msg += SimplePatchDescriptor.describe(chunk, chunk.patches[i]);
-				if (i + 1 < chunk.patches.length) {
-					result.msg += "\r\n";
-				}
+				if (i + 1 < chunk.patches.length)
+					result.msg += "\n";
 			};
-			result.msg += "\r\n";
+			if (chunk.patches.length > 0)
+				result.msg += "\n";
 		});
 
-		if (!result.valid) {
+		if (!result.valid)
 			result.msg = "No patches found here. Try moving somewhere else.";
-		}
+		else
+			result.msg += "\n";
+		return result;
+	}
+
+	/** @returns {{valid:boolean, msg:string}} */
+	scanInOverview() {
+		const result = {valid: false, msg: ""};
+		const chunks = ViewScanner.getVisibleChunks();
+
+		chunks.forEach((chunk) => {
+			let scans = 0;
+			if (chunk.patches.length > 0)
+				result.msg += `\nFound `;
+
+			for (let i = 0; i < chunk.patches.length; i++) {
+				result.valid = true;
+				result.msg += SimplePatchDescriptor.describe(chunk, chunk.patches[i], false);
+
+				scans += 1;
+				if (chunk.patches.length > 1 && scans + 1 == chunk.patches.length)
+					result.msg += ` and `;
+				else if (scans < chunk.patches.length)
+					result.msg += `, `;
+				else
+					result.msg += ` arround x: ${chunk.tileX}, ${chunk.tileY}.`;
+			};
+		});
+
+		if (!result.valid)
+			result.msg = "No patches found here. Try moving somewhere else.";
+		else
+			result.msg += "\n";
+
 		return result;
 	}
 

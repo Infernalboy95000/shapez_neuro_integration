@@ -26,6 +26,7 @@ export class NeuroIntegration extends Mod {
 
 		this.signals.gameStarted.add(root => {
 			ViewScanner.asignRoot(root);
+			this.#coordsGrid.updateRoot(root);
 			this.#actionsController.newGameOpenned(root);
 			this.#eventsController.updateRoot(root);
 			this.#tutorialMessager.notifyGameOpenned();

@@ -27,7 +27,7 @@ export class ComponentsInfo {
 					return result;
 				}
 				if (response.msg != "") {
-					result.msg += `${response.msg}\n`;
+					result.msg += `${response.msg}`;
 				}
 				for (let i = 0; i < response.describedIDs.length; i++) {
 					result.describedIDs.push(response.describedIDs[i]);

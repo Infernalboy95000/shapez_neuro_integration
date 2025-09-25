@@ -11,7 +11,7 @@ export class BuildingDescriptor {
 	static describe(root, entity, force = false) {
 		const response = {msg:"", describedIDs:[entity.uid], skipped:[]};
 		response.msg += `${StaticEntityInfo.describe(root, entity.components).msg}`;
-		if (response.msg != "") { response.msg += "\n"; }
+		//if (response.msg != "") { response.msg += "\n"; }
 		const description = ComponentsInfo.describe(entity, force);
 		if (description.msg == "SKIP") {
 			response.msg = "SKIP";
